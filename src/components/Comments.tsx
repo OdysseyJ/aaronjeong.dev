@@ -1,6 +1,5 @@
 import { useColorMode } from "@chakra-ui/react";
 import { DiscussionEmbed } from "disqus-react";
-import { FC } from "react";
 
 type CommentsProps = {
   config: any

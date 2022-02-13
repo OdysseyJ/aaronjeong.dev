@@ -1,0 +1,41 @@
+---
+title: Postgresql 버전 업데이트시 데이터 마이그레이션
+date: 2022/1/12
+description: data migration on postgresql version update
+tags: [Dev, Postgresql]
+---
+## 개요
+
+- postgresql 11.X 버전에서 12.8버전으로의 업그레이드를 진행했다.
+
+- postgresql 11.X 버전에서 쓰던 데이터를 그대로 옮기고 싶다.
+
+### dump.sql파일 만들기
+
+- 도커를 쓴다면
+    <Callout >
+        docker compose exec [실행할컨테이너] pg_dumpall -U [유저이름] > dump.sql
+    </Callout>
+
+- 도커를 쓰지 않는다면(Homebrew...)
+    <Callout >
+        pg_dumpall -U [유저이름] > dump.sql
+    </Callout>
+
+- 만약 volume을 지정하고 사용하고 있었다면, 해당 볼륨 데이터는 지워줘도 된다.
+    <Callout >
+        sudo rm -rf [/path/to/volumes]
+    </Callout>
+
+### dump.sql파일 다시 새 버전의 postgresql에 넣어주기.
+
+(dump.sql이 있는 경로에서 실행하자)
+
+- 도커를 쓴다면
+    ```shell
+        docker compose exec [컨테이너] psql -U [유저] -d [데이터베이스] < ./dump.sql
+    ```
+- 도커를 쓰지 않는다면(Homebrew...)
+    ```shell
+        psql -U [유저] -d [데이터베이스] < ./dump.sql
+    ```

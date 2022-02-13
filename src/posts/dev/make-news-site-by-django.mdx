@@ -1,0 +1,65 @@
+---
+title: Django를 Django답게. Django로 뉴스 사이트 만들기.
+date: 2022/1/23
+description: PyCon - django queryset structure and optimization
+tags: [Dev, Database, Django, ORM]
+---
+
+해당 영상을 보고 공부한 내용을 정리한 글입니다. 해당 내용을 작성해주신 정경업님, pycon korea에 굉장히 깊은 감사를 표합니다.
+
+https://www.youtube.com/watch?v=SbIQuDKmig0
+
+### Custom Manager 정의하기
+
+- live_objects를 정의해 배포 상태의 기사만 가져올 수 있다. objects는 어드민에서
+  사용되므로 유지한다.
+    ```python
+    def live_q():
+        q = Q(published__lte=timezone.now()) | Q(published__isnull=True)
+        return q & Q(active=True)
+
+    class LiveManager(models.Manager):
+        def get_queryset(self):
+            return super().get_queryset().filter(live_q())
+
+    class Article(TimeStampledModel):
+        # managers
+        live_objects = LiveManager()
+        objects = models.Manager()
+    ```
+
+### TestCode 작성
+- testcode
+    ```python
+    class TestArticleModels(TestCase):
+        def test_live(self):
+            # 모델 인스턴스 목 생성
+            baker.make(Article, active=True)
+            baker.make(Article, active=False)
+
+            # 배포 기사는 1개인 것을 Test로 검증한다.
+            self.assertEqual(Article.objects.count(), 2)
+            self.assertEqual(Article.live_objects.count(), 1)
+    ```
+
+## Signal로 기사 번호 만들기
+- 두 사이트의 기사 숫자가 차이가 나고, 기존 데이터를 가져올 때 옮겨오기 쉽게 하려고
+  number를 따로 만든다.
+    ```python
+    @receiver(post_save, sender=Article)
+    def article_auto_number(sender, instance, created, **kwargs):
+        if not created:
+            return
+        if instance.number > 0:
+            return
+        queryset = sender.objects.filter(site=instance.site)
+        max_number = queryset.aggregate(Max("number"))["number__max"]
+        queryset.filter(id=instance.id).update(number=max_number + 1)
+    ```
+
+## 요약
+ - docker-compose로 개발 환경 설정
+ - CBV (class based view)로 코드 재활용
+ - Test 코드로 검증
+ - Sites, Cache, SearchVector, Admin등의 장고 기본 기능 사용
+

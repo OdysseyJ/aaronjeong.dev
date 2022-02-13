@@ -1,0 +1,294 @@
+---
+title: 자파(Zappa)로 파이썬 프로젝트 lambda에 배포하기
+date: 2022/1/14
+description: deploy python proejects to lambda with zappa
+tags: [Dev, Database]
+---
+https://github.com/zappa/Zappa
+
+## 자파(Zappa)란?
+
+- 자파는 AWS를 클라우드로 사용하며, Lambda + API gateway를 이용해 python api서버를
+  굉장히 손쉽게 배포할 수 있도록 도와주는 패키지다.
+
+- 자파는 항상 virtualenv 내부에서만 동작하기 때문에, virtualenv에 대한 이해가
+  필수적이다.
+
+## Install and Configuration
+
+- Zappa를 사용하려면 Python 3.6/3.7/3.8 버전을 사용해야 한다. (곧 3.9도 공식 지원 예정)
+
+- Zappa는 항상 virtualenv내부에서 작동해야 하며, pip를 통해 원하는 환경 내부에 설치하면
+  된다.
+    ```shell
+    pip install zappa
+    ```
+
+- Zappa는 굉장히 간단한 세팅 방식을 사용한다. 해당 명령어를 입력하면 프로젝트에
+  zappa_settings.json 파일이 생성된다.
+    ```shell
+    zappa init
+
+    >>>
+
+    zappa_settings.json 파일 생성됨
+    ```
+    ```json
+    {
+        "dev": { // The name of your stage
+           "s3_bucket": "lambda", // The name of your S3 bucket
+           "django_settings": "your_project.settings" // The python path to your Django settings.
+        }
+    }
+    ```
+
+- Django를 위한 Zappa 세팅시 참고할만한 자료
+
+    > https://romandc.com/zappa-django-guide/
+
+## Zappa 기본 사용법
+
+### 첫 배포
+- zappa_settings.json에 입력한 환경 이름을 포함해 아래의 명령어를 입력한다.
+    ```shell
+    $ zappa deploy production
+    Deploying..
+    Your application is now live at: https://7k6anj0k99.execute-api.us-east-1.amazonaws.com/production
+    ```
+
+- 람다의 I AM role과 권한 설정을 하고 싶다면 아래의 문서를 참고하자.
+
+    > https://github.com/zappa/Zappa#custom-aws-iam-roles-and-policies-for-execution
+
+### 이후 배포
+- zappa가 이전에 배포된 적이 있다면, 해당 명령어를 통해 쉽게 업데이트가 가능하다.
+    ```shell
+    $ zappa update production
+    Updating..
+    Your application is now live at: https://7k6anj0k99.execute-api.us-east-1.amazonaws.com/production
+    ```
+
+- 해당 명령어를 실행하면, API Gateway 라우트는 변경하지 않고 S3에 업로드된 소스를 새롭게
+  변경한다.
+
+- 0.53.0 버전 이후로, 자파는 도커 이미지를 배포할 수 있는 기능을 제공한다. 관련 문서는
+    해당 글을 참고하자.
+
+    > https://ianwhitestone.work/zappa-serverless-docker/
+
+### 롤백
+- 해당 명령어를 통해 그 이전 배포들로 코드를 롤백할 수 있다.
+    ```shell
+    $ zappa rollback production -n 3
+    ```
+
+### 스케줄링
+
+- AWS Event Bridge를 이용해 Cron Job에 대해 zappa_settings.json에 정의한 대로 만들어 실행해 준다.
+    ```json
+    {
+        "production": {
+           ...
+           "events": [{
+               "function": "your_module.your_function", // The function to execute
+               "expression": "rate(1 minute)" // When to execute it (in cron or rate format)
+           }],
+           ...
+        }
+    }
+    ```
+
+    이후, 아래의 커맨드 실행
+
+    ```shell
+    $ zappa schedule production
+    ```
+
+    스케줄링을 취소하고 싶을 때
+
+    ```shell
+    $ zappa unschedule production
+    ```
+
+- 더 복잡한 스케줄링 관련 Syntax는 아래의 문서를 참고한다.
+
+    > https://docs.aws.amazon.com/lambda/latest/dg/services-cloudwatchevents-expressions.html
+
+### 배포 취소
+
+- 배포를 취소하고 싶으면 아래의 커맨드를 입력한다.
+    ```shell
+    $ zappa undeploy production (--remove-logs)
+    ```
+
+### 패키지
+
+- 람다 함수로 등록하거나 배포하지 않고 프로젝트를 패키징만 하고 싶을 때
+    ```shell
+    $ zappa package production -o my_awesome_package.zip
+    ```
+
+- 자파가 패키지를 만드는 방법
+    - 람다와 호환되는 로컬 캐쉬 휠 (Lambda-compatible manylinux wheels from a local
+      cache)
+    - 람다와 호환되는 pypi 휠 (Lambda-compatible manylinux wheels from PyPI)
+    - 현재 가상환경에 존재하는 모든 패키지 (Packages from the active virtual environment)
+    - 로컬 프로젝트 경로에 존재하는 모든 패키지 (Packages from the local project
+      directory)
+
+- exclude로 패키지 사이즈를 줄일 수 있다. (참고)
+
+    > https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html
+
+### Template
+
+- 패키지 명령어와 비슷하게, API Gateway Cloudfront template이 필요하다면
+    ```shell
+    $ zappa template production --l your-lambda-arn -r your-role-arn
+    ```
+
+### 상태
+
+- 현재 배포된 상태와 스케줄링된 이벤트들을 보고 싶을 때
+    ```shell
+    $ zappa status production
+    ```
+
+### 로그 추적
+
+- tail커맨드를 이용해 현재 생성되는 로그를 볼 수 있음
+    ```shell
+    $ zappa tail production
+    $ zappa tail production --http
+    $ zappa tail production --non-http
+    $ zappa tail production --since 4h # 4 hours
+    $ zappa tail production --since 1m # 1 minute
+    $ zappa tail production --since 1mm # 1 month
+    $ zappa tail production --since 1h --disable-keep-open
+    ```
+
+### 원격 함수 호출
+
+- 아래의 명령어를 입력해 원격으로 배포된 환경의 함수를 호출할 수 있다.
+    ```shell
+    $ zappa invoke production 'my_app.my_function'
+    ```
+
+- python 쉘에 직접 접근해 직접 호출할 수 있다.
+    ```
+    $ zappa invoke production "print(1 + 2 + 3)" --raw
+    ```
+
+### 장고 매니지먼트 커맨드
+
+- 장고 manage.py는 zappa manage를 호출하여 사용할 수 있다.
+    ```shell
+    $ zappa manage production showmigrations admin
+    ```
+
+- user input을 필요로 하는 커맨드는 `zappa invoke <env> --raw`를 사용하여 커맨드로
+  대체되어야 한다.
+
+    > https://stackoverflow.com/questions/6244382/how-to-automate-createsuperuser-on-django/26091252#26091252
+
+### SSL 인증
+
+- 자체 SSL 인증서를 가지고 custom domain을 가지게끔 배포될 수 있다.
+
+```shell
+$ zappa certify
+
+# 만약 ci/cd에서 사용한다면
+$ zappa certify --yes
+```
+
+## Zappa에서 response로 다른 서비스 호출하기
+
+### zappa_settings.json설정하기
+
+- zappa 에서 다른 aws 서비스를 호출하고자 할 때는, 스케줄링을 등록했던 방식과 유사하게
+  설정하면 된다.
+    ```json
+    {
+        "production": {
+           ...
+           "events": [{
+                "function": "your_module.process_upload_function",
+                "event_source": {
+                      "arn":  "arn:aws:s3:::my-bucket",
+                      "events": [
+                        "s3:ObjectCreated:*" // Supported event types: http://docs.aws.amazon.com/AmazonS3/latest/dev/NotificationHowTo.html#supported-notification-event-types
+                      ]
+                   }
+                }],
+           ...
+        }
+    }
+    ```
+
+    ```shell
+    $ zappa schedule production
+    ```
+
+- 더 자세한 내용은 아래의 문서를 참고한다.
+
+    > http://docs.aws.amazon.com/lambda/latest/dg/eventsources.html
+
+### 비동기 함수 지원
+
+- zappa.asynchronous.task 데코레이터를 사용한다.
+```python
+from flask import Flask
+from zappa.asynchronous import task
+app = Flask(__name__)
+
+@task
+def make_pie():
+    """ This takes a long time! """
+    ingredients = get_ingredients()
+    pie = bake(ingredients)
+    deliver(pie)
+
+@app.route('/api/order/pie')
+def order_pie():
+    """ This returns immediately! """
+    make_pie()
+    return "Your pie is being made!"
+```
+
+- 만약, zappa 이외의 환경에서 해당 코드를 실행하면 해당 코드는 해당 환경에서 즉시 실행된다.
+
+- Remote Invocation을 따로 지정해 줄 수 있다.
+
+    > https://github.com/zappa/zappa#remote-invocations
+
+### 비동기 함수 에러 핸들링
+
+- try/except block을 사용해 error 발생시 이메일로 디버깅을 하는 코드 (retry때문에 2회
+  불림)
+    ```python
+    @task
+    def make_pie():
+        try:
+            ingredients = get_ingredients()
+            pie = bake(ingredients)
+            deliver(pie)
+        except Fault as error:
+            """send an email"""
+        ...
+        return Response('Web services down', status=503)
+    ```
+
+- 1회만 불리게 하고 싶을 경우,
+    ```python
+    @task
+    def make_pie():
+        try:
+            """code block"""
+        except Fault as error:
+            """send an email"""
+        ...
+        return {} #or return True
+    ```
+
+더 자세한 설정에 대해서는 필요할 때 상세히 다루겠다.

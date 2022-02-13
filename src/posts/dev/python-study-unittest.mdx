@@ -1,0 +1,118 @@
+---
+title: Python 테스트 시작하기 - PyCon Korea 2015
+date: 2022/2/7
+description: study write python test and unittest
+tags: [Dev, Python, Unittest]
+---
+
+해당 영상을 보고 작성한 글입니다. 해당 영상을 준비해주신 이호성님께 감사드립니다.
+https://www.youtube.com/watch?v=hAUjItE42cY
+
+(파이썬 유닛테스트 공식 문서)
+https://docs.python.org/ko/3/library/unittest.html
+
+### setUp
+- 테스트 실행시 가장 먼저 실행
+
+### tearDown
+- 테스트가 끝난 후 실행
+
+### Subtest
+- 예시
+    ```python
+    import unittest
+
+    class NumberTest(unittest.TestCase):
+
+        def test_even(self):
+            for i in range(0, 6):
+                self.assertEqual(i % 2, 0)
+
+        def test_even_with_subtest(self):
+            for i in range(0, 6):
+                with self.subTest(i=i)
+                    self.assertEqual(i % 2, 0)
+    ```
+
+    ```
+    test_even -> 처음 하고 실패하면 종료
+    test_even_with_subtest -> 중단 되지 않고 모두 테스트
+    ```
+
+### 의존성이 있는 코드
+
+#### db 의존성이 있는 경우
+- 예시
+    ```python
+    def get_username(user_id):
+        user = db.user.query(user_id = user_id)
+        return user.name
+
+    def delete_user(user_id):
+        return db.user.delete(user_id = user_id)
+    ```
+
+    - DB가 있어야 테스트 할 수 있음
+    - DB에 테스트 전 데이터를 넣어 주어야 함
+    - CI 에서는 어떻게 실행 할까?
+
+### Mock 사용하기
+- thing.method를 monkey patch
+    ```python
+    from unittest.mock import MagicMock
+    >>> thing = ProductionClass()
+    >>> thing.method = MagicMock(return_value=3)
+    >>> thing.method(3, 4, 5, key='value')
+    3
+    >>> thing.method.assert_called_with(3, 4, 5, key='value')
+    ```
+
+- os.remove 를 mock_os.remove로 모킹하기. 이때 os.remove가 호출 되었는지는
+  확인했음(assert_called_with)
+    ```python
+    import os.path
+    import tempfile
+    import unittest
+    from unittest import mock
+
+    from Rm import rm
+
+    class RmTestCase(unittest.TestCase):
+
+        @mock.patch('Rm.os')
+        def test_rm(self, mock_os):
+            rm('/tmp/tmpfile')
+            mock_os_remove.assert_called_with('/tmp/tmpfile')
+
+    if __name__ == '__main__':
+        unittest.main()
+    ```
+
+- Mock의 대상이 되는 것
+    - 시간이 오래 걸리는 것
+    - 값이 변하는 것
+    - 상태가 유지 되는 것 (다른 테스트에 영향을 주는 것)
+    - 시스템 콜
+    - 네트워크로 연결된 것
+    - 준비하기 복잡한 것
+
+## Mock - 조건 확인
+- 예시
+    ```python
+    def rm(filename):
+        file_modified = datetime.datetime.fromtimestamp(os.path.getmtime(filename))
+        if datetime.datetime.now() - file_modified > datetime.timedelta(hours=24):
+            os.remove(filename)
+
+    class RmTestCase(unittest.TestCase):
+
+        @mock.patch('__main__.os')
+        def test_rm(self, mock_os):
+            mock_os.path.getmtime.return_valeu = time.time()
+            rm('/tmp/tmpfile')
+            self.assertFalse(mock_os.remove.called)
+
+            mock_os.path.getmtime.return_valeu = time.time() - 86400*2
+            rm('/tmp/tmpfile')
+            mock_os.remove.assert_called_with('/tmp/tempfile')
+    ```

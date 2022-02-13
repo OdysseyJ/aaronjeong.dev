@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 module.exports = {
+  images:{
+    domains: ['seongwoon-blog.s3.ap-northeast-2.amazonaws.com']
+  },
   env: {
     host: "https://aaronjeong.dev",
     github: "https://github.com/Odysseyj",

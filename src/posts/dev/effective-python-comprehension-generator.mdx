@@ -1,0 +1,534 @@
+---
+title: 파이썬 코딩의 기술 - 컴프리헨션과 제너레이터
+date: 2022/1/9
+description: study and note effective python 2nd edition - comprehension and generator
+tags: [Dev, Effective-Python]
+---
+
+### 컴프리헨션과 제너레이터
+
+#### map과 filter대신 컴프리헨션을 사용하라.
+
+- 리스트 컴프리헨션은 코드의 간결함을 높여준다.
+    ```python
+    # Worst
+    a = [1, 2, 3, 4]
+    squares = []
+    for x in a:
+        squares.append(x**2)
+
+    # Bad
+    squares = map(lambda x: x**2, a)
+
+    # Good
+    squares = [x**2 for x in a]
+    ```
+
+- map과 달리 필터링을 하기 쉽다.
+    ```python
+    # Bad
+    alt = map(lambda x: x**2, filter(lambda x: x % 2 == 0, a))
+
+    # Good
+    even_squares = [x**2 for x in a if x % 2 == 0]
+    ```
+
+- 딕셔너리와 집합에도 리스트 컴프리헨션과 동등한 컴프리헨션이 있다.
+    ```python
+    # Bad
+    alt_dict = dict(map(lambda x: (x, x**2),
+                    filter(lambda x: x % 2 == 0, a)))
+    alt_set = dict(map(lambda x: x**3,
+                    filter(lambda x: x % 3 == 0, a)))
+
+    # Good
+    even_squares_dict = {x: x**2 for x in a if x % 2 == 0}
+    three_cubed_set = {x**3 for x in a if x % 3 == 0}
+    {2: 4, 4: 16, 6: 36, 8: 64, 10: 100}
+    {216, 729, 27}
+    ```
+
+#### 컴프리헨션 내부에 제어 하위 식을 세개 이상 사용하지 말라.
+- 2차원 컴프리헨션
+    ```python
+    matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+    flat = [x for row in matrix for x in row]
+
+    >>>
+    [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    ```
+    ```python
+    squared = [[x**2 for x in row] for row in matrix]
+
+    >>>
+    [[1, 4, 9], [16, 25, 36], [49, 64, 81]]
+    ```
+
+- 컴프리헨션이 더 불명확해지는 경우
+    ```python
+    # Bad
+    my_lists = [
+        [[1, 2, 3], [4, 5, 6]],
+        ...
+    ]
+    flat = [x for sublist1 in my_lists
+            for sublist2 in sublist1
+            for x in sublist2]
+
+    # Clear
+    flat = []
+    for sublist1 in my_lists:
+        for sublist2 in sublist1:
+            flat.extend(sublist2)
+    ```
+    ```python
+    matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+    filtered = [[x for x in row if x % 3 == 0]
+                for row in matrix if sum(row) >= 10]
+    ```
+
+#### 대입식을 사용해 컴프리헨션 안에서 반복 작업을 피하라.
+- 대입식으로 반복 작업 줄이기
+    ```python
+    stock = {
+        '못': 125,
+        '나사못': 35,
+        '나비너트': 8,
+        '와셔': 24,
+    }
+
+    order = ['나사못', '나비너트', '클립']
+
+    def get_batches(count, size):
+        return count // size
+
+    # Worst
+    result = {}
+    for name in order:
+        count = stock.get(name, 0)
+        batches = get_batches(count, 8)
+        if batches:
+            result[name] = batches
+
+    # Bad
+    found = {name: get_batches(stock.get(name, 0), 8)
+             for name in order
+             if get_batches(stock.get(name, 0), 8)}
+
+    # Good
+    found = {name: batches for name in order
+            (batches := get_batches(stock.get(name, 0)))}
+    ```
+
+- 컴프리헨션에서 대입식은 조건에만 사용하는것을 권장 한다.
+    ```python
+    # ERROR
+    result = {name: (teeth := count // 10)
+              for name, count in stock.items() if teeth > 0}
+
+    # CORRECT
+    result = {name: teeth for name, count in stock.items()
+              if (teeth := count // 10) > 0}
+
+    # Leak
+    half = [(last := count // 2) for count in stock.values()]
+
+    # Safe
+    found = ((name, batches) for name in order
+             if (batches := get_batches(stock.get(name, 0), 8)))
+    ```
+
+#### 리스트를 반환하기보다는 제너레이터를 사용하라.
+- 리스트 반환 보다는 제너레이터를 사용하라.
+    ```python
+    # BAD
+    def index_words(text):
+        result = []
+        if text:
+            result.append(0)
+        for index, letter in enumerate(text):
+            if letter == ' ':
+                result.append(index + 1)
+        return result
+
+    # Good
+    def index_words_iter(text):
+        if text:
+            yield 0
+        for index, letter in enumerate(text):
+            if letter == ' ':
+                yield index + 1
+
+    # 필요하다면, 언제든 리스트 변환 가능
+    result = list(index_words_iter(address))
+    ```
+
+- index words는 리스트의 모든 결과를 메모리에 다 저장해야하기 때문에 입력이 매우 크면
+  메모리 초과로 프로그램이 정리될 수 있다. 이터레이터는 이를 해결할 수 있다.
+    ```python
+    def index_file(handle):
+        offset = 0
+        for line in handle:
+            if line:
+                yield offset
+            for letter in lline:
+                offset += 1
+                if letter == " ":
+                    yield offset
+    ```
+
+#### 인자에 대해 이터레이션할 때는 방어적이 돼라
+- 객체가 원소로 들어있는 리스트를 파라미터로 받았을 때, 여러번 이터레이션 해야
+  할 경우에는 이터러블 컨테이너 클래스를 정의해라.
+    ```python
+    def normalize(numbers):
+        total = sum(numbers)
+        result = []
+        for value in numbers:
+            percent = 100 * value / total
+            result.append(percent)
+        return result
+
+    # BAD - iterator를 사용할지 않을때와 같이 메모리 이슈
+    def normalize_copy(numbers):
+        numbers_copy = list(numbers)
+        ...
+
+    # BAD - iter를 생성하는 람다 함수를 넘기는것이 직관적이지 못함.
+    def normalize_func(get_iter):
+        total = sum(get_iter())
+        ...
+
+    # Good - 이터러블 컨테이너 클래서 정의
+    def ReadVisits:
+        def __init__(self, data_path):
+            self.data_path = data_path
+
+        def __iter__(self):
+            with open(self.data_path) as f:
+                for line in f:
+                    yield int(line)
+
+    # 사용
+    visits = ReadVisits(path)
+    percentage = normalize(visits)
+    print(percentages)
+    assert sum(percentages) == 100.0
+    ```
+
+- isinstance를 사용해 잠재적인 문제를 검사하라.
+    ```python
+    from collections.abc import Iterator
+
+    def normalize_defensive(numbers):
+        /* if iter(numbers) is numbers: */
+        /*     raise TypeError('컨테이너를 제공해야 합니다') */
+        if isinstance(numbers, Iterator):
+            raise TypeError('컨테이너를 제공해야 합니다')
+        total = sum(numbers)
+        result = []
+        for value in numbers:
+            percent = 100 * value / total
+            result.append(percent)
+        return result
+    ```
+
+#### 긴 리스트 컴프리헨션보다는 제너레이터 식을 사용하라.
+
+- 너무 큰 리스트 컴프리헨션은 모든 메모리를 사용해야하기 때문에 피하거나, Generator를
+  사용해야한다.
+    ```python
+    # BAD
+    value = [len(x) for x in open('my_file.txt')]
+
+    # GOOD : Generator
+    it = (len(x) for x in open('my_file.txt'))
+
+    # USAGE
+    print(next(it))3
+    print(next(it))
+    ```
+
+#### yield from을 사용해 여러 제너레이터를 합성하라.
+
+- yield from은 여러 제너레이터를 합성해 가독성을 늘려준다. 또한 기존의 for loop보다
+  성능이 조금 더 개선된다.
+    ```python
+    def move(period, speed):
+        for _ in range(period):
+            yield speed
+
+    def pause(delay):
+        for _ in range(delay):
+            yield 0
+
+    # BAD
+    def animate():
+        for delta in move(4, 5.0):
+            yield delta
+        for delta in pause(3):
+            yield delta
+        for delta in move(2, 3.0):
+            yield delta
+
+    # Good
+    def animate_composed():
+        yield from move(4, 5.0)
+        yield from pause(3)
+        yield from move(2, 3.0)
+    ```
+
+#### send로 제너레이터에 데이터를 주입하지 말라.
+
+- send 메서드를 이용해 데이터를 제너레이터에 주입할 수 있다. 제너레이터는 send로
+  주입된 값을 yield식이 반환하는 값을 통해 받으며, 이 값을 변수에 저장해 활용할 수 있다.
+
+    ```python
+    import math
+
+    def wave_modulating(steps):
+        step_size = 2 * math.pi / steps
+        amplitude = yield # 초기 진폭 받기
+        for step in range(steps):
+            radians = step * step_size
+            factrion = math.sin(radians)
+            output = amplitude * fraction
+            amplitude = yield output # 다음 진폭 받기
+
+    def transmit(output):
+        if output is None:
+            print(f'출력: None')
+        else:
+            print(f'출력: {output:>5.1f}')
+
+    def run_modulating(it):
+        amplitudes = [None, 7, 7, 7, 2, 2, 2, 10, 10, 10, 10, 10]
+        for amplitude in amplitudes:
+            output = it.send(amplitude)
+            transmit(output)
+
+    run_modulating(wave_modulating(3.0, 8))
+    ```
+
+- 합성할 제너레이터들의 입력으로 이터레이터를 전달하는 방식이 send르 사용하는 방식 보다
+  더 낫다.
+    ```python
+    def wave_cascading(amplitude_it, steps):
+        step_size = 2 * math.pi / steps
+        for step in range(steps):
+            radians = step * step_size
+            fraction = math.sin(radians)
+            amplitude = next(amplitude_it)
+            output = amplitude * fraction
+            yield output
+
+    def complex_wave_cascading(amplitude_it):
+        yield from wave_cascading(amplitude_it, 3)
+        yield from wave_cascading(amplitude_it, 4)
+        yield from wave_cascading(amplitude_it, 5)
+
+    def run_cascading():
+        amplitudes = [7, 7, 7, 2, 2, 2, 2, 10, 10, 10, 10, 10]
+        it = complex_wave_cascading(iter(amplitudes))
+        for amplitude in amplitudes:
+            output = next(it)
+            transmit(output)
+
+    run_cascading()
+    ```
+
+#### 제너레이터 안에서 throw로 상태를 변화시키지 말라
+- throw로 제너레이터 안에서 제너레이터 상태를 변화시킬 수 있다.
+    ```python
+    def my_generator():
+        yield 1
+
+        try:
+            yield 2
+        except MyError:
+            print('My Error')
+        else:
+            yield 3
+
+        yield 4
+
+    it = my_generator()
+    print(next(it))
+    print(next(it))
+    print(it.throw(MyError('test error')))
+
+    >>>
+    1
+    2
+    My Error
+    4
+    ```
+
+- 제너레이터에서 예외적인 동작을 제공하려면 __ iter __메서드를 구현하는 클래스를
+  사용하는것이 더 낫다.
+    ```python
+    class Timer:
+        def __init__(self, period):
+            self.current = period
+
+        def reset(self):
+            self.current = self.period
+
+        def __iter__(self):
+            while self.current:
+                self.current -= 1
+                yield self.current
+
+    def run():
+        timer = Timer(4)
+        for current in Timer:
+            if check_for_reset():
+                timer.reset()
+            announce(current)
+
+    run()
+    ```
+
+#### 여러 이터레이터 병합하기
+- chain : 여러 이터레이터를 순차적으로 합치고 싶을 때
+    ```python
+    it = itertools.chain([1, 2, 3], [4, 5, 6])
+
+    >>>
+    [1, 2, 3, 4, 5, 6]
+    ```
+
+- repeat : 한 값을 계속해서 반복하고 싶을 때
+    ```python
+    it = itertools.repeat('안녕', 3)
+    >>>
+    ['안녕', '안녕', '안녕']
+    ```
+
+- cycle : 어떤 이터레이터가 내놓는 원소들을 계속 반복하고 싶을 때
+    ```python
+    it = itertools.cycle([1, 2])
+    result = [next(it) for _ in range(10)]
+
+    >>>
+    [1, 2, 1, 2, 1, 2, 1, 2, 1, 2]
+    ```
+
+- tee : 한 이터레이터를 병렬적으로 두 번째 인자로 지정된 개수의 이터레이터로 만들고
+  싶을 때
+    ```python
+    it1, it2 = itertools.tee(['a', 'b'], 2)
+    >>> it1
+    ['a', 'b']
+    >>> it2
+    ['a', 'b']
+    ```
+
+- zip_longest : zip중 더 긴 원소로 이터레이션 하고 싶을 때
+    ```python
+    keys = ['하나', '둘', '셋']
+    values = [1, 2]
+
+    normal = list(zip(keys, values))
+    >>> normal
+    [('하나', 1), ('둘', 2)]
+
+    it = itertools.zip_logest(keys, values, fillvalue='없음')
+    >>> it
+    [('하나', 1), ('둘', 2), ('셋', '없음')]
+    ```
+
+#### 이터레이터에서 원소 거르기
+- islice : 이터레이터를 복사하지 않으면서 원소 인덱스를 이용해 슬라이싱하고 싶을 때
+    ```python
+    values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+    middle_odds = itertools.islice(values, 2, 8, 2)
+    >>> middle_odds
+    [3, 5, 7]
+    ```
+
+- takewhile : 이터레이터에서 주어진 술어가 False를 반환하는 첫 원소가 나타날 때까지
+  원소를 돌려준다. (술어가 True를 반환하는동안 돌려줌)
+    ```python
+    valeus = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    less_than_seven = lambda x: x < 7
+    it = itertools.takewhile(less_than_seven, values)
+    print(list(it))
+
+    >>>
+    [1, 2, 3, 4, 5, 6]
+    ```
+
+- dropwhile : takewhile의 반대
+    ```python
+    values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    less_than_seven = lambda x: x < 7
+    it = itertools.dropwhile(less_than_seven, values)
+    print(list(it))
+
+    >>>
+    [7, 8, 9, 10]
+    ```
+
+- filterfalse : False를 반환하는 모든 원소를 돌려준다
+    ```python
+    values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    evens = lambda x: x % 2 == 0
+    filter_result = filter(evens, values)
+    >>> filter_result
+    [2, 4, 6, 8, 10]
+
+    filter_false_result = itertools.filterfalse(evens, values)
+    >>> filter_false_result
+    [1, 3, 5, 7, 9]
+    ```
+
+#### 이터레이터에서 원소의 조합 만들어내기
+- accumulate : iterator의 누적 결과 iteration을 제작해준다
+    ```python
+    values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    sum_reduce = itertools.accumulate(values)
+    >>> sum_reduce
+    [1, 3, 6, 10, 15, 21, 28, 36, 45, 55]
+
+    def sum_modulo_20(first, second):
+        output = first + second
+        return output % 20
+
+    modulo_reduce = itertools.accumulate(values, sum_modulo_20)
+    >>> modulo_reduce
+    [1, 3, 6, 10, 15, 1, 8, 16, 5, 15]
+    ```
+
+- product : 아이템들의 데카르트곱
+    ```python
+    single = itertools.product([1, 2], repeat=2)
+    >>> single
+    [(1,1), (1, 2), (2, 1), (2, 2)]
+
+    multiple = itertools.product([1, 2], ['a', 'b'])
+    >>> multiple
+    [(1, 'a'), (1, 'b'), (2, 'a'), (2, 'b')]
+    ```
+
+- permutations : 순열
+    ```python
+    it = itertools.permutations([1, 2, 3, 4], 2)
+    >>> it
+    [(1, 2), (1, 3), (1, 4), (2, 1), (2, 2), (2, 3), (2, 4), (3, 1), (3, 2), (3, 4), (4, 1), (4, 2), (4, 3)]
+    ```
+
+- combinations : 조합
+    ```python
+    it = itertools.combinations([1, 2, 3, 4], 2)
+    >>> it
+    [(1, 2), (1, 3), (1, 4), (2, 3), (2, 4), (3, 4)]
+    ```
+
+- combintions_with_replacement : 중복 조합
+    ```python
+    it = itertools.combinations_with_replacement([1, 2, 3, 4], 2)
+    >>> it
+    [(1, 1), (1, 2), (1, 3), (1, 4), (2, 2), (2, 3), (2, 4), (3, 3), (3, 4), (4, 4)]
+    ```

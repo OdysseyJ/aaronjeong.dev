@@ -1,0 +1,40 @@
+---
+title: 쉘 스크립트 - if, then, else 구문 정리
+date: 2022/1/14
+description: shell script - if, then, else expressions
+tags: [Dev, Shell, Bash]
+---
+
+### 사용법
+```shell
+if [조건];
+then
+    (조건이 True일때 실행)
+else
+    (조건이 False일때 실행)
+fi
+```
+
+```shell
+# !주의 []대괄호와 표현식 사이는 space 1칸이 있어야 한다.
+if [ "$deployed" == "$flag" ];
+then
+    echo "this is true"
+else
+    echo "this is false"
+fi
+```
+
+```shell
+# false일 경우 ~=이 아닌 =~ 연산자 사용
+if ["$deployed" =~ "$flag"]
+then
+    echo "this is true"
+else
+    echo "this is false"
+fi
+```
+
+### 참고
+- https://chocoamond.tistory.com/191?category=704917
+- https://brownbears.tistory.com/221

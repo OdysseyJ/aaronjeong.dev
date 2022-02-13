@@ -1,0 +1,358 @@
+---
+title: Django queryset 내장 함수 살펴보기
+date: 2022/1/31
+description: learn django queryset aggregate/annotate
+tags: [Dev, Python, Django]
+---
+
+### 모델 정의
+```python
+class Score(models.Model):
+    student_id = models.CharField(max_length=50, help_text="학생 번호")
+    student_name = models.CharField(max_length=50, help_text="학생 이름")
+    subject_name = models.CharField(max_length=40, help_text="과목 이름")
+    score = models.IntegerField(help_text="시험 성적")
+
+class Product(models.Model):
+    name = models.CharField('이름', max_length=150, unique=True)
+    price = models.IntegerField('가격')
+
+class OrderLog(models.Model):
+    product = models.ForeignKey('Product')
+    created = models.DateTimeField(u'판매일')
+```
+
+### values, values_list
+#### values
+    ```python
+    order_qs = OrderLog.objects.values(
+        'created', 'product__name', 'product__price'
+    )
+    >>> for order in order_qs:
+    ...     print(order)
+    ...
+    {'product__price': 9900, 'created': datetime.datetime(2016, 4, 1, 0, 0), 'product__name': 'ABC Activity'}
+    {'product__price': 8200, 'created': datetime.datetime(2016, 4, 1, 0, 0), 'product__name': '동물동요'}
+    ```
+#### values_list
+    ```python
+    order_qs = OrderLog.objects.values_list('product_name', flat=True)
+
+    >>> order_qs
+    ["ABC Activities", "동물 동요"]
+    ```
+
+### Aggregate
+전체 시험 성적을 대상으로 최고 점수나 평균 점수를 구하는 것은 `aggregate`로 가능하다.
+```python
+>>> from django.db.models import Avg, Max
+>>> Score.objects.aggregate(Avg('score'))
+{'score__avg': 59.166666666666664}
+>>> Score.objects.aggregate(Max('score'))
+{'score__max': 100}
+```
+
+### Annotate
+기본적인 Annotate는 새로운 필드를 만들어 1. 다른 필드의 값을 그대로 복사하거나 2. 다른 필드의 값을 조합한 값을 넣을 수 있다.
+
+1. 다른 필드의 값을 그대로 복사하는 경우
+```python
+# 앞의 쿼리를 재작성
+order_qs = OrderLog.objects.annotate(
+    name=F('product__name'), 
+    price=F('product__price')
+).values(
+    'created', 'name', 'price'
+)
+
+# 내용을 보면,
+{'price': 9900, 'created': datetime.datetime(2016, 4, 1, 0, 0), 'name': 'ABC Activity'}
+{'price': 8200, 'created': datetime.datetime(2016, 4, 1, 0, 0), 'name': '동물동요'}
+{'price': 38400, 'created': datetime.datetime(2016, 4, 1, 0, 0), 'name': '사운드북 패키지'}
+```
+
+2. 다른 필드의 값을 조합한 새로운 값을 사용하기
+
+과목별 최고 점수를 구하기 위해서는 `values`와 `annotate`를 섞어 사용한다.
+```python
+from django.db.models import Avg
+qs = Score.objects.values('subject_name') \
+                  .annotate(Avg('score'))
+
+for row in qs:
+    print(row)
+
+# 실행 결과
+{'subject_name': '봉술', 'score__avg': 68.33333333333333}
+{'subject_name': '성악', 'score__avg': 25.0}
+{'subject_name': '음주', 'score__avg': 62.5}
+```
+
+ 해당 내용을 쿼리로 옮겨보면 다음과 같다
+```sql
+SELECT subject_name, AVG(score) FROM ScoreTable
+GROUP BY subject_name
+```
+
+annotate는 수행될 때 values로 지정된 필드를 `GROUP BY`로 전달하여 필드끼리 묶은 결과를 구한다.
+
+### Conditional Annotation
+```python
+order_list_2 = order_qs.annotate(
+    sales_price=Case(
+        When(
+            is_cancel=False,  # 결제 취소가 아닌 경우
+            then=F('price')
+        ),
+        default=0
+    ),
+    cancel_price=Case(
+        When(
+            is_cancel=True,   # 결제 취소인 경우
+            then=F('price')
+        ),
+        default=0
+    )
+)
+```
+결과 확인해보기
+```python
+>>> for data in order_list_2:
+...     print(data)
+...
+{'cancel_price': 0, 'name': 'ABC Activity', 'sales_price': 9900, 'price': 9900, 'created': datetime.datetime(2016, 4, 1, 0, 0)}
+{'cancel_price': 0, 'name': '동물동요', 'sales_price': 8200, 'price': 8200, 'created': datetime.datetime(2016, 4, 1, 0, 0)}
+
+# (중략)
+
+{'cancel_price': 9900, 'name': 'ABC Activity', 'sales_price': 0, 'price': 9900, 'created': datetime.datetime(2016, 4, 3, 0, 0)}
+```
+
+### Annotate의 문제점
+
+최고 점수를 낸 사람을 같이 보고 싶은 경우에는 어떻게 해야할까? `values`에 학생 이름을 추가로 넣으면 의도한 결과가 나오지 않음.
+```python
+from django.db.models import Max
+qs = Score.objects.values('subject_name', 'student_name') \
+                  .annotate(Max('score'))
+
+for row in qs:
+    print(row)
+
+# 실행 결과
+{'subject_name': '봉술', 'student_name': '관우', 'score__max': 100}
+{'subject_name': '봉술', 'student_name': '유비', 'score__max': 10}
+{'subject_name': '봉술', 'student_name': '장비', 'score__max': 95}
+{'subject_name': '성악', 'student_name': '관우', 'score__max': 25}
+{'subject_name': '음주', 'student_name': '유비', 'score__max': 25}
+{'subject_name': '음주', 'student_name': '장비', 'score__max': 100}
+```
+
+왜 이런 결과가 나왔을까? Raw SQL을 보면
+```sql
+SELECT subject_name, student_name, MAX(score) FROM ScoreTable
+    GROUP BY subject_name, student_name
+```
+
+그렇다면 `values`를 `annotate` 뒤에 추가로 놓으면 결과가 달라질까?
+```python
+from django.db.models import Max
+qs = Score.objects.values('subject_name') \
+                  .annotate(Max('score')) \
+                  .values('subject_name', 'student_name', 'score__max')
+
+for row in qs:
+    print(row)
+
+{'subject_name': '봉술', 'student_name': '관우', 'score__max': 100}
+{'subject_name': '봉술', 'student_name': '유비', 'score__max': 10}
+{'subject_name': '봉술', 'student_name': '장비', 'score__max': 95}
+{'subject_name': '성악', 'student_name': '관우', 'score__max': 25}
+{'subject_name': '음주', 'student_name': '유비', 'score__max': 25}
+{'subject_name': '음주', 'student_name': '장비', 'score__max': 100}
+```
+
+`annotate`와 `values` 구문은 배치된 순서에 따라 작동이 달라지는데, `values`가 `annotate`보다 앞서있는 경우는 예제와 같이 결과를 묶는데 사용되지만, 반대인 경우에는 전체 쿼리셋에 대해 annotation이 적용된다. 해당 경우에는 `values`는 결과를 묶는데 사용되지 않고 어떤 필드를 출력하는지만 결정한다.
+
+과목별 최고 점수를 얻은 학생이 1명이 아니라면 어떻게 될까? 만약 장비 또한 score에서 100점을 받았다면 관우와 장비 중 누구를 출력해야 할까? 엄격한 데이터베이스에서는 이를 에러로 처리하겠지만, 대중적인 sql에서는 문제 없이 수행되는 경우가 많다.
+
+### 문제점 해결
+#### LOOP
+과목별 최고 점수를 구한 뒤, 각 결과를 순회하며 student_name을 직접 요청해 넣어주는 것이다.
+단점은 , 과목별로 쿼리가 하나씩 추가로 나가야 한다.
+```python
+from django.db.models import Max
+qs = Score.objects.values('subject_name') \
+                  .annotate(Max('score'))
+
+for row in qs:
+    row['student_name'] = \
+        Score.objects.filter(
+            subject_name=row['subject_name'],
+            score=row['score__max']
+        ).first().student_name
+    print(row)
+
+# 실행 결과
+{'subject_name': '봉술', 'score__max': 100, 'student_name': '관우'}
+{'subject_name': '성악', 'score__max': 25, 'student_name': '관우'}
+{'subject_name': '음주', 'score__max': 100, 'student_name': '장비'}
+```
+
+해당 내용에 대한 쿼리
+```sql
+SELECT subject_name, AVG(score) FROM ScoreTable
+GROUP BY subject_name
+
+SELECT student_name From ScoreTable
+WHERE subject_name="" AND score=""
+SELECT student_name From ScoreTable
+WHERE subject_name="" AND score=""
+SELECT student_name From ScoreTable
+WHERE subject_name="" AND score=""
+SELECT student_name From ScoreTable
+WHERE subject_name="" AND score=""
+SELECT student_name From ScoreTable
+WHERE subject_name="" AND score=""
+...
+```
+
+#### Subquery
+subquery를 이용해 각 과목별 최고 점수를 가져오는 서브쿼리를 통해 한번의 쿼리 요청으로 전체 결과를 얻어온 뒤에 넣어준다.
+```python
+from django.db.models import Subquery, OuterRef
+qs = Score.objects.filter(
+    id=Subquery(
+        Score.objects.filter(subject_name=OuterRef('subject_name'))
+            .order_by('-score')
+            .values('id')[:1])
+    ).values('subject_name', 'student_name', 'score')
+
+for row in qs:
+    print(row)
+
+# 실행 결과
+{'subject_name': '봉술', 'student_name': '관우', 'score': 100}
+{'subject_name': '성악', 'student_name': '관우', 'score': 25}
+{'subject_name': '음주', 'student_name': '장비', 'score': 100}
+```
+
+해당 내용에 대한 쿼리
+```sql
+SELECT A.subject_name, A.student_name, A.score FROM ScoreTable A
+    WHERE A.id = (
+        SELECT B.id FROM ScoreTable B
+            WHERE B.subject_name = A.subject_name
+            ORDER BY B.score DESC
+            LIMIT 1
+    )
+```
+
+#### Raw query
+Django ORM없이 SQL문을 실행하는 방법이다. 이는 해당 데이터베이스가 애매한 결과를 문제삼지 않는 경우에 사용할 수 있다. 하지만 데이터베이스와 데이터가 저장된 순서에 따라 같은 동작이 보장되지 않으므로 비추천.
+```python
+qs = Score.objects.raw('''
+    SELECT id, subject_name, student_name, MAX(score) FROM ScoreTable
+        GROUP BY subject_name
+''')
+
+for row in qs:
+    print(', '.join(
+        ['{}: {}'.format(field, getattr(row, field))
+            for field in ['subject_name', 'student_name', 'score']]
+    ))
+
+# 실행 결과
+subject_name: 봉술, student_name: 관우, score: 100
+subject_name: 성악, student_name: 관우, score: 25
+subject_name: 음주, student_name: 장비, score: 100
+```
+
+### 일반적인 문제 해결해보기 (Many to one relation)
+위와 같은 문제를 일반적으로 많이 사용하는 Mant-to-one에서도 만나볼 수 있다.
+```python
+class Contractor(models.Model):
+    name = models.CharField(max_length=150, help_text="업자명")
+    address = models.CharField(max_length=150, help_text="업자 주소")
+
+
+class Contract(models.Model):
+    contractor = models.ForeignKey(Contractor, on_delete=models.CASCADE)
+    location = models.CharField(max_length=150, help_text="계약지")
+    amount = models.IntegerField(help_text="계약 수량")
+
+
+# Contract 데이터 예시
+qs = Contract.objects.values_list(
+    'contractor__name', 'location', 'amount')
+
+for row in qs:
+    print(row)
+
+('Park', '서울', 10)
+('Park', '인천', 90)
+('Park', '부산', 30)
+('Kim', '서울', 50)
+('Kim', '인천', 10)
+('Kim', '부산', 100)
+```
+
+간단하게, 계약자 별 총 계약 수량이나 가장 큰 계약건을 구하고 싶을 경우 아래와 같이 요청한다.
+```python
+# 계약자별 총 계약 수량
+>>> Contractor.objects.values_list('name', Sum('contract__amount'))
+<QuerySet [('Park', 130), ('Kim', 160)]>
+
+# 계약자별 가장 큰 계약 건
+>>> Contractor.objects.values_list('name', Max('contract__amount'))
+<QuerySet [('Park', 90), ('Kim', 100)]>
+```
+
+이때, 계약자별 가장 큰 계약건을 체결한 계약지가 어디인지 알아볼려고 하면, 앞서 겪었던 문제가 똑같이 발생한다.
+```python
+# 잘못된 쿼리셋
+from django.db.models import Max
+qs = Contractor.objects.values_list(
+    'name', 'contract__location', Max('contract__amount'))
+
+for row in qs:
+    print(row)
+
+# 실행 결과
+('Park', '부산', 30)
+('Park', '서울', 10)
+('Park', '인천', 90)
+('Kim', '부산', 100)
+('Kim', '서울', 50)
+('Kim', '인천', 10)
+```
+```sql
+SELECT Contractor.name, Contract.location, MAX(Contract.amount)
+    FROM Contractor
+        LEFT OUTER JOIN Contract ON (
+            Contractor.id = Contract.contractor_id
+        ) GROUP BY Contractor.id, Contractor.name, Contractor.address, Contract.location
+```
+
+이때, `LOOP`말고 `Subquery`를 사용해서 해당 문제를 해결해 보면
+```python
+# 계약자별 가장 큰 계약 건의 위치와 수량을 구하기
+from django.db.models import Subquery, OuterRef
+qs = Contract.objects.filter(
+    id=Subquery(
+        Contract.objects.filter(contractor=OuterRef('contractor'))
+            .order_by('-amount')
+            .values('id')[:1])
+    ).values('contractor__name', 'location', 'amount')
+
+for row in qs:
+    print(row)
+
+# 실행 결과
+{'contractor__name': 'Park', 'location': '인천', 'amount': 90}
+{'contractor__name': 'Kim', 'location': '부산', 'amount': 100}
+```
+
+### 참고
+- https://lqez.github.io/blog/django-queryset-basic.html
+- http://raccoonyy.github.io/django-annotate-and-aggregate-like-as-excel/

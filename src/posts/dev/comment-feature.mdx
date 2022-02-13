@@ -1,0 +1,101 @@
+---
+title: 블로그에 댓글 기능 추가하기
+date: 2022/1/7
+description: add comment feature on my blog
+tags: [Dev, Blog]
+---
+
+댓글 기능을 새로 달았다.
+
+Disqus라는 서비스를 이용했는데, 생각보다 꽤 쉬웠다. 스크립트를 불러서 댓글 UI를 가져오는 방식이다.
+
+https://disqus.com/
+
+1. Get Started > I want to install Disqus on my site
+
+2. Website Name에 유니크한 이름을 입력하고, Create a new site를 끝낸다.
+
+3. Start > Install Instructions에 안내된 내용을 진행하면 된다. 아래는 내가 리액트 - NextJs를 통해 적용한 방법이다.
+
+```js
+<div id="disqus_thread"></div>
+<script>
+    /**
+    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+    /*
+    var disqus_config = function () {
+    this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+    this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+    };
+    */
+    (function() { // DON'T EDIT BELOW THIS LINE
+    var d = document, s = d.createElement('script');
+    s.src = ######################## (secret);
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+```
+
+그냥 이런 스크립트를 달아주기만 하면 된다고 해서 리액트로 쓸수 있게 컴포넌트 형태로 감쌌다. 아래 코드는 새롭게 제작한 리액트 댓글 컴포넌트다. 이때 해당 컴포넌트를 footer에 붙이려고 했기 때문에, url을 통해서 댓글이 붙어야하는지 확인해줬다.
+
+```js
+import {useRouter} from "next/router";
+import {useEffect} from "react";
+
+
+const Comment = () => {
+    const router = useRouter()
+
+    useEffect(()=>{
+        const is_commentable = router.pathname.split("/").length >= 3;
+        if(is_commentable){
+            (function() { // DON'T EDIT BELOW THIS LINE
+                var d = document, s = d.createElement('script');
+                s.src = ######################## (secret);
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+                })();
+        }
+    },[])
+
+    return (<div id="disqus_thread"></div>)
+}
+
+export default Comment 
+```
+
+해당 Comment 컴포넌트를 footer에 부착해준다.
+
+```js
+import Comment from './comment'
+
+const YEAR = new Date().getFullYear()
+
+export default {
+  footer: (
+    <>
+        <Comment/>
+        <small style={{ display: 'block', marginTop: '8rem' }}>
+          <time>{YEAR}</time>
+          <a href="/feed.xml">RSS</a>
+          <style jsx>{`
+            a {
+              float: right;
+            }
+            @media screen and (max-width: 480px) {
+              article {
+                padding-top: 2rem;
+                padding-bottom: 4rem;
+              }
+            }
+          `}</style>
+        </small>
+    </>
+  )
+}
+```
+
+신난다! 누군가 댓글을 달아줬으면 좋겠다.

@@ -9,6 +9,7 @@ import InlineCode from "@src/components/Typography/InlineCode";
 import { Li, Ol, Ul } from "@src/components/Typography/List";
 import P from "@src/components/Typography/P";
 import Pre from "@src/components/Typography/Pre";
+import Image from "@src/components/Images/Image";
 
 const MDXComponents = {
   h1: H1,
@@ -35,5 +36,6 @@ const MDXComponents = {
   th: Th,
   td: Td,
   a: A,
+  Image: Image
 };
 export default MDXComponents;

@@ -1,0 +1,132 @@
+---
+title: 데이터베이스 정규화(database normalization)
+date: 2022/1/13
+description: database normalization
+tags: [Dev, Database]
+---
+## 개요
+### 데이터베이스 정규화란?
+- 데이터베이스 설계를 논리적 흐름에 맞게 재구성하는것
+
+### 정규화의 목적
+- 불필요한 데이터(redundancy)의 제거
+- 삽입/갱신/삭제시 발생하는 다양한 이상현상 방지
+
+### 정규화를 하지 않았을때 생기는 문제점들
+
+| **S_id** | **S_name** | **S_Address** | **Subject_opted** |
+| - | - | - | - |
+| 401 | Adam | Noida | Bio |
+| 402 | Alex | Panipat | Math |
+| 403 | Stuart | Jammu | Math |
+| 404 | Adam | Noida | Physics |
+
+- Update
+    - Adam의 Address 변경시 여러줄을 한꺼번에 수정해야한다.
+
+- Insert
+    - 아무 과목도 수강하지 않는다면 Subject_opted = NULL 이다.
+
+- Deletion
+    - Alex가 수강을 취소한다면 Alex의 정보가 모두 사라짐.
+
+### 정규화의 종류
+- 1차 정규화
+- 2차 정규화
+- 3차 정규화
+- BCNF
+- 4차 정규화
+- 5차 정규화
+
+### 1차 정규화
+- 1차 정규화란 각 로우마다 컬럼의 값을 1개만 가지게 만든다. 특정 컬럼이 원자값(Atomic
+  value) 를 가지게 한다.
+
+| **Student** | **Age** | **Subject** |
+| - | - | - |
+| Adam | 15 | Bio, English |
+| Alex | 14 | Math |
+| Stuart | 17 | Math |
+
+> redundancy는 더 증가했지만, 논리적 흐름을 위해 포기한다.
+
+| **Student** | **Age** | **Subject** |
+| - | - | - |
+| Adam | 15 | Bio |
+| Adam | 15 | English |
+| Alex | 14 | Math |
+| Stuart | 17 | Math |
+
+### 2차 정규화
+- 2차 정규화란 모든 컬럼이 완전 함수적 종속을 만족하는 것이다. (기본키중에 특정 컬럼에만
+  종속된 칼럼이 없어야한다.)
+
+> Age의 경우 Student에 종속되어 있으므로, 따로 분리해서 테이블로 만든다.
+
+| **Student** | **Age**  |
+| - | - |
+| Adam | 15 |
+| Alex | 14 |
+| Stuart | 17 |
+
+| **Student** | **Subject**  |
+| - | - |
+| Adam | Bio |
+| Adam | English |
+| Alex | Math |
+| Stuart | Math |
+
+### 3차 정규화
+- 3차 정규화란 기본키를 제외한 속성들 간의 이행적 함수 종속이 없는 것. 즉, 기본키 이외의
+  다른 컬럼이 그 외 다른 컬럼을 결정할 수 없는것.
+
+> 3차 정규화 또한 2차 정규화와 마찬가지로 테이블을 분리해 해결한다.
+
+Student Detail Table
+| **Student_id** | **Student_name**  | **DOB** | **Street**  | **City** | **State**  | **Zip** |
+| - | - | - | - | - | - | - |
+
+> zip코드만 알면 Street City State가 결정되어버린다.
+
+| **Student_id** | **Student_name**  | **DOB** | **Zip** |
+| - | - | - | - |
+
+| **Zip** | **Street**  | **City** | **State**  |
+| - | - | - | - |
+
+논리단위로 분리되었고, 데이터의 redundancy도 줄었다.
+
+
+### BCNF(Boyce and Codd Normal Form)
+- BCNF란 3차 정규형의 강화로, 3차 정규형을 만족하면서 모든 결정자가 후보키 집합에 속한
+  정규형이다.
+- 3차 정규형을 만족하면서 BCNF를 만족하지 못하는 경우 : 일반 칼럼이 후보키를 결정하는
+  경우
+
+| **학생** | **과목** | **교수** | **학점** |
+| - | - | - | - |
+| 1 | ABC123 | Mr.Kim | A
+| 2 | CS123 | Mr.Sin | A
+| 3 | CS123 | Mr.Sin | A
+
+> 해당 테이블에서
+
+> 후보키 : (학생, 과목) - 유일하게 구분 가능, 일반 칼럼
+
+> 결정자 : 교수 - 1개의 과목당 1명의 교수
+
+
+| **과목** | **교수** |
+| - | - |
+| ABC123 | Mr.Kim |
+| CS123 | Mr.Sin |
+
+
+| **학생** | **과목** | **학점** |
+| - | - | - |
+| 1 | ABC123 | A
+| 2 | CS123 | A
+| 3 | CS123 | A
+
+참고
+- https://3months.tistory.com/193

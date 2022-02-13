@@ -1,0 +1,132 @@
+---
+title: Django REST Framework(DRF) - Authentication, permissions
+date: 2022/1/13
+description: RESTful api with django rest framework
+tags: [Dev, DRF, Django]
+---
+
+https://www.django-rest-framework.org/tutorial/4-authentication-and-permissions/
+
+### Authentication and permissions
+
+아직까지는 API에 대해 누가 수정과 삭제를 진행할 수 있는지 설정하지 않았다.
+
+- creator와 항상 Associate되어 있다.
+- authenticated된 유저만 snippet을 만들 수 있다.
+- snippet을 만든 유저만이 업데이트나 삭제를 진행할 수 있다.
+- unauthenticated된 request는 full readonly-access만을 가져야 한다.
+
+#### model에 추가 정보 입력하기
+- 예시
+    ```python
+    owner = models.ForeignKey('auth.User', related_name='snippets', on_delete=models.CASCADE)
+    highlighted = models.TextField()
+    ```
+
+#### User 모델에 endpoint 추가하기
+- snippet은 User에 대해 reverse relationship을 가지는데, 이것은 ModelSerilaizer를 쓰면
+  자동으로 추가되지 않으므로 선언해 줘야 한다.
+    ```python
+    from django.contrib.auth.models import User
+
+    class UserSerializer(serializers.ModelSerializer):
+        snippets = serializers.PrimaryKeyRelatedField(many=True, queryset=Snippet.objects.all())
+
+        class Meta:
+            model = User
+            fields = ['id', 'username', 'snippets']
+    ```
+    ```python
+    from django.contrib.auth.models import User
+
+    class UserList(generics.ListAPIView):
+        queryset = User.objects.all()
+        serializer_class = UserSerializer
+
+    class UserDetail(generics.RetrieveAPIView):
+        queryset = User.objects.all()
+        serializer_class = UserSerializer
+    ```
+
+    ```python
+    path('users/', views.UserList.as_view()),
+    path('users/<int:pk>/', views.UserDetail.as_view()),
+    ```
+
+#### Snippet을 유저와 함께 사용하기
+- 예시
+    ```python
+    (in SnippetList)
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+    ```
+    ```python
+    (in SnippetSerializer)
+    class SnippetSerializer(serializers.ModelSerializer):
+        ...
+        owner = serializers.ReadOnlyField(source='owner.username')
+
+        class Meta:
+            model = Snippet
+            fields = [..., 'owner']
+    ```
+
+#### view에 permission을 permission을 사용해 권한 부여하기
+- 예시
+    ```python
+    from rest_framework import permissions
+    Then, add the following property to both the SnippetList and SnippetDetail view classes.
+
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    ```
+
+#### object level permission 부여하기
+- 예시
+    ```python
+    from rest_framework import permissions
+
+    class IsOwnerOrReadOnly(permissions.BasePermission):
+        """
+        Custom permission to only allow owners of an object to edit it.
+        """
+
+        def has_object_permission(self, request, view, obj):
+            # Read permissions are allowed to any request,
+            # so we'll always allow GET, HEAD or OPTIONS requests.
+            if request.method in permissions.SAFE_METHODS:
+                return True
+
+            # Write permissions are only allowed to the owner of the snippet.
+            return obj.owner == request.user
+
+    ...
+
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly,
+                          IsOwnerOrReadOnly]
+    ```
+
+#### authentication 부여하기
+- BasicAuthentication
+
+- TokenAuthentication : Client-server 앱에 적절함.
+
+- SessionAuthentication : Ajax Client에게 적절함.
+
+- RemoteUserAuthentication : Env variable을 통해 서버에서 authentication을 위임받음.
+
+#### TokenAuthentication
+- 예시
+    ```python
+    INSTALLED_APPS = [
+        'rest_framework.authtoken'
+    ]
+
+    >>> python manage.py makemigrations
+    >>> python manage.py migrate
+
+    DEFAULT_AUTHENTICATION_CLASSES = [
+        'rest_framework.authentication.TokenAuthentication'
+    ]
+    ```
+
+> 참고 : https://eunjin3786.tistory.com/253

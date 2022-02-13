@@ -1,0 +1,67 @@
+---
+title: .io vs .dev 도메인 비교 분석
+date: 2021/12/15
+description: why i decide my blog domain to .dev
+tags: [Dev]
+---
+import Image from 'next/image'
+
+도메인 네임 서비스(DNS)란, 인터넷에서 사용하는 주소 체계에 현실상에서 사용하는 이름을 부여하는 것입니다.
+
+인터넷은 하나의 거대한 네트워크이기 때문에, 다른 웹 사이트로 이동하려면 해당 웹 사이트의 IP주소를 찾아가야 하지만, DNS 서비스를 이용해서 특정 주소를 입력했을 때 사용자들을 원하는 주소로 이동 시킬 수 있습니다.
+
+최근에 블로그에 연결할 도메인을 구매하기 위해서 알아보던 중, 많은 it회사와 블로그들이 io 도메인을 이용한다는 사실을 알았습니다. 그래서 왜 수많은 it직종의 도메인들이 io 도메인을 사용하고 있는지 궁금해졌습니다.
+
+### .io  도메인
+
+***io*** 도메인은 국가 코드 톱 레벨 도메인 중 하나로, 영국령 인도양 식민지(British Indian Ocean Territory)의 국가 톱 레벨 도메인입니다. 우리나라로 치면 .kr같은 도메인입니다. .io도메인이 IT업계에서 주로 사용되는 이유는, 일반적으로 국가 코드 톱 레벨 도메인은 해당 국가에 등록하거나, 기업이 해당 국가에 기반을 두고 있어야 사용이 가능하지만, io 도메인은 해당 지역이 아니라도, 해당 지사가 없어도 누구나 사용이 가능한 도메인이기 때문입니다.
+특징은, 해당 도메인은 국가 코드의 용도보다 IT업계에서 주로 많이 사용하기 때문에, 지역 기반 검색이나 광고가 나오지 않아서 검색에 유리하다고 합니다.
+
+또한, 오늘날에는 io 도메인을 사용함으로써 컴퓨터 기술 기업이라는 정체성을 표현할 수 있다고 합니다.
+아마 해당 이유가 수많은 IT기업에서 io도메인을 사용하는데 가장 결정적인 역할을 하지 않았나 싶습니다.
+
+
+### 또다른 선택지 .dev
+***dev*** 도메인은 구글에서 2019년에 처음으로 공개한 최상위 도메인(Top Level Domain)입니다. 최근에 등록된 도메인이니만큼, 빅 IT회사를 제외하고는 (ex, https://slack.dev/) 사실 사용하는곳이 많아보이지는 않습니다.
+특징은 HSTS가 미리 설정된 상태라서, HTTPS요청이 강제된다고 합니다.
+
+
+### .io vs .dev 도메인
+저는 .dev 도메인을 선택했습니다. 그 이유는, 가격 차이 때문입니다.
+실제로 한화로 약 5만원정도의 금액이 차이가 나는데, 왜 그런지는 잘 모르겠으나(선호도 때문인가?) 저는 혼자 끄적거릴 블로그에 사용할 도메인이기 때문에 그렇게 중요하지 않아서 싼걸 선택했습니다.
+
+<Image
+  src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/difference-of-dev-and-io-domains/io-price.png'
+  alt="Photo"
+  width={800}
+  height={400}
+  priority
+  className="next-image"
+/>
+<Image
+  src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/difference-of-dev-and-io-domains/dev-price.png'
+  alt="Photo"
+  width={800}
+  height={400}
+  priority
+  className="next-image"
+/>
+
+참고로, 아마존의 route53에서는 dev 도메인을 구매할 수 없었습니다. (이유는 정확히 모르겠습니다.) 그래서 Godaddy를 이용해 구매했습니다. 구매 하실 때 참고하시면 좋을 듯 합니다!
+
+<Image
+  src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/difference-of-dev-and-io-domains/route53.png'
+  alt="Photo"
+  width={800}
+  height={300}
+  priority
+  className="next-image"
+/>
+
+
+### 참고
+- https://www.blockmedia.co.kr/archives/122750
+- https://devbono.com/get_domain_connect_godaddy/
+- https://www.44bits.io/ko/post/dot-dev-doamin-for-developers
+- https://bigboss.dev/2021/03/domain-for-developer/
+- https://medium.com/windmill-engineering/dev-is-a-better-io-why-we-moved-to-tilt-dev-9fc8321693d3

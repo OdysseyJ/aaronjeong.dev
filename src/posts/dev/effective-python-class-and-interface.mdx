@@ -1,0 +1,215 @@
+---
+title: 파이썬 코딩의 기술 - 클래스와 인터페이스
+date: 2022/1/11
+description: study and note effective python 2nd edition - class and iterface
+tags: [Dev, Effective-Python]
+---
+
+### 클래스와 인터페이스
+
+#### 내장 타입을 여러 단계로 내포시키기보다는 클래스를 활용하라
+
+- 간단한 경우 딕셔너리를 이용해서 데이터를 매니징해도 괜찮지만, 긴 딕셔너리, 긴 튜플,
+  다른 내장 타입이 복잡하게 내포된 데이터를 값으로 사용하는 딕셔너리를 만들지 마라
+
+- 완전한 클래스가 제공하는 유연성이 필요하지 않고, 가벼운 불변 데이터 컨테이너가
+  필요하다면 namedtuple을 사용하라.
+    ```python
+    from collections import namedtuple
+
+    Grade = namedtuple('Grade', ('score', 'weight'))
+
+    # default 인자 지정 불가
+    # 왠만하면 클래스로 나누는게 나음
+    ```
+
+- 내부 상태를 표현하는 딕셔너리가 복잡해지면 여러 클래스로 나누어 재작성하라.
+
+#### 간단한 인터페이스의 경우 클래스 대신 함수를 받아라
+
+- 파이썬에서 함수는 일급 시민 객체다.
+    ```python
+    names = ['소크라테스', '아르키메데스', '플라톤', '아리스토텔레스']
+    names.sort(key=len)
+    print(names)
+    ```
+
+- 도우미 클래스로 상태가 있는 클로저와 같은 동작을 제공하는것이 더 깔끔하다.
+    ```python
+    # BAD
+    def increment_with_report(current, increment):
+        added_count = 0
+
+        def missing():
+            nonlocal added_coiunt
+            added_count += 1
+            return 0
+
+        result = defaultdict(missing, current)
+        for key, amount in increments:
+            result[key] += amount
+
+        return result, added_count
+
+    # GOOD
+    class CountMissing:
+        def __init__(self):
+            self.added = 0
+
+        def missing(self):
+            self.added += 1
+            return 0
+
+    counter = CountMissing()
+    result = defaultdict(counter.missing, current)
+    for key, amount in increments:
+        result[key] += amount
+    assert counter.added == 2
+
+    # CountMissing클래스 자체만 놓고 보면 목적을 파악하기 힘듬.
+    ```
+
+- 호출가능 객체 만들기
+    ```python
+    class BetterCountMissing:
+        def __init__(self):
+            self.added = 0
+
+        def __call__(self):
+            self.added += 1
+            return 0
+
+    counter = BetterCountMissing()
+    assert counter() == 0
+    assert callable(counter)
+
+    counter = BetterCountMissing()
+    result = defaultdict(counter, current)
+    for key, amount in increments:
+        result[key] += amount
+    assert counter.added == 2
+    ```
+
+#### 객체를 제너릭하게 구성하려면 @classmethod를 통한 다형성을 활용하라.
+- 예시
+    ```python
+    class GenericInputData:
+        def read(self):
+            raise NotImplementedError
+
+        @classmethod
+        def generate_inputs(cls, config):
+            raise NotImplementedError
+
+    class PathInputData(GenericInputData):
+        ...
+
+        @classmethod
+        def generate_inputs(cls, config):
+            data_dir = config['data_dir']
+            for name in os.listdir(data_dir):
+                yield cls(os.path.join(data_dir, name))
+
+    class GenericWorker:
+        def __init__(self, input_data):
+            self.input_data = input_data
+            self.result = None
+
+        def map(self):
+            raise NotImplementedError
+
+        def reduce(self, other):
+            raise NotImplementedError
+
+        @classmethod
+        def create_workers(cls, input_class, config):
+            workers = []
+            for input_data in input_class.generate_inputs(config):
+                workers.append(cls(input_data))
+            return workers
+
+    class LineCountWorker(GenericWorker):
+        ...
+
+    def mapreduce(worer_class, input_class, config):
+        workers = worker_class.create_workers(input_class, config)
+        return execute(workers)
+    ```
+
+#### super로 부모 클래스를 초기화하라
+- super().__init__ 호출은 MRO(표준 메서드 결정 순서)를 활용해 다중 상속을 튼튼하게 해 주며, 하위 클래스에서 상위 클래스를
+  직접 호출하는 것 보다 유지보수를 편하게 해준다.
+    ```python
+    class ExplicitTrisect(MyBaseClass):
+        def __init__(self, value):
+            # 모두 동일
+            super(ExplicitTrisect, self).__init__(value)
+            super(__class__, self).__init__(value)
+            super().__init__(value)
+            self.value /= 3
+    ```
+
+
+
+#### 기능을 합성할 때는 믹스인 클래스를 사용하라
+- 다중 상속이 제공하는 편의와 캡슐화가 필요하지만 다중 상속으로 인해 발생하는 골치아픈
+  경우를 피하고 싶은 경우 믹스인을 사용한다. 믹스인은 다중 상속이 가능하다.
+    ```python
+    class ToDictMixin:
+        def to_dict(self):
+            return self._traverse_dict(self.__dict__)
+
+        ...
+
+    class JsonMixin:
+        @classmethod
+        def from_json(cls, data):
+            kwargs = json.loads(data)
+            return cls(**kwargs)
+
+        def to_json(self):
+            return json.dumps(self.to_dict())
+
+    class DatacenterRack(ToDictMixin, JsonMixin):
+        ...
+
+    serialized = '''{"switch": {"ports": 5 ,...}}'''
+
+    deserialized = DatacenterRack.from_json(serailized)
+    roundtrip = deserialized.to_json()
+    ```
+
+#### 비공개 애트리뷰트보다는 공개 애트리뷰트를 사용하라
+- 통상적으로는 비공개 어트리뷰트는 자식 클래스에서 접근할 수 없다.
+- 파이썬의 비공개 어트리뷰트는 실제로 단순히 어트리뷰트의 이름을 변경해주는것에 불과하다. 실제로
+  특별한 권한을 요청하지 않아도 하위 클래스에서 원하는 클래스의 비공개 어트리뷰트에 접근이 가능하다.
+    ```python
+    assert baz._MyParentObject__private_field == 71
+    ```
+- 일반적으로 상속을 허용하는 클래스(부모) 쪽에서 보호 애트리뷰트를 사용하고 오류를 내는
+  편이 낫다. 모든 보호 필드에 문서를 추가한 후, API 내부에 있는 필드중에서 어떤 필드를 하위 클래스에서 변경할 수 있는지 명시하라.
+    ```python
+    class MyStringClass:
+        def __init__(self, value):
+            # 여기서 객체에게 사용자가 제공한 값을 저장
+            # 사용자가 제공하는 값은 문자열로 타입 변환이 가능해야 함
+            # 일단 한번 객체 내부에 설정되고 나면
+            # 불변 값으로 취급
+            self._value = value
+    ```
+- 비공개 어트리뷰트를 사용할지 진지하게 고민해야하는 유일한 경우는 하위 클래스의 필드와
+  이름이 충돌할 수 있는 경우 뿐 (공개 API에 속한 클래스들)
+
+#### 커스텀 컨테이너 타입은 collections.abc를 상속하라
+- 파이썬에서 내장 collections.abc 모듈 안에는 컨테이너 타입에 정의해야하는 전형적인
+  메서드를 모두 제공하는 추상 기반 클래스 정의가 여러가지 들어 있다.
+    ```python
+    from collections.abc import Sequence
+
+    class BadType(Sequence):
+        pass
+
+    >>> foo = BadType()
+    can't initiate
+    abstract methods __getitem__, __len__
+    ```

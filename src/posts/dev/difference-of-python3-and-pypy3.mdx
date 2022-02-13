@@ -1,0 +1,65 @@
+---
+title: python3와 pypy3의 차이 비교
+date: 2021/12/26
+description: difference of python3 and pypy3
+tags: [Dev]
+---
+요즘 알고리즘 문제를 python3를 이용해서 풀고있다. 이때, 내가 무슨 언어를 선택해 문제를 풀지 선택하는 항목에 있어서, python3는 너무나도 당연한 선택지였지만, pypy3라는 새로운 선택지가 있어서, 이에 대한 궁금증을 가지고 있었다.
+
+최근에 알고리즘 문제를 풀면서, pypy3로 했을 때 성능이 극적으로 좋아지는 케이스를 만났고, 내가 파이썬을 이용해서 문제를 풀게 된다면 이 두 언어 선택지의 비교는 불가피하겠다는 생각이 들었다. 그래서 블로그 글로 두 차이점을 정리해보려고 한다.
+
+### 컴파일러와 인터프리터
+
+두가지의 차이점을 분석하기 전에, 컴파일러와 인터프리터의 차이점을 알아야 한다.
+
+*컴파일러 : 소스코드를 기계어로 번역 -> 실행파일 생성*
+
+*인터프리터 : 소스코드를 해석해 실행해 주는 역할을 담당.*
+
+### Python3의 동작 방식
+
+Python3는 컴파일러와 동시에 인터프리터로 CPython을 사용한다.
+
+https://github.com/python/cpcython
+
+CPython의 동작방식은 아래와 같다.
+
+1. 인터프리터가 logic과 syntax error를 체크한다.
+
+2. 에러가 없다면, Python코드를 Bytecode형태로 변환한다(컴파일)
+
+3. Bytecode는 PVM(Python Virtual Machine)으로 보내지는데, 해당 PVM은 CPU가 bytecode를 실행할 때 코드를 기계어로 번역해 준다.
+
+CPython의 단점으로는 멀티 쓰레드 코드를 작성할 시에 GIL(global interpreter lock)을 사용한다는 것인데, 많은 쓰레드가 하나의 파이썬 객체에 동시에 접근하지 못하도록 lock을 건다고 한다. 하지만 GIL의 단점은 다양한 기법들에 의해 극복이 되어 실제로는 느끼기 힘든 수준이라고 한다.
+
+### Pypy3의 동작 방식
+
+pypy3는 meta tracing 으로 알려진 테크닉을 사용해, 인터프리터를 JIT(just in time)방식을 사용하는 컴파일러로 변환한다. 따라서 CPython처럼 처음에 전체 코드를 컴파일하는 대신에, 인터프리터가 실행되는 도중에 컴파일을 진행한다. 이때 자주 쓰이는 코드의 캐싱이 일어나기 때문에, 메모리를 조금 더 사용하지만, 속도 개선의 효과를 볼 수 있다고 한다.
+
+Pypy3의 단점으로는, 메모리 사용량이 비교적 많다는 것과, 일부 파이썬 코드를 실행할 수 없는 케이스가 있어 약간의 수정이 필요하다는 것이다. (해당 부분은 직접 예제를 통해 보지는 못했으나, 대부분 알고리즘 문제 해결 수준에 있어서는 문제가 없어보인다.) 또한, 바이트코드를 로드해 컴파일하는데 걸리는 아주 작은 워밍업 시간이 필요하다고 하는데, 굉장히 작은 규모의 프로그램을 작성할때는 별로 좋지 못한 성능을 낼 수 있다고 한다.
+
+### 다른 선택지들
+- IronPython (Python running on .NET)
+- Jython (Python running on the Java Virtual Machine)
+- Stackless Python (Branch of CPython supporting micro threads)
+- MicroPython (Python running on microcontrollers)
+
+### 두 언어의 퍼포먼스 비교글
+https://pypy.org/performance.html
+
+벤치마크 대상마다 차이가 있을 수 있지만, 대부분 pypy3의 퍼포먼스가 더 좋다고 한다.
+
+(약 4.4배의 속도 개선 효과)
+
+### 결론
+앞으로 알고리즘 문제를 해결할 때 대부분 케이스에 있어서 pypy3를 사용하는것이 퍼포먼스가 중요한 알고리즘 문제 해결에 도움이 될 듯 하다.
+메모리 사용 핸들링이 굉장히 섬세하게 요구되는 케이스에서는 python3를 이용할 수 있겠다.
+
+### 참고
+- https://ralp0217.tistory.com/entry/Python3-%EC%99%80-PyPy3-%EC%B0%A8%EC%9D%B4
+- https://www.acmicpc.net/board/view/32552
+- https://www.geeksforgeeks.org/why-pypy3-is-preferred-over-python3/
+
+참고한 글을 작성하신 분들께 정말 감사드립니다.
+
+(Thank you for good article writers)

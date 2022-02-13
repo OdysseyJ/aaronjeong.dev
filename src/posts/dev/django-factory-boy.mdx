@@ -1,0 +1,129 @@
+---
+title: Factory boy를 Django ORM과 함께 사용하기
+date: 2022/1/10
+description: factory boy in python
+tags: [Dev, Python, Django]
+---
+https://www.aaronjeong.dev/posts/python-factory-boy 와 이어지는 글입니다.
+
+## `DjangoModelFactory`
+
+### factory.django.DjangoModelFactory(factory.Factory)
+
+- Django에서 쓰이는 `Model` class에 dedicate한 팩토리다.
+
+- `app.Model` syntax를 지원한다.
+
+- create()는 Model.objects.create() function을 사용한다.
+
+- RelatedFactory 혹은 PostGeneration과 함께 쓰일때는 object가 모든
+  post-generation hook이 실행되고 난 이후에 생성된다.
+
+### factory.django.DjangoOptions(factory.base.FactoryOptions)
+
+- database : 'default'를 기본적으로 사용한다.
+
+- django_get_or_create
+    - create대신에 Model.objects.get_or_create()를 호출한다.
+        ```python
+        class UserFactory(factory.django.DjangoModelFactory):
+            class Meta:
+                model = 'myapp.User'  # Equivalent to ``model = myapp.models.User``
+                django_get_or_create = ('username',)
+
+            username = 'john'
+
+        >>> User.objects.all()
+        []
+        >>> UserFactory()                   # Creates a new user
+        <User: john>
+        >>> User.objects.all()
+        [<User: john>]
+
+        >>> UserFactory()                   # Fetches the existing user
+        <User: john>
+        >>> User.objects.all()              # No new user!
+        [<User: john>]
+
+        >>> UserFactory(username='jack')    # Creates another user
+        <User: jack>
+        >>> User.objects.all()
+        [<User: john>, <User: jack>]
+        ```
+
+    - get_or_create를 사용할 때 기존과 다른 attribute를 넘겨 update를 시도해도
+      업데이트가 안된다.
+          ```python
+            >>> john = UserFactory(username="john")   # Fetches the existing user
+            <User: john>
+
+            >>> john.email
+            "john@example.com"
+
+            >>> john = UserFactory(                   # Fetches the existing user
+                username="john",                  # and provides a new email value
+                email="a_new_email@example.com"
+            )
+            <User: john>
+
+            >>> john.email                            # The email value was not updated
+            "john@example.com"
+          ```
+
+### factory.django.FileField
+- __init__(self, from_path='', from_file='', from_func='', data=b'', filename='example.dat')
+
+- usage
+    ```python
+        class MyFactory(factory.django.DjangoModelFactory):
+            class Meta:
+                model = models.MyModel
+
+            the_file = factory.django.FileField(filename='the_file.dat')
+
+        >>> MyFactory(the_file__data=b'uhuh').the_file.read()
+        b'uhuh'
+        >>> MyFactory(the_file=None).the_file
+        None
+    ```
+
+### factory.django.ImageField
+- __init__(self, from_path='', from_file='', from_func='', filename='example.jpg', width=100, height=100, color='green', format='JPEG')
+
+- usage
+    ```python
+        class MyFactory(factory.django.DjangoModelFactory):
+            class Meta:
+                model = models.MyModel
+
+            the_image = factory.django.ImageField(color='blue')
+
+        >>> MyFactory(the_image__width=42).the_image.width
+        42
+        >>> MyFactory(the_image=None).the_image
+        None
+    ```
+
+### diableing signals
+
+- usage
+    ```python
+    # foo/factories.py
+
+    import factory
+
+    from . import models
+    from . import signals
+
+    @factory.django.mute_signals(signals.pre_save, signals.post_save)
+    class FooFactory(factory.django.DjangoModelFactory):
+        class Meta:
+            model = models.Foo
+
+        # ...
+
+    def make_chain():
+        with factory.django.mute_signals(signals.pre_save, signals.post_save):
+            # pre_save/post_save won't be called here.
+            return SomeFactory(), SomeOtherFactory()
+    ```

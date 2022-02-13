@@ -1,0 +1,360 @@
+---
+title: 파이썬 코딩의 기술 - 함수
+date: 2022/1/9
+description: study and note effective python 2nd edition - functions
+tags: [Dev, Effective-Python]
+---
+
+### 함수
+
+#### 함수가 여러 값을 반환하는 경우 절대로 네 값 이상을 언패킹하지 말라.
+
+- 너무 많은 값의 언패킹은 순서를 혼동하게 만들어 실수를 유발한다.
+    ```python
+    minimum, maximum, average, median, count = get_stats(lengths)
+    ```
+
+- 4개 이상 사용하는 구문에 관해서는 경량 클래스나, namedtuple을 사용하고 함수가 이런
+  값을 반환하게끔 하는것이 더 낫다.
+
+#### None을 반환하기보다는 예외를 발생시켜라
+
+- None을 반환하는 코드는 실수를 발생시킨다.
+    ```python
+    def careful_divide(a, b):
+        try:
+            return a/b
+        except ZeroDivisionError:
+            return None
+
+    x, y = 1, 0
+    result = careful_divide(x, y)
+    if result is None:
+        print("잘못된 입력")
+
+    # 만약 False취급 검사를 했을 경우
+    x, y = 0, 5
+    result = careful_divide(x, y)
+    if not result:
+        print("잘못된 입력")
+
+    기대값 : 0 (0을 5로 나누어도 0이다.)
+    실제값 : "잘못된 입력"
+    ```
+
+- Exception을 던져라, docstring과 annotation을 작성해라
+    ```python
+    def careful_divide(a: float, b: float):
+        """a를 b로 나눈다.
+
+        Raises:
+            ValueError: b가 0이어서 나눗셈을 할 수 없을 때
+        """
+        try:
+            return a / b
+        except ZeroDivisionError as e:
+            raise ValueError("잘못된 입력")
+
+    # 호출자는 더이상 조건문을 사용하지 않는다.
+
+    x, y = 5, 2
+    try:
+        result = careful_divide(x, y)
+    except ValueError:
+        print("잘못된 입력")
+    else:
+        print(f"{result}")
+    ```
+
+#### 변수 영역과 클로저의 상호작용 방식을 이해하라
+
+- 파이썬은 아래와 같은 특징이 있다.
+    - 파이썬의 클로저 : 자신이 정의된 영역밖의 변수를 접근할 수 있는것.
+    - 파이썬에서는 함수가 일급 시민 객체다.
+    - 일급 시민 객체는
+      1. 직접 가리킬 수 있다.
+      2. 변수에 대입하거나 다른 함수에 인자로 전달 할 수 있다.
+      3. 식이나 if문에서 함수를 비교하거나 함수에서 반환하는것 등이 가능하다.
+    - 시퀀스(튜플 포함)을 비교하는 구체적 규칙이 있다. 작은 인덱스부터 차례대로
+      비교한다.
+
+- 식 안에서 변수를 참조할 때, 파이썬 인터프리터는 아래의 방식으로 동작한다. 만약 해당
+  4가지 영역에 변수가 없을 경우 NameError를 발생시킨다.
+    1. 해당 함수의 영역
+    2. 현재 함수를 둘러싼 영역(현재 함수를 둘러싸고 있는 함수 등)
+    3. 현재 코드가 들어 있는 모듈의 영역(전역 영역(global scope)이라고도 부른다.)
+    4. 내장 영역(built-in scope)
+
+- 변수에 값을 대입하는 것은 참조와는 다른 방식으로 작동한다.
+  - 변수가 현재 영역에 이미 정의되어 있다 -> 변수의 값만 새로운 값으로 변경
+  - 변수가 현재 영역에 정의되어 있지 않다 -> 변수 대입을 변수 정의로 취급
+
+- 잘못된 클로저 이해의 예시
+    ```python
+    def sort_priority2(numbers, group):
+        found = False <<<<<<<<
+        def helper(x):
+            if x in group:
+                found = True <<<<<<<<<<<<
+                return (0, x)
+            return (1, x)
+        numbers.sort(key=helper)
+        return found
+
+    print(sort_priority2(numbers, group))
+
+    # 예상 : True
+    # 결과 : False
+    # 이유 : helper가 정의되어 있던 영역에서는 found가 정의되어 있지 않다. 이때 변수
+    대입은 새로운 변수의 정의로 취급한다. (참조는 가능함.)
+    ```
+
+- 해당 문제를 해결하는 방법
+    1. nonlocal의 사용 - 거의 모든케이스에서 권장되지 않음
+        ```python
+        def sort_priority2(numbers, group):
+            found = False
+            def helper(x):
+                nonlocal found <<<<<<<
+                if x in group:
+                    found = True
+                    return (0, x)
+                return (1, x)
+            numbers.sort(key=helper)
+            return found
+        ```
+    2. 새로운 클래스로 정의하기 - 훨씬 읽기 쉽고 명확해서 권장됨
+        ```python
+        class Sorter:
+            def __init__(self, group):
+                self.group = group
+                self.found = False
+
+            def __call__(self, x):
+                if x in self.group:
+                    self.found = True
+                    return (0, x)
+                return (1, x)
+
+        sorter = Sorter(group)
+        numbers.sort(key=sorter)
+        assert sorter.found is True
+        ```
+
+#### 변수 위치 인자를 사용해 시각적인 잡음을 줄여라
+- 가변 인자 함수를 만들면 시각적 잡음을 줄이는데 유용하다
+    ```python
+    def log(message, *values):
+        if not values:
+            print(message)
+        else:
+            values_str = ', '.join(str(x) for x in values)
+            print(f'{message}: {values_str}')
+
+    log("내 숫자는", 1, 2)
+    numbers = [1, 2]
+    log("테스트", *numbers)
+    ```
+
+- *args를 받는 함수에 새로운 위치 기반 인자를 넣지 말자.
+    ```python
+    def log(message, new_message, *values):
+        if not values:
+            print(message)
+        else:
+            values_str = ', '.join(str(x) for x in values)
+            print(f'{message}: {values_str}')
+
+    log("내 숫자는", 1, 2) <<<<< log를 사용하던 모든 곳에서 리팩토링을 해야 한다.
+    ```
+
+#### 키워드 인자로 선택적인 기능을 제공하라
+- 인자에 키워드를 사용하면 넘기는 순서와 관계가 없어진다.
+    ```python
+    def remainder(number, divisor):
+        return number % divisor
+
+    assert remainder(20, 7) == 6
+    assert remainder(number=20, divisor=7)
+    assert remainder(divisor=7, number=20)
+    my_kwargs = {
+        'divisor': 7
+    }
+    assert remainder(number=20, **my_kwargs) == 6
+    ```
+
+- 아무 키워드 인자나 받는 함수를 만들고 싶다면, 모든 키워드 인자를 dict에 모아주는
+  **kwargs를 정의한다.
+    ```python
+    def print_params(**kwargs):
+        for key, value in kwargs.items():
+            print(f"{key} = {value}")
+
+    print_params(alpha=1.5, beta=9, 감마=4)
+    alpha = 1.5
+    beta = 9
+    감마 = 4
+    ```
+
+- 선택적 인자를 구현할 때, 혹은 기존의 함수가 파라미터가 추가될 때 keyword argument와
+  default인자를 사용하면 좋다.
+    ```python
+    def flow_rate(weight_diff, time_diff, period=1):
+        return (weight_diff / time_diff) * period
+
+    flow_per_second = flow_rate(weight_diff, time_diff)
+    flow_per_hour = flow_rate(weight_diff, time_diff, period=3600)
+    ```
+
+#### None과 독스트링을 사용해 동적인 디폴트 인자를 지정하라.
+- 디폴트 인자는 함수가 정의되는 시점에 단 한번만 호출된다.
+    ```python
+    from time import sleep
+    from datetime import datetime
+
+    def log(message, when=datetime.now()):
+        print(f"{when}: {message}")
+
+    log("안녕")
+    sleep(0.1)
+    log("다시 안녕!")
+
+    2020-08-18 11:29:12.857588: 안녕
+    2020-08-18 11:29:12.857588: 다시 안녕!  <<<<<<<< 바뀌지 않음.
+
+    >>>>>>
+
+    def log(message, when=None):
+        if when is None:
+            when = datetime.now()
+
+        print(f"{when}: {message}")
+    ```
+
+- 디폴트 인자 값으로 비어있음을 확인할때는 None을 사용하는게 좋다.
+    ```python
+    import json
+
+    def decode(data, default={}):
+        try:
+            return json.loads(data)
+        except ValueError:
+            return default
+
+    foo = decode("잘못된 데이터")
+    foo["stuff"] = 5
+    bar = decode("잘못된 데이터2")
+    bar["meep"] = 1
+
+    >>> foo
+    {"stuff": 5, "meep": 1}
+    >>> bar
+    {"stuff": 5, "meep": 1}
+
+    동일한 딕셔너리 객체
+
+    def decode(data, default=None):
+        try:
+            return json.loads(data)
+        except ValueError:
+            return default
+    ```
+
+- 타입 애너테이션을 사용할 때도 None을 사용해 키워드 인자의 디폴트 값을 표현하는 방식을
+  적용할 수 있다.
+    ```python
+    from typing import Optional
+
+    def log_typed(message: str,
+                  when: Optional[datetime]=None) -> None:
+    """메세지와 타임스탬프를 로그에 남긴다.
+
+    Args:
+        message: 출력할 메세지.
+        when: 메세지가 발생한 시각(datetime).
+            디폴트 값은 현재 시간이다.
+    """
+
+    if when is None:
+        when = datetime.now()
+    print(f'{when}: {message}')
+    ```
+
+#### 위치로만 인자를 지정하게 하거나, 키워드로만 인자를 지정하게 해서 함수 호출을 명확하게 만들어라.
+
+- 키워드만으로 인자를 지정하게 하는 방법
+    ```python
+    def safe_division_c(number, divisor, *, <<<<
+                        ignore_overflow=False,
+                        ignore_zero_divison=False)
+        ...
+
+    safe_division_c(1.0, 10**500, True, False) <<< fail
+    safe_division_c(1.0, 10**500, ignore_overflow=True, ignore_zero_divison=False) <<< success
+    ```
+
+- 위치로만 인자를 지정하게 하는 방법 + 키워드와 함께 쓰기
+    ```python
+    def safe_divison_d(numerator, denominator, /, *, <<<<
+                       ignore_overflow=False,
+                       ignore_zero_divison=False):
+        ...
+
+    assert safe_divison_d(2, 5) == 0.4
+    safe_divison_d(numertaor=2, denominator=5) <<< error
+    ```
+
+- /와 * 사이에 있는 모든 파라미터는 위치를 사용해 전달할 수도 있고 이름을 이용해 전달할
+  수도 있다.
+    ```python
+    def safe_divison_e(numertaor, denominator, /,
+                       ndigits=10, *,
+                       ignore_overflow=False,
+                       ignore_zero_divison=False):
+        ...
+    ```
+
+#### functools.wrap을 사용해 함수 데코레이터를 작성해라
+
+- functools.wrap을 사용하지 않으면 데코레이터가 반환하는 함수의 이름이 wrapper가 되고,
+  pickle 객체 직렬화도 사용할 수 없음
+    ```python
+    def trace(func):
+        def wrapper(*args, **kwargs):
+            result = func(*args, **kwargs)
+            return result
+        return wrapper
+
+    @trace
+    def fibonacci(n):
+        if n in (0, 1):
+            return n
+        return fibonacci(n - 2) + fibonacci(n - 1)
+
+    print(fibonacci)
+    <function trace.<locals>.wrapper at 0x....>
+
+    pickle.dumps(fibonacci) <<< error
+    ```
+
+- functools.wraps 를 사용하면 데코레이터로 감싸진 함수에 대해서 원하는 결과를
+  볼 수 있다.
+    ```python
+    from functools import wraps
+
+    def trace(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            ...
+        return wrapper
+
+    @trace
+    def fibonacci(n):
+        ...
+
+    print(fibonacci)
+    <function fibonacci ...>
+
+    pickle.dumps(fibonacci)
+    b'\x80\x04....''
+    ```

@@ -1,0 +1,310 @@
+---
+title: Django Queryset의 구조와 원리, 최적화 전략
+date: 2022/1/23
+description: PyCon - django queryset structure and optimization
+tags: [Dev, Database, Django, ORM]
+---
+해당 영상을 보고 공부한 내용을 정리한 글입니다. 해당 내용을 작성해주신 김성렬님, pycon korea에 굉장히 깊은 감사를 표합니다.
+
+https://www.youtube.com/watch?v=EZgLfDrUlrk
+
+## queryset을 통해 알아보는 orm의 특징
+
+1. Lazy Loading : 정말 필요한 시점에 SQL을 호출한다.
+    ```python
+    user: QuerySet = User.objects.all()
+
+    user_list = List[User] = list(users) <<< 해당 시점에 쿼리를 불러 가져온다.
+    ```
+    ```python
+    users: QuerySet = User.objects.all()
+    orders: QuerySet = Order.objects.all()
+    companies : QuerySet = Companies.objects.all()
+    ```
+
+2. Lazy Loading을 통해 생기는 비효율성이 있을 수 있다.
+    ```python
+    users: QuerySet = User.objects.all()
+
+    first_user: User = users[0] <<< LIMIT을 통해 1번의 쿼리를 부른다.
+
+    user_list = List[User] = list(users) <<< 해당 시점에 쿼리를 다시 불러 가져온다.
+    ```
+
+3. Caching : QuerySet 캐싱을 재사용하여 효율을 높인다.
+    ```python
+    users: QuerySet = User.objects.all()
+
+    user_list = List[User] = list(users) <<< 해당 시점에 쿼리를 부른다.
+
+    first_user: User = users[0] <<< 캐싱을 하기 때문에 다시 쿼리를 부르지 않는다.
+
+    ```
+
+4. Eager Loading : 즉시 로딩 - 많은 데이터를 한번에 얻어오고 싶을 때
+    - user라는 테이블과 users라는 테이블이 1:1 관계인 상황에서, userinfo를 조회시 user를 1회 쿼리하고, userinfo를 가져오기 위해 n번의 쿼리를 하게된다.
+        ```python
+        users: QuerySet = User.objects.all()
+
+        for user in users:
+            # QuerySet에서 user의 userinfo가  필요한 시점
+            # user의 데이터를 조회했는데, userinfo가 없으므로 1번 더 호출
+            user.userinfo
+        ```
+
+## QuerySet 상세 살펴보기
+1. QuerySet은 한개의 Query와 0 또는 N개의 추가 쿼리셋으로 구성되어 있다.
+    ```python
+    class QuerySet:
+        query: query = Query() # 메인 쿼리
+        _result_cache: List[Dict[Any, Any]] = dict() # SQL 수행결과의 캐싱
+
+        _prefetch_related_lookups = Tuple[str] = [] # prefetch_related로 선언한 값을 저장하는 추가쿼리셋
+
+        _iterable_class = ModelIterable # sql 결과값을 python의 어떤 자료구조로 반환받을 것인가를 선언하는 프로퍼티.
+    ```
+
+2. Eager loading methods : select_related(), prefetch_related()
+    - select_related : Join, prefetch_related : 1 More query
+        ```python
+        Model.objects.filter(조건)
+        .select_related('정방향_참조_필드') # 해당 필드를 join해서 가져온다.
+        .prefetch_related('역방향_참조_필드') # 해당 필드는 추가쿼리로 가져온다.
+        ```
+
+        ```python
+        # select_related
+        select * from 'Model' m
+        (innter OR left, outer) join '정방향_참조_필드' r on mr_id=r.id
+        'where 조건절';
+
+        # prefetch_related
+        select * from '역방향_참조_필드' where id in ('첫번째 쿼리 결과의 id 리스트')
+        ```
+
+    - 예시
+        ```python
+        order_list = (
+            Order.objects
+            .select_related('order_owner')
+            .filter(order_owner__username='username4')
+            .prefetch_related('product_set_included_order')
+        )
+        ```
+
+    - 역방향 참조 모델은 select_related에 줄 수 없다.
+    - 정방향 참조 모델은 둘 다 사용 가능하지만, select_related로 사용하기를 권장.
+
+3. pefetch_related()는 추가 쿼리셋이다.
+
+    - Prefetch에 선언한 개수만큼 쿼리가 추가로 실행된다.
+        ```python
+        queryset = (
+            AModel.objects
+            .prefetch_related(
+                'b_model_set',
+                'c_models'
+            )
+        )
+
+        # 위와 동일한 수행 결과
+        from django.db.models import Prefetch
+
+        queryset = (
+            AModel.objects
+            .pefetch_related(
+                Prefetch(to_attr='b_model_set', queryset=BModel.objects.all(is_deleted=False)),
+                Prefetch(to_attr='c_models', queryset=CModel.objects.all())
+            )
+        )
+        ```
+        ```python
+        select * from a_model;
+
+        select * from b_model where id in (~~) and is_deleted is False;
+        select * from c_model where id in (~~)
+        ```
+
+4. SQL Performance를 커버하는 Textcase [CaptureQueriesContext를 활용하자.]
+    - N+1 문제같이 크리티컬한 이슈가 발생하는 문제에 대한 테스트는 아래의 코드를
+      이용해보자.
+        ```python
+        from django.test.utils import CaptureQueriesContext
+        from rest_framework.test import APIClient
+
+        def test_check_n_plus_1_problem():
+            from django.db import connection
+
+            # Given : 주문이 2개 더 추가되기 전 API에서 발생하는 SQL Count
+            with CaptureQueriesContext(connection) as expected_num_queries:
+                APIClient().get(path="/restaurants/")
+
+            # When: 주문이 2개 더 추가된 이후 API에서 발생하는 SQL Context
+            Order.objects.create(
+                total_price=9800,
+                comment="주문데이터가 N개 생성되었다고 SQL이 N개더 생성되면 안된다."
+            )
+            Order.objects.create(
+                total_price=8800,
+                comment="주문데이터가 N개 생성되었다고 SQL이 N개더 생성되면 안된다."
+            )
+
+            with CaptureQueriesContext(connection) as checked_num_queries:
+                APIClient().get(path="/restaurants/")
+
+            # Then: 주문이 2더 추가된다고 동일 API에서 SQL이 추가 발생하면 안된다.
+            assert len(checked_num_queries.captured_queries) == len(expected_num_queries.captured_queries)
+        ```
+
+## 실수하기 쉬운 QuerySet의 특성들
+
+### prefetch_related()와 filter()는 완전 별개다.
+- 잘못 사용 시 메인쿼리에 조인하고, 추가쿼리에서 한번 더 조회하게 된다.
+```python
+    company_queryset = (
+        Company.objects
+        .prefetch_related('product_set')
+        .filter(name='company_name1', product_name_isnull=False)
+        )
+
+    개선
+    ->
+    company_queryset = (
+        Company.objects
+        .filter(name='company_name1', product_name_isnull=False)
+        )
+
+    혹은
+    ->
+    company_queryset = (
+        Company.objects
+        .filter(name='company_name1')
+        .prefetch_related(
+            'product_set', queryset=Product.objects.filter(product__name__isnull=False))
+        )
+```
+
+### 쿼리셋 작성 순서 추천
+```python
+    queryset = (
+        Model.objects.
+        .annotate()
+        .select_related()
+        filter()
+        only()
+        prefetch_related()
+```
+
+### queryset 캐시를 재활용하지 못하는 queryset 호출
+```python
+company_list = list(Company.objects.prefetch_related("product_set").all())
+
+company = company_list[0] << 캐싱 사용
+
+company.product_set.filter(name="불닭볶음면") << 하지만 SQL 발생
+
+# sql을 발생시키지 않으려면
+fire_noodle_product_list = [product for product in company.product_set.all() if product.name == "불닭볶음면"]
+```
+
+### RawQuerySet은 NativeSQL이 아니다.
+- RawQuerySet은 raw를 정의하는 것이다.
+    ```python
+    from django.db.models.query import QuerySet, RawQuerySet
+
+    this_is_raw_queryset: RawQuerySet = Model.objects.raw("select * from model where ~~~~") # raw() 선언시 RawQuerySet
+
+    this_is_queryset: QuerySet = Model.objects.filter(~~~~)
+    ```
+
+- QuerySet vs RawQuerySet 의 차이는 self.query를 제외하고는 모두 같다.
+    ```python
+    order_queryset: RawQuerySet = (
+        Order.objects
+        .raw(raw_query=
+            """
+                SELECT *
+                FROM "orm_practie_app_order"
+                INNER JOIN "orm_practice_app_user" ON ("orm_practice_app_order", "order_owner_id" = "orm_practice_app_user"."id")
+                WHERE "orm_practice_app_user"."username" = %(username_param1)s
+            """,
+            params={"username_param1": "username4"})
+            )
+        .prefetch_related("product_set_included_order")
+
+        동일
+        ->
+        order_queryset: QuerySet = (
+            Order.objects
+            .select_related('order_owner')
+            .fiter(order_owner__username="username4")
+            .prefetch_related("product_set_included_order")
+        )
+    ```
+
+- 단, RawQuerySet에서는 아래의 메서드들은 사용불가. 직접 적어줘야 한다.
+    ```python
+    .select_related()
+    FilteredRelation()
+    .annotate()
+    .order_by()
+    .extra() # 메인쿼리에 sql추가하는 메서드
+    [:10]
+    ```
+
+### 서브쿼리 발생 조건
+- QuerySet in QuerySet
+    ```python
+    company_queryset = Company.objects.all()
+    product_queryset = Product.objects.filter(product_owned_company_id_in=company_queryset)
+
+    서브쿼리셋 회피
+    --->
+
+    company_list = list(Company.objects.all())
+    product_queryset = Product.objects.filter(product_owned_company_id_in=company_list)
+    ```
+
+- 역방향 참조 모델을 exclude()절에 넣어서 JOIN을 유도하면 서브쿼리 발생(버그같음)
+    ```python
+    subquery_executed_queryset = Order.objects.filter(description__isnull=False).exclude(product_set_included_order__name="asdfasdf")
+    ```
+
+- 정방향 참조 모델은 exclude()절에 넣어서 유도해도 서브쿼리 발생 안함.
+
+### QuerySet의 반환타입을 잘 알아두자
+
+- values(), values_list()
+    ```python
+    result : List[Model] = Model.objects.all()
+                                        .only() # 지정한 필드만 조회
+                                        .defer() # 필드 제외 조회
+
+    # ValuesIterable
+    result: List[Dict[str, Any]] = Model.objects.values()
+
+    # ValuesListIterable
+    result : List[Tuple[str, Any]] = Model.objects.values_list()
+
+    # FlatValuesListIterable (ValuesListIterable 상속)
+    result : List[Any] = Model.objects.values_list('pk', flat=True)
+
+    # NamedValuesListIterable (ValuesListIterable 상속)
+    result : List[Any] = Model.objects.values_list(named=True)
+    ```
+
+- values(), values_list()를 사용하면 select_related(), prefetch_related() 옵션들을
+  전부 `무시`한다. (중요)
+
+## 쿼리셋을 잘 쓰는 법 정리
+1. QuerySet은 1개의 Query와 0~N개의 QuerySet으로 이루어져 있다.
+2. 수행하고자 하는 SQL을 먼저 떠올리지 말고 가져 오고자 하는 데이터 리스트를 먼저 떠올리자.
+3. QuerySet이 제공하는 기초적 SQL구조를 기억하자 이 구조를 벗어난다면 그건 RawQuerySet으로 풀자.
+4. ORM으로 복잡한 SQL을 구현했다고 잘 쓰는 것이 아니라, 어떤 로직을 작성하는데 단조로운 SQL작업을 줄여주고 Object와 Relational Mapping을 해 준다는 장점을 얻을 수 없다면 NativeSQL을 이용하자.
+5. NativeSQL 사용을 망설이지 말자. 특히 SQL 성능이 중요하다면 더더욱.
+
+
+### 참고할만한 프로젝트
+https://www.github.com/KimSoungRyoul/Django_ORM_practice_project
+
+https://www.medium.com/deliverytechkorea/django-queryset-1-14b0cc715eb7

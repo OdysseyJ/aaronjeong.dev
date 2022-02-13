@@ -1,4 +1,4 @@
-import { HStack, Spinner } from "@chakra-ui/react";
+import {Box, HStack, Spinner} from "@chakra-ui/react";
 import Comments from "@src/components/Comments";
 import MDXComponents from "@src/components/MDXComponents";
 import TagLink from "@src/components/TagLink";
@@ -18,6 +18,7 @@ const PostPage = ({ source, frontMatter, slug }: any) => {
 
   const { title, description, date, tags } = frontMatter;
   const canonical = process.env.host + router.asPath;
+  console.log(source)
   return (
     <>
       <NextSeo
@@ -53,17 +54,19 @@ const PostPage = ({ source, frontMatter, slug }: any) => {
       />
       <H2>{title}</H2>
       <H6>{dayjs(date).format("YYYY-MM-DD")}</H6>
-      <MDXRemote {...source} components={MDXComponents} />
       <HStack spacing={2} py={4}>
         {tags.map((tag: any) => (
-          <TagLink key={tag} tag={tag} count={0} />
+            <TagLink key={tag} tag={tag} count={0} />
         ))}
       </HStack>
+      <MDXRemote {...source} components={MDXComponents} />
+      <Box padding={10}/>
       <Comments
         config={{
           url: canonical,
           identifier: slug,
           title: title,
+          language: "ko"
         }}
       />
     </>

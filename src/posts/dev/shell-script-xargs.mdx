@@ -1,0 +1,25 @@
+---
+title: 쉘 스크립트 - xargs 정리
+date: 2022/1/20
+description: shell script - xargs
+tags: [Dev, Shell, Bash]
+---
+
+https://ko.linux-console.net/?p=229
+
+### xargs란?
+
+xargs란 표준 입력에서 데이터 스트림을 읽어 명령줄을 생성하는 도구이다.
+
+### 사용법
+
+- 앞의 표준 입력에서 받은 내용을 전부 명령줄로 바꾸어 다음 커맨드에 전달함.
+    ```shell
+    ❯ pip freeze | xargs echo
+    alembic==1.7.5 apache-airflow==2.0.2 apache-airflow-providers-amazon==1.3.0 apache-airflow-providers-ftp==2.0.1 apache-airflow-providers-http==2.0.1 apache-airflow-providers-imap==2.0.1 apache-airflow-providers-slack==3.0.0 apache-airflow-providers-sqlite==2.0.1 apispec==3.3.2 appnope==0.1.2 argcomplete==1.12.3 arrow==1.2.1 asgiref==3.4.1 attrs==20.3.0 Babel==2.9.1 backcall==0.2.0 backports.entry-points-selectable==1.1.1 backports.zoneinfo==0.2.1 binaryornot==0.4.4 black==21.12b0 blinker==1.4 boto3==1.17.112 botocore==1.20.112 cached-property==1.5.2 cattrs==1.9.0 certifi==2021.10.8 cffi==1.15.0 cfgv==3.3.1 cfn-flip==1.3.0 chardet==4.0.0 charset-normalizer==2.0.9 click==7.1.2 clickclick==20.10.2 colorama==0.4.4 colorlog==6.6.0 commonmark==0.9.1 connexion==2.9.0 cookiecutter==1.7.3 coolsms-python-sdk==2.0.3 coverage==5.1 croniter==0.3.37 cryptography==36.0.0 decorator==5.1.1 defusedxml==0.7.1 dill==0.3.4 distlib==0.3.4 Django==3.0.5 django-allauth==0.42.0 django-choices==1.7.1 django-cors-headers==3.3.0 django-cte==1.1.5 django-debug-toolbar==2.2 django-extensions==2.2.9 django-rest-auth==0.9.5 django-storages==1.9.1 django-url-filter==0.3.15 djangorestframework==3.11.0 djangorestframework-jwt==1.11.0 dnspython==2.1.0 docutils==0.18.1 durationpy==0.5 elasticsearch==7.12.1 email-validator==1.1.3 enum-compat==0.0.3 factory-boy==2.12.0 Faker==9.9.0 filelock==3.4.0 Flask==1.1.4 Flask-AppBuilder==3.4.0 Flask-Babel==2.0.0 Flask-Caching==1.10.1 Flask-JWT-Extended==3.25.1 Flask-Login==0.4.1 Flask-OpenID==1.3.0 Flask-SQLAlchemy==2.5.1 Flask-WTF==0.14.3 freezegun==1.1.0 future==0.18.2 gitdb==4.0.9 GitPython==3.1.2 graphviz==0.19 greenlet==1.1.2 gunicorn==19.10.0 hjson==3.0.2 identify==2.4.0 idna==3.3 importlib-metadata==1.7.0 importlib-resources==1.5.0 inflection==0.5.1 ipython==7.31.0 iso8601==1.0.2 isodate==0.6.0 itsdangerous==1.1.0 jedi==0.18.1 Jinja2==2.11.3 jinja2-time==0.2.0 jmespath==0.10.0 jsonschema==3.2.0 kappa==0.6.0 lazy-object-proxy==1.6.0 lockfile==0.12.2 Mako==1.1.6 Markdown==3.3.4 MarkupSafe==1.1.1 marshmallow==3.14.1 marshmallow-enum==1.5.1 marshmallow-oneofschema==3.0.1 marshmallow-sqlalchemy==0.26.1 matplotlib-inline==0.1.3 msgpack==1.0.3 mypy-extensions==0.4.3 natsort==8.0.0 nodeenv==1.6.0 numpy==1.18.2 oauthlib==3.1.1 openapi-schema-validator==0.1.5 openapi-spec-validator==0.3.1 pandas==1.2.3 parso==0.8.3 pathspec==0.9.0 pendulum==2.1.2 pep517==0.12.0 pexpect==4.8.0 pickleshare==0.7.5 Pillow==7.1.1 pip-tools==6.4.0 placebo==0.10.0 platformdirs==2.4.0 poyo==0.5.0 pre-commit==2.16.0 prison==0.2.1 prompt-toolkit==3.0.24 psutil==5.8.0 psycopg2-binary==2.8.5 ptyprocess==0.7.0 pycparser==2.21 pyfcm==1.5.1 Pygments==2.10.0 PyJWT==1.7.1 pynvim==0.4.3 pyrsistent==0.18.0 python-daemon==2.3.0 python-dateutil==2.8.2 python-dotenv==0.12.0 python-nvd3==0.15.0 python-slugify==4.0.1 python3-openid==3.2.0 pytz==2021.3 pytzdata==2020.1 PyVimeo==1.1.0 PyYAML==5.4.1 requests==2.26.0 requests-oauthlib==1.3.0 rest-condition==1.0.3 rich==9.2.0 s3transfer==0.4.2 sentry-sdk==0.13.5 setproctitle==1.2.2 six==1.16.0 slack-bolt==1.8.0 slack-sdk==3.10.1 smmap==5.0.0 SQLAlchemy==1.3.24 SQLAlchemy-JSONField==1.0.0 SQLAlchemy-Utils==0.37.9 sqlparse==0.4.2 swagger-ui-bundle==0.0.9 tabulate==0.8.9 tenacity==6.2.0 termcolor==1.1.0 text-unidecode==1.3 tinydb==4.5.2 toml==0.10.2 tomli==1.2.2 tqdm==4.62.3 traitlets==5.1.1 troposphere==3.1.1 tuspy==0.2.5 typing-extensions==3.10.0.2 unicodecsv==0.14.1 urllib3==1.26.7 virtualenv==20.10.0 watchtower==0.7.3 wcwidth==0.2.5 Werkzeug==1.0.1 ...
+    ```
+
+- 보통 파이썬 패키지를 전부 지울때 많이 애용했다.
+    ```shell
+    pip freeze | grep -v "^-e" | xargs pip uninstall -y
+    ```

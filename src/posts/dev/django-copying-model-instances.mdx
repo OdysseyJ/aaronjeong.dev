@@ -1,0 +1,89 @@
+---
+title: Django에서 모델 인스턴스 복사하기
+date: 2022/1/17
+description: copying model instances in django
+tags: [Dev, Django]
+---
+
+## model.pk = None
+- 모든 필드 값이 복사되게끔 모델 인스턴스를 복사하기 위한 간단한 방법은 model.pk
+  = None으로 선언한 후 save() 함수를 부르는 것이다.
+    ```python
+    blog = Blog(name='My blog', tagline='Blogging is easy')
+    blog.save() # blog.pk == 1
+
+    blog.pk = None
+    blog._state.adding = True
+    blog.save() # blog.pk == 2
+    ```
+
+## Inheritance
+- 만약, 객체가 상속 객체라면 모델 인스턴스를 복사하기 위해서는 id = None을 함께 해 준다.
+    ### Django 3.1
+    ```python
+    class ThemeBlog(Blog):
+        theme = models.CharField(max_length=200)
+
+    django_blog = ThemeBlog(name='Django', tagline='Django is easy', theme='python')
+    django_blog.save() # django_blog.pk == 3
+    ```
+    ```python
+    django_blog.pk = None
+    django_blog.id = None
+    django_blog.save() # django_blog.pk == 4
+    ```
+    ### Django 4.0 : _state.adding = True
+    ```python
+    class ThemeBlog(Blog):
+    theme = models.CharField(max_length=200)
+
+    django_blog = ThemeBlog(name='Django', tagline='Django is easy', theme='python')
+    django_blog.save() # django_blog.pk == 3
+    ```
+    ```python
+    django_blog.pk = None
+    django_blog.id = None
+    django_blog._state.adding = True
+    django_blog.save() # django_blog.pk == 4
+    ```
+
+## ManyToMany
+- many to many는 set method를 사용해 직접 relation을 지정해줘야 한다.
+    ### Django 3.1
+    ```python
+    entry = Entry.objects.all()[0] # some previous entry
+    old_authors = entry.authors.all()
+    entry.pk = None
+    entry.save()
+    entry.authors.set(old_authors)
+    ```
+
+    ### Django 4.0 : _state.adding = True
+    ```python
+    entry = Entry.objects.all()[0] # some previous entry
+    old_authors = entry.authors.all()
+    entry.pk = None
+    entry._state.adding = True
+    entry.save()
+    entry.authors.set(old_authors)
+    ```
+
+## OneToOne
+- OneToOneField는 related object를 복제해서 새로운 object에 넘겨야 one-to-one unique
+  constraint를 피할 수 있다.
+    ### Django 3.1
+    ```python
+    detail = EntryDetail.objects.all()[0]
+    detail.pk = None
+    detail.entry = entry
+    detail.save()
+    ```
+
+    ### Django 4.0 : _state.adding = True
+    ```python
+    detail = EntryDetail.objects.all()[0]
+    detail.pk = None
+    detail._state.adding = True
+    detail.entry = entry
+    detail.save()
+    ```

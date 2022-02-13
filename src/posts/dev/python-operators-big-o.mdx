@@ -1,0 +1,68 @@
+---
+title: Python 주요 연산자 및 자료형 시간복잡도(Big-O) 정리
+date: 2022/1/13
+description: python main opeations and data structures time complexity
+tags: [Dev, Python]
+---
+
+### 리스트 자료형과 메서드
+
+| **Operation** | **Example** | **Complexity** | **Notes** |
+| - | - | - | - |
+| Index | l[i] | O(1) | 인덱스로 값 찾기 |
+| Store | l[i] = 0 | O(1) | 인덱스로 데이터 저장 |
+| Length | len(l) | O(1) | 리스트 길이 |
+| Append | l.append(5) | O(1) | 리스드 뒤에 데이터 저장 |
+| Pop | l.pop() | O(1) | 가장 뒤의 데이터 pop |
+| Clear | l.clear() | O(1) | l = [] |
+| Slice | l[a:b] | O(b-a) | 슬라이싱되는 요소들 수 만큼 비례 |
+| Extend | l.extend(...) | O(len(...)) | 확장되는 길이만큼 |
+| Construction | list(...) | O(len(...)) | 리스트 길이만큼 |
+| check ==, != | l1 == l2 | O(N) | 전체 리스트가 동일한지 확인 |
+| Insert | l[a:b] = ... | O(N) | 데이터 삽입 |
+| Delete | del l[i] | O(N) | 데이터 삭제 |
+| Containment | x in/not in l | O(N) | 포함 여부 확인 |
+| Copy | l.copy() | O(N) | 복제 |
+| Remove | l.remove(...) | O(N) | 제거 |
+| Pop | l.pop(i) | O(N) | 제거된 값 이후를 전부 한칸씩 당겨줘야함 |
+| Extreme value | min(l)/max(l) | O(N) | 전체 데이터를 확인해야함 |
+| Reverse | l.reverse() | O(N) | 뒤집기 |
+| Iteration | for v in l: | O(N) | 전체 데이터 확인하므로 |
+| Sort | l.sort() | O(N Log N) | 파이썬 기본 정렬 알고리즘 |
+| Multiply | k*l | O(k N) |  리스트의 곱은 리스트 개수 늘어남 |
+
+### 집합 자료형과 메서드
+
+| Operation | Example | Class | Notes |
+| - | - | - | - |
+| Add | s.add(5) | O(1) | 집합 요소 추가 |
+| Containment | x in/not in s | O(1) | 포함 여부 확인 |
+| Remove | s.remove(..) | O(1) | 요소 제거 |
+| Discard | s.discard(..) | O(1) | 특정 요소 제거 |
+| Pop | s.pop() | O(1) | 랜덤하게 하나 pop |
+| Clear | s.clear() | O(1) | similar to s = set() |
+| Construction | set(...) | O(len(...)) | 길이만큼 |
+| check ==, != | s != t | O(len(s)) | 전체 요소 동일 여부 확인 |
+| <=/< | s <= t | O(len(s)) | 부분집합 여부 |
+| >=/> | s >= t | O(len(t)) | 부분집합 여부 |
+| Union | s, t | O(len(s)+len(t)) | 합집합 |
+| Intersection | s & t | O(len(s)+len(t)) | 교집합 |
+| Difference | s - t | O(len(s)+len(t)) | 차집합 |
+| Symmetric Diff | s ^ t | O(len(s)+len(t)) | 여집합 |
+| Iteration | for v in s: | O(N) | 전체 요소 순회 |
+| Copy | s.copy() | O(N) | 복제 |
+
+### dictionary 자료형과 메서드
+
+| Operation | Example | Class | Notes |
+| - | - | - | - |
+| Store | d[k] = v | O(1) | 데이터 저장 |
+| Length | len(d) | O(1) | 길이 출력 |
+| Delete | del d[k] | O(1) | 요소 제거 |
+| get/setdefault | d.get(k) | O(1) | key에 따른 value 확인 |
+| Pop | d.pop(k) | O(1) | pop |
+| Pop item | d.popitem() | O(1) | 랜덤하게 선택해서 pop |
+| Clear | d.clear() | O(1) | similar to s = {} or = dict() |
+| View | d.keys() | O(1) | same for d.values() / 키값 전체 확인 |
+| Construction | dict(...) | O(len(...)) | (key, value) 튜플 개수만큼 |
+| Iteration | for k in d: | O(N) | 전체 딕셔너리 순회 |

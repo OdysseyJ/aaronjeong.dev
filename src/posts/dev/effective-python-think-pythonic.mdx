@@ -1,0 +1,366 @@
+---
+title: 파이썬 코딩의 기술 - 파이썬답게 생각하기
+date: 2022/1/7
+description: study and note effective python 2nd edition - think pythonic
+tags: [Dev, Effective-Python]
+---
+
+### 파이썬답게 생각하기
+#### PEP 8 스타일 가이드를 따르라
+- 공백
+
+  공백은 보통 IDE를 사용하면 linter들이 워닝이나 에러를 내 주기 때문에 적용하기 어려운 방법은 아니나, 한번쯤은 정리해 두자.
+
+    1. 탭 대신 스페이스 사용하기
+    2. 문법적으로 중요한 들여쓰기에는 4칸 스페이스 사용.
+    3. 라인 길이 79자 이하
+    4. 긴 식을 다음줄에 이어 쓸 경우 일반 들여쓰기보다 4 스페이스 더 들여쓰기
+        ```python
+        introduce = ("hello my name is aaron and i'm working"
+            "on turing and now i")
+        ```
+    5. 파일 안에서 각 함수와 클래스 사이에는 두 줄을 넣자.
+        ```python
+        class A:
+            pass
+       # 2줄
+       # 2줄
+        class B:
+            pass
+        ```
+    6. 클래스 안에서 메서드와 메서드 사이에는 빈 줄을 한 줄 넣자.
+        ```python
+        class A:
+
+            def a():
+                pass
+
+            def b():
+                pass
+        ```
+    7. 딕셔너리에서 키와 콜론 사이에는 공백 없음, 한 줄 안에 키와 값을 같이 넣는 경우에는 콜론 다음에 스페이스바를 하나 넣음.
+        ```python
+        d = {'key': 'value'}
+        ```
+    8. 변수 대입에서 = 전후에는 스페이스를 하나씩만 넣음
+        ```python
+        a = 'apple'
+        ```
+    9. 타입 표기를 덧붙이는 경우에는 변수 이름과 콜론 사이에는 공백을 넣지 않고, 콜론과 타입 정보 사이에는 스페이스를 넣기.
+        ```python
+        def run(p: int){
+            print("run")
+        }
+        ```
+
+- 명명 규약
+
+  이름을 어떻게 지을 것인가?
+
+    1. 공개(public) 함수, 변수, 어트리뷰트는 lower_undercase의 snake case를 사용하라.
+    2. 보호돼야(protected) 하는 어트리뷰트는 _leading_underscore로 사용하라.
+    3. 비공개(private) 인스턴스 어트리뷰트는 __leading_underscore로 사용하라.
+    4. 클래스, 예외는 CapitalizedWord처럼 PascalCase를 사용하라.
+    5. 모듈 수준 상수는 ALL_CAPS처럼 대문자 snake case를 사용하라.
+    6. 클래스 인스턴스 메서드는 첫번째 인자로 반드시 self를 사용하라.
+    7. 클래스 메서드는 첫번째 인자로 반드시 cls를 사용하라.
+
+- 식과 문
+
+  수식을 작성할 때의 규칙
+
+    1. 긍정적 식을 부정하지 말고, 부정을 내부에 넣어라.
+    ```python
+    if not a is b -> if a is not b
+    ```
+    2. 빈 컨테이너나 시퀀스의 검사를 len으로 하지 마라. 빈 시퀀스는 암묵적으로 False로 취급된다는 사실을 이용해 아래와 같이 작성하라
+    ```python
+    valid_numbers = []
+    if not valid_numbers:
+        ...
+    ```
+    3. 비어있지 않은 컨테이너나 시퀀스의 검사에서도 len을 사용하지 마라.
+    ```python
+    valid_numbers = [1, 2, 3]
+    if valid_numbers:
+        # use valid numbers
+    ```
+    4. 한 줄 짜리 if 문이나 for, while, except 복합문을 사용하지 마라. 각 부분을 여러줄에 나누어 작성하라.
+    ```python
+    for i in range(5): print(i)
+
+    ->
+
+    for i in range(5):
+        print(i)
+    ```
+    5. 식을 한 줄 안에 다 쓸수 없는 경우, 괄호로 둘러싸고 줄바꿈과 들여쓰기를 추가해서 읽기 쉽게 만들어라.
+    6. 여러 줄에 걸쳐 식을 쓸 때는 줄이 계속된다는 표시를 하는 문자보다는 괄호를 사용하라.
+    ```python
+    introduce = ("hello my name is aaron and i'm working"
+        "on turing and now i")
+    ```
+
+- 임포트
+
+  모듈을 임포트에 코드에 사용하는 방법에 대한 규칙
+
+    1. import문이 항상 파일 제일 앞에 오게 하라
+    2. 절대 이름으로 import하고, 상대경로 사용하지 마라. bar 패키지로부터 foo를 임포트하고싶다면 아래와 같은 방식을 사용해라
+    ```python
+    from bar import foo
+    ```
+    3. 반드시 상대적인 경로로 임포트해야 하는 경우에는 from . import foo처럼 명시적 구문을 사용해라.
+    4. 임포트 순서 표준라이브러리 모듈 >> 서드 파티 모듈 >> 직접 만든 모듈, 알파벳 순서로 작성
+
+#### bytes와 str의 차이를 알아둬라.
+
+- `bytes` => 8비트 값의 시퀀스, `str` => 유니코드 코드 포인트의 시퀀스
+- 처리할 입력이 원하는 문자 시퀀스인지 확실히 하려면 도우미 함수를 사용하는것이
+  좋다.
+    ```python
+    def to_str(bytes_or_str):
+        if isinstance(bytes_or_str, bytes):
+            value = bytes_or_str.decode('utf-8')
+        else:
+            value = bytes_or_str
+        return value
+
+    >>> repr(to_str(b'foo'))
+    'foo'
+    >>> repr(to_str('bar'))
+    'bar'
+    >>> repr(to_str(b'\xed\x95\x9c')) # UTF-8 에서 한글은 3바이트
+    '한'
+    ```
+
+    ```python
+    def to_bytes(bytes_or_str):
+        if isinstance(bytes_or_str, str):
+            value = bytes_or_str.encode('utf-8')
+        else:
+            value = bytes_or_str
+        return value
+
+    >>> repr(to_bytes(b'foo'))
+    b'foo'
+    >>> repr(to_bytes('bar'))
+    b'bar'
+    >>> repr(to_bytes('한글'))
+    b'\xed\x95\x0c\xea\xb8\x80'
+    ```
+- bytes와 str인스턴스를 연산자에 섞어서 사용할 수 없다.
+- 이진 데이터를 파일에서 읽거나 파일에 쓰고 싶으면 항상 이진모드('rb' or 'wb')로
+  파일을 열어라.
+- 유니코드 데이터를 파일에서 읽거나 파일에 쓰고 싶을 때는 시스템 디폴트 인코딩에
+  주의하라. 인코딩 차이로 놀라고 싶지 않다면 open에 encoding 파라미터 명시적으로 전달하기.
+
+#### f-문자열의 사용
+
+- % 연산자를 사용하는 C스타일 문자열, str.format 메서드를 피하고 f-문자열을
+  적극적으로 사용한다.
+    ```python
+    >>> key = 'abc'
+    >>> value = 1.2345
+    >>> f'{key!r:<10} = {value:.2f}'
+    "'abc'      = 1.23"
+    ```
+
+#### 복잡한 식을 쓰는 대신 도우미 함수를 제작하라
+
+- 파이썬은 기본적으로 복잡하고 읽기 어려운 한줄짜리 식을 허용하지만, 도우미
+  함수를 써서 가독성을 높이는게 좋다.
+- 같은 로직을 반복해서 사용할거면 더욱 옮겨라.
+- boolean연산자 or나 and를 활용하는것보다 if/else가 더 가독성이 좋다.
+
+#### 언패킹을 활용하라
+
+- 임시 변수를 정의하지 않고도 값을 맞바꾸는 방법
+    ```python
+    def bubble_sort(a):
+        for _ in range(len(a)):
+            for i in range(1, len(a)):
+                if a[i] < a[i-1]:
+                    temp = a[i]
+                    a[i] = a[i-1]
+                    a[i-1] = temp
+
+    >>>
+
+    def bubble_sort(a):
+        for _ in range(len(a)):
+            for i in range(1, len(a)):
+                if a[i] < a[i-1]:
+                    a[i], a[i-1] = a[i-1], a[1] # 맞바꾸기
+    ```
+
+- enumerate를 사용한 for문 언패킹
+    ```python
+    snacks = [('베이컨', 350), ('도넛', 240), ('머핀', 190)]
+    for rank, (name, calories) in enumerate(snacks, 1):
+        print(f'#{rank}: {name} 은 {calories} 칼로리입니다.')
+    ```
+
+#### range보다는 enumerate를 사용하라.
+
+- range는 정수 집합을 이터레이션하는 루프가 있을 때 유용하다.
+    ```python
+    for i in range(10):
+        print(i)
+
+    for i in range(1, 10):
+        print(i)
+    ```
+
+- enumerate는 인덱스와 값을 둘 다 반환하기 때문에, 더 유용하다.
+    ```python
+    >>> test = [1,2,3]
+    >>> for i, n in enumerate(test, 1):
+    ...     print(i, n)
+    ...
+    1 1
+    2 2
+    3 3
+    >>> for i, n in enumerate(test, 2):
+    ...     print(i, n)
+    ...
+    2 1
+    3 2
+    4 3
+    ```
+
+#### 여러 iteration에 나란한 루프를 설정하려면 zip을 이용해라
+
+- zip 은 배열중 가장 짧은 길이까지만 실행된다.
+    ```python
+    for i, name in enuerate(names):
+        count = counts[i]
+        if count > max_count:
+            longest_name = name
+            max_count = count
+
+    >>>
+
+    for name, count in zip(names, counts):
+        if count > max_count:
+            longest_name = name
+            max_count = count
+    ```
+
+- 둘의 길이가 차이가 날 때, 더 긴 iteration까지 루프를 돌고 싶다면 itertools.zip_longest를 사용한다.
+    ```python
+    import itertools
+
+    for name, count in itertools.zip_longest(names, count):
+        print(f'{name}: {count}')
+    ```
+
+#### for, while과 else를 섞어서 사용하지 마라. (루프와 else를 사용하지 마라.)
+- 루프 뒤에 오는 else 블록은 루프가 반복되는 도중에 break을 만나지 않은 경우에만 실행된다.
+    ```python
+    >>> while False:
+    ...     pass
+    ... else:
+    ...     print("This is while else")
+    ...
+    This is while else
+    ```
+
+- 루프 뒤 else사용을 피하라
+    ```python
+    a = 4
+    b = 9
+
+    for i in range(2, min(a, b) + 1):
+        print("검사 중", i)
+        if a % i == 0 and b % i == 0:
+            print("서로소 아님")
+            break
+    else:
+        print("서로소")
+
+    >>>
+
+    def coprime(a, b):
+        for i in range(2, min(a, b) + 1):
+            print("검사 중", i)
+            if a % i == 0 and b % i == 0:
+                return False
+        return True
+    assert coprime(4, 9)
+    assert not coprime(3, 6)
+    ```
+
+#### 대입식을 사용해 반복을 피하라
+- 대입식은 코드 수를 줄여주고, 깔끔하게 만들어준다.
+    ```python
+    fresh_fruit = {
+        '사과': 10,
+        '바나나': 8,
+        '레몬': 5
+    }
+
+    def make_lemonade(count):
+        ...
+
+    def out_of_stock():
+        ...
+
+    count = fresh_fruit.get('레몬', 0)
+    if count:
+        make_lemonade(count)
+    else:
+        out_of_stock()
+
+    >>>
+
+    if count := fresh_fruit.get('레몬', 0):
+        make_lemonade(count)
+    else:
+        out_of_stock()
+    ```
+
+    ```
+    count = fresh_fruit.get('사과', 0)
+    if count >= 4:
+        make_cider(count)
+    else:
+        out_of_stock()
+
+    >>>
+
+    if (count := fresh_fruit.get('사과', 0)) >= 4:
+        make_cider(count)
+    else:
+        out_of_stock()
+    ```
+
+- 파이썬에서는 switch문을 사용할 수 없지만, 연산자로 훌륭하게 흉내낼 수 있다.
+    ```python
+    count = fresh_fruit.get('바나나', 0)
+    if count >= 2:
+        pieces = slice_bananas(count)
+        to_enjoy = make_smoothies(pieces)
+    else:
+        count = fresh_fruit.get('사과', 0)
+        if count >= 4:
+            to_enjoy = make_cider(count)
+        else:
+            count = fresh_fruit.get('레몬', 0)
+            if count:
+                to_enjoy = make_lemonade(count)
+            else:
+                to_ejoy = '아무것도 없음'
+
+    >>>
+
+    if (count := fresh_fruit.get('바나나', 0)) >= 2:
+        pieces = slice_bananas(count)
+        to_enjoy = make_smoothies(pieces)
+    elif (count := fresh_fruit.get('사과', 0)) >= 4:
+        to_enjoy = make_cider(count)
+    elif count := fresh_fruit.get('레몬', 0):
+        to_enjoy = make_lemonade(count)
+    else:
+        to_ejoy = '아무것도 없음'
+    ```

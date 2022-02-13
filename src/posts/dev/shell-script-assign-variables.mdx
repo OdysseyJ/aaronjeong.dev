@@ -1,0 +1,20 @@
+---
+title: 쉘 스크립트 - 변수 할당
+date: 2022/1/14
+description: shell script - assign variables
+tags: [Dev, Shell, Bash]
+---
+
+```shell
+# 변수 할당
+username="aaron"
+
+# 변수 할당 with date함수
+TAG=`date +"%Y-%m-%d-%H-%M-%S"`
+
+# 사용
+docker tag $username:$TAG {host}/$username:$TAG
+
+# 안전하게 사용하기 -> ""로 감싸준다.
+if [ "$deployed" == "$flag" ]
+```

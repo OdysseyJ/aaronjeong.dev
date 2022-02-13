@@ -1,0 +1,1016 @@
+---
+title: Python에서 Factory boy를 사용해 인스턴스 제작
+date: 2022/1/10
+description: factory boy in python
+tags: [Dev, Python, Django]
+---
+
+https://factoryboy.readthedocs.io/en/stable/introduction.html
+
+### Factory boy가 뭘까?
+
+- 인스턴스를 쉽게 생성할 수 있도록 도와주는 패키지다.
+
+### 버전
+- factory-boy 2.12.0을 기준으로 작성되었다.
+```python
+❯ pip show factory-boy
+Name: factory-boy
+Version: 2.12.0
+Summary: A versatile test fixtures replacement based on thoughtbot's factory_bot for Ruby.
+Home-page: https://github.com/FactoryBoy/factory_boy
+Author: Mark Sandstrom
+Author-email: mark@deliciouslynerdy.com
+License: MIT
+Location: /Users/turing-211231/.pyenv/versions/3.8.1/lib/python3.8/site-packages
+Requires: Faker
+Required-by:
+```
+
+#### 기본 사용법
+
+- factory.Factory를 상속받아 생성한다.
+    ```python
+    import factory
+    from django.contrib.auth.models import User
+
+    class UserFactory(factory.Factory):
+        class Meta:
+            model = User
+
+        first_name = "John"
+        last_name = "Doe"
+    ```
+
+    ```
+    In [2]: john = UserFactory()
+
+    In [3]: john
+    Out[3]: <User: >
+
+    In [4]: john.first_name
+    Out[4]: 'John'
+
+    In [5]: john.last_name
+    Out[5]: 'Doe'
+
+    In [6]: mike = UserFactory(first_name="mike")
+
+    In [7]: mike
+    Out[7]: <User: >
+    ```
+
+#### Sequence
+
+- 필드가 유니크 키를 가지는 경우, 인스턴스마다 다른 값을 가져야 하는 경우에 유용하다.
+    ```python
+    import factory
+    from django.contrib.auth.models import User
+
+    class UserFactory(factory.Factory):
+        class Meta:
+            model = User
+
+        first_name = "John"
+        last_name = "Doe"
+        username = factory.Sequence(lambda n: f'User({n})')
+    ```
+
+    ```python
+    In [1]: from factory_boy.factory import UserFactory
+
+    In [2]: john = UserFactory()
+
+    In [3]: john.username
+    Out[3]: 'User(0)'
+
+    In [4]: mike = UserFactory()
+
+    In [5]: mike.username
+    Out[5]: 'User(1)'
+    ```
+
+#### LazyFunction
+
+- 간단한 경우에는, 값을 계산하기에 함수 하나를 부르는 과정이 적합할 수 있다. 만약에 오브젝트 생성에 의존성이 없다면, LazyFunction을 사용하는것이 좋다.
+    ```python
+    import datetime
+    import factory
+    from django.contrib.auth.models import User
+
+    class UserFactory(factory.Factory):
+        class Meta:
+            model = User
+
+        first_name = "John"
+        last_name = "Doe"
+        username = factory.Sequence(lambda n: f'User({n})')
+        date_joined = factory.LazyFunction(datetime.datetime.now)
+    ```
+
+    ```python
+    In [2]: mike = UserFactory()
+
+    In [3]: mike
+    Out[3]: <User: User(0)>
+
+    In [4]: mike.date_joined
+    Out[4]: datetime.datetime(2022, 1, 10, 4, 17, 32, 155316)
+
+    In [5]: import datetime
+
+    # LazyFunction can be overwritten
+    In [6]: john = UserFactory(date_joined = datetime.datetime.now() - datetime.timedelta(days=1))
+
+    In [7]: john.date_joined
+    Out[7]: datetime.datetime(2022, 1, 9, 4, 18, 55, 989726)
+    ```
+
+#### LazyAttribute
+
+- 특정 필드들은 인스턴스 어트리뷰트에 대해 의존성이 있을 수 있다. 이럴때 사용하면 좋은것이 바로 LazyAttribute이다.
+    ```python
+    import datetime
+    import factory
+    from django.contrib.auth.models import User
+
+    class UserFactory(factory.Factory):
+        class Meta:
+            model = User
+
+        first_name = "John"
+        last_name = "Doe"
+        username = factory.Sequence(lambda n: f'User({n})')
+        date_joined = factory.LazyFunction(datetime.datetime.now)
+        email=factory.LazyAttribute(lambda obj: f'{obj.first_name}.{obj.last_name}@google.com')
+    ```
+
+    ```python
+    In [2]: john = UserFactory()
+
+    In [3]: john.email
+    Out[3]: 'John.Doe@google.com'
+    ```
+
+- @factory.lazy_attribute 데코레이터를 사용해서도 작성할 수 있다.
+
+    ```python
+    import datetime
+    import factory
+    from django.contrib.auth.models import User
+
+    class UserFactory(factory.Factory):
+        class Meta:
+            model = User
+
+        first_name = "John"
+        last_name = "Doe"
+        username = factory.Sequence(lambda n: f'User({n})')
+        date_joined = factory.LazyFunction(datetime.datetime.now)
+        #  email=factory.LazyAttribute(lambda obj: f'{obj.first_name}.{obj.last_name}@google.com')
+
+        @factory.lazy_attribute
+        def email(self):
+            return f'{self.first_name}.{self.last_name}@google.com'
+
+    ```
+
+#### Inheritance
+
+- 부모 클래스의 특정 다른 버전의 인스턴스화가 필요하다면, 상속받아서 사용한다.
+    ```python
+    import factory
+    from django.contrib.auth.models import User
+
+    class UserFactory(factory.Factory):
+        class Meta:
+            model = User
+
+        first_name = "John"
+        last_name = "Doe"
+        username = "user1"
+
+    class AdminFactory(UserFactory):
+        email = factory.lazy_attribute(lambda obj: f'{obj.username}@admin.com')
+        username = "user2"
+    ```
+
+    ```python
+    In [2]: john = UserFactory()
+
+    In [3]: john
+    Out[3]: <User: user1>
+
+    In [4]: admin = AdminFactory()
+
+    In [5]: admin
+    Out[5]: <User: user2>
+
+    In [6]: admin.email
+    Out[6]: 'user2@admin.com'
+    ```
+
+    ```python
+    In [7]: admin_overwritten = AdminFactory(email="sample@google.com")
+    # call time에 오버라이딩을 할 수 있다.
+
+    In [8]: admin_overwritten
+    Out[8]: <User: user2>
+
+    In [9]: admin_overwritten.email
+    Out[9]: 'sample@google.com'
+    ```
+
+#### Non-kwarg Arguments
+
+- 몇몇 어트리뷰트들은 keyword argument가 아닌 inline-arg로 관리하고 싶을 수 있다. 이런
+  상황에서는 meta클래스 내부에 inline_args를 정의하면 된다.
+
+    ```python
+    class MyFactory(factory.Factory):
+    class Meta:
+        model = MyClass
+        inline_args = ('x', 'y')
+
+    x = 1
+    y = 2
+    z = 3
+    ```
+
+    ```python
+    >>>MyFactory(y=4)
+    <MyClass(1, 4, z=3)>
+    ```
+
+#### 팩토리의 행동 변경하기 : parameters and traits
+
+- Params 클래스를 정의해 실제 모델에 없는 필드를 정의해서 사용할 수 있다.
+    ```python
+    class RentalFactory(factory.Factory):
+        class Meta:
+            model = Rental
+
+        begin = factory.fuzzy.FuzzyDate(start_date=datetime.date(2000, 1, 1))
+        end = factory.LazyAttribute(lambda o: o.begin + o.duration)
+
+        class Params:
+            duration = 12
+    ```
+
+    ```python
+    >>>RentalFactory(duration=0)
+    <Rental: 2012-03-03 -> 2012-03-03>
+    >>>RentalFactory(duration=10)
+    <Rental: 2008-12-16 -> 2012-12-26>
+    ```
+
+- 파라미터에 의해 많은 필드가 변경되어야 할 경우, Trait사용을 고려해볼만 하다.
+    ```python
+    class OrderFactory(factory.Factory):
+        status = 'pending'
+        shipped_by = None
+        shipped_on = None
+
+        class Meta:
+            model = Order
+
+        class Params:
+            shipped = factory.Trait(
+                status='shipped',
+                shipped_by=factory.SubFactory(EmployeeFactory),
+                shipped_on=factory.LazyFunction(datetime.date.today),
+            )
+    ```
+
+    ```python
+    >>>OrderFactory()
+    <Order: pending>
+    >>>OrderFactory(shipped=True)
+    <Order: shipped by John Doe on 2016-04-02>
+    ```
+
+#### Strategies
+
+- 팩토리는 두가지의 생성 전략을 제공한다.
+    - `build`는 local object를 생성하게 해 준다.
+    - `create`는 local object를 인스턴스화 하고, 데이터베이스에 생성해준다.
+
+    > Factory boy 1.X버전까지는 create 호출시 Model.objects.create를 직접 호출했지만,
+
+    > 버전2.0 이상부터는 Model(**kwargs)를 호출한다. Django model에 관해서는 DjangoModelFactory 클래스를 사용해야 한다.
+
+- 그냥 팩토리를 사용해서 인스턴스 create 해보기 (X)
+    ```python
+    import factory
+    from django.contrib.auth.models import User
+
+    class UserFactory(factory.Factory):
+    class Meta:
+        model = User
+
+    first_name = "John"
+    last_name = "Doe"
+    username = "user1"
+    ```
+
+    ```
+    In [1]: from factory_boy.factory import UserFactory
+
+    In [2]: UserFactory.create()
+    Out[2]: <User: user1>
+
+    In [3]: from django.contrib.auth.models import User
+
+    In [4]: User.objects.first()
+
+    # 확실히 모델이 생성되지 않았다. (버전2.0이상)
+    ```
+
+- DjangoModelFactory를 사용해서 인스턴스 create 해보기 (O)
+    ```python
+    import factory
+    from django.contrib.auth.models import User
+
+    class UserFactory(factory.DjangoModelFactory):
+        class Meta:
+            model = User
+
+        first_name = "John"
+        last_name = "Doe"
+        username = "user1"
+    ```
+
+    ```python
+    In [1]: from factory_boy.factory import UserFactory
+
+    In [2]: UserFactory.create()
+    Out[2]: <User: user1>
+
+    In [3]: from django.contrib.auth.models import User
+
+    In [4]: User.objects.first()
+    Out[4]: <User: user1>
+    ```
+
+### `Factory` 클래스 옵션
+
+#### Meta Options
+```python
+class MyFactory(factory.Factory):
+    class Meta:
+        model = MyObject
+        abstract = False
+```
+
+- model
+    - 생성할 클래스를 선언한다.
+    - 만약 선언되어 있지 않으면 부모 클래스의 모델을 사용한다.
+    ```python
+    In [12]: UserFactory._meta.model
+    Out[12]: django.contrib.auth.models.User
+    ```
+
+- get_model_class
+    - 실제 모델 클래스를 리턴한다. FactoryOptions.model은 모델까지의 경로가
+      될 수 있다. 만약 모델 경로를 지정했을 경우, 실제 모델 클래스를 리턴해준다.
+        ```python
+        In [10]: UserFactory._meta
+        Out[10]: <DjangoOptions for FactoryMetaClass>
+
+        In [11]: UserFactory._meta.get_model_class
+        Out[11]: <bound method DjangoOptions.get_model_class of <DjangoOptions for FactoryMetaClass>>
+        ```
+
+- abstract
+    - 해당 모델 팩토리가 인스턴스화되지 않아야한다고 선언한다.
+    - 만약 상속관계에 있는 팩토리일 경우에 부모가 model을 정의하지 않았다거나,
+      Factory의 서브클래스가 아닐 경우에는 자동으로 True로 설정된다.
+        ```python
+        import factory
+        from django.contrib.auth.models import User
+
+        # model을 메타에 정의하지 않았다.
+        class UserFactory(factory.DjangoModelFactory):
+        first_name = "John"
+        last_name = "Doe"
+        username = "user2"
+
+        class AdminFactory(UserFactory):
+        email = "test@google.com"
+        ```
+        ```python
+        In [1]: from factory_boy.factory import UserFactory, AdminFactory
+
+        In [2]: UserFactory._meta.abstract
+        Out[2]: True
+
+        In [3]: AdminFactory._meta.abstract
+        Out[3]: True
+        ```
+
+- inline_args
+    - 몇몇 팩토리들은 생성시 모델에서 non_keyword argument를 요구할 수 있다. 이때 inline_args를
+      정의하면 된다.
+      ```python
+        class UserFactory(factory.Factory):
+            class Meta:
+                model = User
+                inline_args = ('login', 'email')
+
+            login = 'john'
+            email = factory.LazyAttribute(lambda o: '%s@example.com' % o.login)
+            firstname = "John"
+      ```
+      ```python
+        >>>UserFactory()
+        <User: john>
+        >>>User('john', 'john@example.com', firstname="John")  # actual call
+      ```
+
+- exclude
+    - 인스턴스화 할때는 필요하지만, 실제로 모델까지는 넘기지 않는 argument가
+      필요할때 정의한다.
+      ```python
+      class OrderFactory(factory.Factory):
+        class Meta:
+            model = Order
+            exclude = ('now',)
+
+        now = factory.LazyFunction(datetime.datetime.utcnow)
+        started_at = factory.LazyAttribute(lambda o: o.now - datetime.timedelta(hours=1))
+        paid_at = factory.LazyAttribute(lambda o: o.now - datetime.timedelta(minutes=50))
+      ```
+      ```python
+        >>>OrderFactory()    # The value of 'now' isn't passed to Order()
+        <Order: started 2013-04-01 12:00:00, paid 2013-04-01 12:10:00>
+
+        >>> # An alternate value may be passed for 'now'
+        >>>OrderFactory(now=datetime.datetime(2013, 4, 1, 10))
+        <Order: started 2013-04-01 09:00:00, paid 2013-04-01 09:10:00>
+      ```
+
+- rename
+    - 어트리뷰트 네임을 변경해서 적용해야 할 경우에 사용
+        ```python
+        class ImageFactory(factory.Factory):
+            # The model expects "attributes"
+            form_attributes = ['thumbnail', 'black-and-white']
+
+            class Meta:
+                model = Image
+                rename = {'form_attributes': 'attributes'}
+        ```
+- strategy
+    - 팩토리 생성 전략을 변경할때 쓰인다. default는 `CREATE_STRATEGY`
+
+
+### 기본 클래스 함수들
+- build
+- build_batch
+- create
+- create_batch
+- stub
+- stub_batch
+- generate
+- generate_batch
+- simple_generate
+- simple_generate_batch
+- _adjust_kwargs(cls, **kwargs)
+    - late field 튜닝을 가능하게 해 준다. 아래의 코드는 lastname이 항상
+      uppercase임을 보장한다.
+        ```python
+        class UserFactory(factory.Factory):
+
+        @classmethod
+        def _adjust_kwargs(cls, **kwargs):
+            # Ensure ``lastname`` is upper-case.
+            kwargs['lastname'] = kwargs['lastname'].upper()
+            return kwargs
+        ```
+- _build, _create
+    - build, create가 일어나기 전에 실행되는 함수이다.
+
+- reset_sequence(cls, value=None, force=False)
+    - 해당 팩토리가 가진 시퀀스를 초기화해준다.
+
+    - 상속받은 자식 클래스에서 호출시 Error를 내는데, 이때 진행하고 싶다면
+      Force=True를 주면 된다.
+      ```python
+        >>>InheritedFactory.reset_sequence() # error
+        >>>InheritedFactory.reset_sequence(force=True)
+      ```
+
+### Trait 심화
+- trait는 chaining될 수 있다.
+    ```python
+    class OrderFactory(factory.Factory):
+        class Meta:
+            model = Order
+
+        # Can be pending/shipping/received
+        state = 'pending'
+        shipped_on = None
+        shipped_by = None
+        received_on = None
+        received_by = None
+
+        class Params:
+            shipped = factory.Trait(
+                state='shipped',
+                shipped_on=datetime.date.today,
+                shipped_by=factory.SubFactory(EmployeeFactory),
+            )
+            received = factory.Trait(
+                shipped=True,
+                state='received',
+                shipped_on=datetime.date.today - datetime.timedelta(days=4),
+                received_on=datetime.date.today,
+                received_by=factory.SubFactory(CustomerFactory),
+            )
+    ```
+    ```python
+    >>>OrderFactory(received=True)
+    <Order: shipped by John Doe on 2016-03-20, received by Joan Smith on 2016-04-02>
+    ```
+
+- trait는 상속되어 overwritten될 수 있다.
+    ```python
+    class LocalOrderFactory(OrderFactory):
+
+        class Params:
+            received = factory.Trait(
+                shipped=True,
+                state='received',
+                shipped_on=datetime.date.today - datetime.timedelta(days=1),
+                received_on=datetime.date.today,
+                received_by=factory.SubFactory(CustomerFactory),
+            )
+    ```
+    ```python
+    >>>OrderFactory(received=True)
+    <Order: shipped by John Doe on 2016-03-20, received by Joan Smith on 2016-04-02>
+    ```
+
+### Declaration
+
+#### Faker
+- 자동으로 랜덤한 값을 생성해준다.
+    ```python
+    class UserFactory(factory.Factory):
+        class Meta:
+            model = User
+
+        name = factory.Faker('name')
+
+    >>> user = UserFactory()
+    >>> user.name
+    'Lucy Cechtelar'
+    ```
+    ```python
+    class UserFactory(fatory.Factory):
+        class Meta:
+            model = User
+
+        arrival = factory.Faker(
+            'date_between_dates',
+            date_start=datetime.date(2020, 1, 1),
+            date_end=datetime.date(2020, 5, 31),
+        )
+    ```
+
+#### LazyFunction
+- 어트리뷰트를 간단한 함수를 통해 생성해준다.
+    ```python
+    class LogFactory(factory.Factory):
+        class Meta:
+            model = models.Log
+
+        timestamp = factory.LazyFunction(datetime.now)
+
+    >>>LogFactory()
+    <Log: log at 2016-02-12 17:02:34>
+
+    # The LazyFunction can be overridden
+    >>>LogFactory(timestamp=now - timedelta(days=1))
+    <Log: log at 2016-02-11 17:02:34>
+    ```
+
+- Decorator를 통해서 쓸 수 있다.
+
+#### LazyAttribute
+- 어트리뷰트를 동적으로 생성해 준다.
+    ```python
+    class UserFactory(factory.Factory)
+        class Meta:
+            model = User
+
+        name = "Jean"
+
+        @factory.lazy_attribute
+        def email(self):
+            # Convert to plain ascii text
+            clean_name = (unicodedata.normalize('NFKD', self.name)
+                            .encode('ascii', 'ignore')
+                            .decode('utf8'))
+            return '%s@example.com' % clean_name
+    joel = UserFactory(name="Joël")
+    joel.email
+    'joel@example.com'
+    ```
+
+- Decorator를 통해서 쓸 수 있다.
+
+#### Sequence
+- 유니크한 sequence를 관리해준다.
+    ```python
+    class UserFactory(factory.Factory)
+        class Meta:
+            model = User
+
+        phone = factory.Sequence(lambda n: '123-555-%04d' % n)
+    UserFactory().phone
+    '123-555-0001'
+    UserFactory().phone
+    '123-555-0002'
+    ```
+
+- Decorator를 통해서 쓸 수 있다.
+
+- Sharing이 가능하다.
+    ```python
+    class UserFactory(factory.Factory):
+        class Meta:
+            model = User
+
+        phone = factory.Sequence(lambda n: '%04d' % n)
+        office = factory.Sequence(lambda n: 'A23-B%03d' % n)
+    u = UserFactory()
+    u.phone, u.office
+    '0041', 'A23-B041'
+    u2 = UserFactory()
+    u2.phone, u2.office
+    '0042', 'A23-B042'
+    ```
+
+#### Inheritance
+- 상속받아 사용이 가능하다.
+    ```python
+    class UserFactory(factory.Factory):
+        class Meta:
+            model = User
+
+        phone = factory.Sequence(lambda n: '123-555-%04d' % n)
+
+
+    class EmployeeFactory(UserFactory):
+        office_phone = factory.Sequence(lambda n: '%04d' % n)
+    u = UserFactory()
+    u.phone
+    '123-555-0001'
+
+    e = EmployeeFactory()
+    e.phone, e.office_phone
+    '123-555-0002', '0002'
+
+    u2 = UserFactory()
+    u2.phone
+    '123-555-0003'
+    ```
+
+#### LazyAttributeSequence
+- Sequence와 LazyAttribute를 합쳐서 사용할 때 유용하다.
+    ```python
+    class UserFactory(factory.Factory):
+        class Meta:
+            model = User
+
+        login = 'john'
+        email = factory.LazyAttributeSequence(lambda o, n: '%s@s%d.example.com' % (o.login, n))
+    UserFactory().email
+    'john@s1.example.com'
+    UserFactory(login='jack').email
+    'jack@s2.example.com'
+    ```
+
+- Decorator를 통해서 사용이 가능하다.
+
+#### SubFactory
+- 다른 팩토리를 불러 인스턴스화 해야 할 경우 유용하다.
+    ```python
+    # A standard factory
+    class UserFactory(factory.Factory):
+        class Meta:
+            model = User
+
+        # Various fields
+        first_name = 'John'
+        last_name = factory.Sequence(lambda n: 'D%se' % ('o' * n))  # De, Doe, Dooe, Doooe, ...
+        email = factory.LazyAttribute(lambda o: '%s.%s@example.org' % (o.first_name.lower(), o.last_name.lower()))
+
+    # A factory for an object with a 'User' field
+    class CompanyFactory(factory.Factory):
+        class Meta:
+            model = Company
+
+        name = factory.Sequence(lambda n: 'FactoryBoyz' + 'z' * n)
+
+        # Let's use our UserFactory to create that user, and override its first name.
+        owner = factory.SubFactory(UserFactory, first_name='Jack')
+    ```
+
+    ```python
+    c = CompanyFactory()
+    c
+    <Company: FactoryBoyz>
+
+    # Notice that the first_name was overridden
+    >>> c.owner
+    <User: Jack De>
+    >>> c.owner.email
+    jack.de@example.org
+    ```
+
+- Subfactory또한 외부에서 overwritten될 수 있다.
+    ```python
+    >>> c = CompanyFactory(owner__first_name='Henry')
+    >>> c.owner
+    <User: Henry Doe>
+
+    # Notice that the updated first_name was propagated to the email LazyAttribute.
+    >>> c.owner.email
+    henry.doe@example.org
+
+    # It is also possible to override other fields of the SubFactory
+    >>> c = CompanyFactory(owner__last_name='Jones')
+    >>> c.owner
+    <User: Henry Jones>
+    >>> c.owner.email
+    henry.jones@example.org
+    ```
+
+- Subfactory또한 상위 팩토리가 저장될 때 함께 저장된다.
+    ```python
+    >>> c = CompanyFactory()
+    >>> c.pk            # Saved to the database
+    3
+    >>> c.owner.pk      # Saved to the database
+    8
+
+    >>> c = CompanyFactory.build()
+    >>> c.pk            # Not saved
+    None
+    >>> c.owner.pk      # Not saved either
+    None
+    ```
+
+- circular dependency는 model에 경로를 넘김으로써 해결할 수 있다.
+    ```python
+    class UserFactory(factory.Factory):
+        class Meta:
+            model = User
+
+        username = 'john'
+        main_group = factory.SubFactory('users.factories.GroupFactory')
+
+    class GroupFactory(factory.Factory):
+        class Meta:
+            model = Group
+
+        name = "MyGroup"
+        owner = factory.SubFactory(UserFactory)
+    ```
+
+#### SelfAttribute
+- 다른 Attribute를 참조해 Attribute를 생성해야 하는 경우에 사용한다.
+    ```python
+    class UserFactory(factory.Factory):
+        class Meta:
+            model = User
+
+        birthdate = factory.Sequence(lambda n: datetime.date(2000, 1, 1) + datetime.timedelta(days=n))
+        birthmonth = factory.SelfAttribute('birthdate.month')
+    >>> u = UserFactory()
+    >>> u.birthdate
+    date(2000, 3, 15)
+    >>> u.birthmonth
+    3
+    ```
+
+- 다른 Subfactory와의 접점이 있는 경우, ..를 사용해 사용할 수 있다.
+    ```python
+    class UserFactory(factory.Factory):
+        class Meta:
+            model = User
+
+        language = 'en'
+
+
+    class CompanyFactory(factory.Factory):
+        class Meta:
+            model = Company
+
+        country = factory.SubFactory(CountryFactory)
+        # owner를 만들 때, 상위 country의 language 조회
+        owner = factory.SubFactory(UserFactory, language=factory.SelfAttribute('..country.language'))
+    ```
+
+    ```
+    >>> company = CompanyFactory()
+    >>> company.country.language
+    'fr'
+    >>> company.owner.language
+    'fr'
+    ```
+
+- 아래와 같은 LazyAttribute, LazyAttributeSequence로 사용이 가능하다.
+    ```python
+    class CompanyFactory(factory.Factory):
+        class Meta:
+            model = Company
+        country = factory.SubFactory(CountryFactory)
+        owner = factory.SubFactory(UserFactory,
+            language=factory.LazyAttribute(lambda user: user.factory_parent.country.language),
+        )
+    ```
+
+#### Iterator
+- cycle해서 반복적인 값을 테스트해야할 때 유용하다.
+    ```python
+    class UserFactory(factory.Factory)
+        lang = factory.Iterator(['en', 'fr', 'es', 'it', 'de'])
+    >>> UserFactory().lang
+    'en'
+    >>> UserFactory().lang
+    'fr'
+
+    >>> UserFactory().lang
+    'en'
+    >>> UserFactory(lang='cn').lang
+    'cn'
+    >>> UserFactory().lang
+    'fr'
+    ```
+
+- Tuple등 존재하는 Iterable의 데이터를 가져올때 getter를 사용하면 된다.
+    ```python
+    class UserFactory(factory.Factory):
+        class Meta:
+            model = User
+
+        # CATEGORY_CHOICES is a list of (key, title) tuples
+        category = factory.Iterator(User.CATEGORY_CHOICES, getter=lambda c: c[0])
+    ```
+
+- 리셋이 가능하다.
+    ```python
+    >>> UserFactory().lang
+    'en'
+    >>> UserFactory().lang
+    'fr'
+    >>> UserFactory.lang.reset()
+    >>> UserFactory().lang
+    'en'
+    ```
+
+#### Dict and List
+- Dict like attribute를 생성하기 위해 Dict를 사용한다.
+    ```python
+    class UserFactory(factory.Factory):
+        class Meta:
+            model = User
+
+        is_superuser = False
+        roles = factory.Dict({
+            'role1': True,
+            'role2': False,
+            'role3': factory.Iterator([True, False]),
+            'admin': factory.SelfAttribute('..is_superuser'),
+        })
+    ```
+
+- List는 list like attribute를 생성하기 위해 사용한다.
+    ```python
+    class UserFactory(factory.Factory):
+        class Meta:
+            model = User
+
+        flags = factory.List([
+            'user',
+            'active',
+            'admin',
+        ])
+    >>> u = UserFactory(flags__2='superadmin')
+    >>> u.flags
+    ['user', 'active', 'superadmin']
+    ```
+
+#### Maybe
+- 만약, 특정 다른 어트리뷰트에 따라서 field를 build하는 케이스가 나눠져야 할 경우 Maybe를 사용한다.
+  ```python
+    class UserFactory(factory.Factory):
+        class Meta:
+            model = User
+
+        is_active = True
+        deactivation_date = factory.Maybe(
+            'is_active',
+            yes_declaration=None,
+            no_declaration=factory.fuzzy.FuzzyDateTime(timezone.now() - datetime.timedelta(days=10)),
+        )
+
+    >>> u = UserFactory(is_active=True)
+    >>> u.deactivation_date
+    None
+    >>> u = UserFactory(is_active=False)
+    >>> u.deactivation_date
+    datetime.datetime(2017, 4, 1, 23, 21, 23, tzinfo=UTC)
+  ```
+
+### Post Generation Hooks
+
+- 몇몇 오브젝트는 적절한 정의를 위해 추가적으로 함수를 호출하거나 복잡한 연산을
+  해야 하는 경우가 있다.
+
+(예를 들어 User는 related된 Profile이 필요하고, Profile은 User object를 통해서 만들어지는 경우)
+
+- 이를 지원하기 위해서 Factory에서는 여러가지 방법을 지원한다.
+    - PostGenerationMethodCall: function call시 특정 attribute를 hook하는것을
+      허용한다.
+    - PostGeneration: function을 특정 generate된 objects와 함께 호출할
+      수 있도록 한다.
+    - post_generation(): PostGeneration과 동일한 역할을 하는 decorator
+    - RelatedFactory : 주어진 팩토리를 첫 팩토리 생성 이후에 생성한다.
+    - RelatedFactoryList : 주어진 팩토리의 리스트를 첫 팩토리 생성 이후에
+      생성한다.
+
+#### PostGeneration
+- 만약, 아래와 같이 정의했다고 하면,
+   ```python
+    class SomeFactory(factory.Factory):
+        class Meta:
+            model = SomeObject
+
+        @post_generation
+        def post(obj, create, extracted, **kwargs):
+            obj.set_origin(create)
+   ```
+   ```python
+    SomeFactory(
+        post=1,
+        post_x=2,
+        post__y=3,
+        post__z__t=42,
+    )
+  post는 extracted=1, {'y':3, 'z__t':42}를 kwargs로 받을 것이다. {'post_x':2}는 SomeFactory._meta.model로 전달된다.
+   ```
+
+#### RelatedFactory
+
+- SubFactory와 유사하게 동작하지만, 다른점은 BaseFactory의 생성 이후에
+  생성된다는 것이다.
+  ```python
+    class CityFactory(factory.Factory):
+        class Meta:
+            model = City
+
+        capital_of = None
+        name = "Toronto"
+
+    class CountryFactory(factory.Factory):
+        class Meta:
+            model = Country
+
+        lang = 'fr'
+        capital_city = factory.RelatedFactory(
+            CityFactory,  # Not CityFactory()
+            factory_related_name='capital_of',
+            name="Paris",
+        )
+
+    >>> france = CountryFactory()
+    >>> City.objects.get(capital_of=france)
+    City: Paris
+  ```
+
+- subfactory에도 kwargs를 넘길 수 있다.
+    ```python
+    england = CountryFactory(lang='en', capital_city__name="London")
+    City.objects.get(capital_of=england)
+    City: London
+    ```
+
+- 상위 팩토리 생성 이후에 생성되기는 하지만, build context는 전달되기 때문에
+  SelfAttribute를 사용할 경우 calling factory context로 이동해서 사용해야 한다.
+  ```python
+    class CountryFactory(factory.Factory):
+        class Meta:
+            model = Country
+
+        lang = 'fr'
+        capital_city = factory.RelatedFactory(
+            CityFactory,
+            factory_related_name='capital_of',
+            # Would also work with SelfAttribute('capital_of.lang')
+            main_lang=factory.SelfAttribute('..lang'),
+        )
+  ```

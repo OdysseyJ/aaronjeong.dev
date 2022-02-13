@@ -1,0 +1,185 @@
+---
+title: Django db router를 활용해 rds cluster read replica 100% 활용하기
+date: 2022/1/31
+description: using django db router and using with rds cluster read replica
+tags: [Dev, AWS, RDS, Django, Router]
+---
+
+https://www.youtube.com/watch?v=eAP8zimx05M
+
+해당 강의를 보고 공부한 내용을 정리했습니다. 한종원 님께 감사드립니다.
+
+## 왜 RDS, 왜 Aurora인가?
+
+- Cloud 인프라 Abstraction level
+    - SaaS : Software 통채로 대여
+    - PaaS : Platform 까지 대여
+    - Iaas : Infrastructure만 대여
+    - On-Premises : Cloud 안쓰기
+
+- RDS를 쓰는 이유 -> Platform보다는 Application(business logic)에 더 집중할 수 있다.
+
+- Aurora를 쓰는 이유
+    - 기존 RDS보다 5배 더 나은 성능
+    - 데이터를 S3로 실시간 백업
+    - 무중단으로 auto scaling out 되는 storage
+    - 더 많은 15개의 read replicas
+    - RDS보다 더 빠른 read replicas 동기화 -> milliseconds내에 동기화
+
+## Aurora
+- 오로라의 엔드포인트 타입
+    - cluster endpoint (read-write)
+    - reader endpoint (read only)
+    - custom endpoint
+    - instance endpoint
+
+- Cluster : 인스턴스들의 집합
+    - 1 writer instance, 0 reader instance (cluster endpoint == reader endpoint)
+    - 1 writer instance, 1 reader instance (cluster endpoint(1) != reader endpoint(1))
+    - 1 writer instance, n reader instance (cluster endpoint(1) != reader endpoint(n))
+
+## Django DB Router v1
+```python
+DATABASES = {
+    'default': ...
+    'replica': {
+        (reader endpoint를 연결)
+    }
+}
+DATABASE_ROUTERS = ['app.router.Router']
+```
+```python
+class Router:
+    @staticmethod
+    def db_for_read(model, **hints):
+        return 'replica'
+
+    @staticmethod
+    def db_for_write(model, **hints):
+        return 'default'
+
+    @staticmethod
+    def allow_relation(obj1, obj2, **hints):
+        return True
+
+    @staticmethod
+    def allow_migrate(db, app_label, model_name=None, **hints):
+        return True
+```
+- 문제점
+    1. writer를 활용할 수 없다.
+
+## Django DB Router v2
+```python
+class Router:
+    @staticmethod
+    def db_for_read(model, **hints):
+        databases = ['replica', 'default']
+        return random.choice(databases)
+
+    @staticmethod
+    def db_for_write(model, **hints):
+        return 'default'
+
+    @staticmethod
+    def allow_relation(obj1, obj2, **hints):
+        return True
+
+    @staticmethod
+    def allow_migrate(db, app_label, model_name=None, **hints):
+        return True
+```
+
+- 문제점
+    1. lock을 reader에 잡고, writer에 쓰는 경우 writer의 변경사항이 reader로 싱크 맞출때 실패함.
+    2. lock을 writer에 잡고, writer에 쓰고 reader에서 변경 사항을 확인할 경우 해당 변경 사항을 확인할 수 없다. (데이터 일관성이 깨짐)
+
+## Django DB Router v3
+```python
+import random
+from
+class Router:
+    @staticmethod
+    def db_for_read(model, **hints):
+        conn = transaction.get_connection['default']
+        if conn.in_atomic_block:
+            return 'default'
+
+        databases = ['replica', 'default']
+
+        return random.choice(databases)
+
+    @staticmethod
+    def db_for_write(model, **hints):
+        return 'default'
+
+    @staticmethod
+    def allow_relation(obj1, obj2, **hints):
+        return True
+
+    @staticmethod
+    def allow_migrate(db, app_label, model_name=None, **hints):
+        return True
+```
+
+- 문제점
+    1. writer, replica에 골고루 트래픽이 분산되지 않았다.
+
+## Django DB Router v4
+```python
+import random
+from
+class Router:
+    @staticmethod
+    def db_for_read(model, **hints):
+        conn = transaction.get_connection['default']
+        if conn.in_atomic_block:
+            return 'default'
+
+        databases = ['replica', 'default', 'replica']
+
+        return random.choice(databases)
+
+    @staticmethod
+    def db_for_write(model, **hints):
+        return 'default'
+
+    @staticmethod
+    def allow_relation(obj1, obj2, **hints):
+        return True
+
+    @staticmethod
+    def allow_migrate(db, app_label, model_name=None, **hints):
+        return True
+```
+
+## Django DB Router v5 - 커스텀 엔드포인트
+```python
+import random
+from
+class Router:
+    @staticmethod
+    def db_for_read(model, **hints):
+        conn = transaction.get_connection['default']
+        if conn.in_atomic_block:
+            return 'default'
+
+        return 'custom'
+
+    @staticmethod
+    def db_for_write(model, **hints):
+        return 'default'
+
+    @staticmethod
+    def allow_relation(obj1, obj2, **hints):
+        return True
+
+    @staticmethod
+    def allow_migrate(db, app_label, model_name=None, **hints):
+        return True
+```
+
+## 단점
+- multi databases에 대비가 안된 3rd library의 존재
+- lock 관련된 의외의 문제가 종종 발생되는데 디버깅하기 쉽지 않음.
+    -> db_for_read는 'custom'대신 'replica'를 사용하게끔 해서 해결.

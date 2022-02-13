@@ -1,0 +1,384 @@
+---
+title: 파이썬 코딩의 기술 - 리스트와 딕셔너리
+date: 2022/1/8
+description: study and note effective python 2nd edition - list and dictionaray
+tags: [Dev, Effective-Python]
+---
+
+### 리스트와 딕셔너리
+
+#### 시퀀스를 슬라이싱하는 방법을 익혀라
+
+- 슬라이싱 구문의 기본 형태는 list[start:end]
+    ```python
+    >>> a = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+    >>> a[:]
+    ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+    >>> a[:5]
+    ['a', 'b', 'c', 'd', 'e']
+    >>> a[:-1]
+    ['a', 'b', 'c', 'd', 'e', 'f', 'g']
+    >>> a[4:]
+    ['e', 'f', 'g', 'h']
+    >>> a[-3:]
+    ['f', 'g', 'h']
+    >>> a[2:5]
+    ['c', 'd', 'e']
+    >>> a[2:-1]
+    ['c', 'd', 'e', 'f', 'g']
+    >>> a[-3:-1]
+    ['f', 'g']
+    ```
+
+- 리스트의 맨 앞부터 슬라이싱시 0 생략
+    ```python
+    assert a[:5] == a[0:5]
+    ```
+
+- 리스트의 끝까지 슬라이싱 할 때는 쓸데없이 끝 인덱스를 적지마라
+    ```python
+    assert a[5:] == a[5:len(a)]
+    ```
+
+- 슬라이싱시 리스트의 인덱스 범위를 넘어가는 인덱스는 무시된다.
+    ```python
+    >>> a = [1, 2]
+    >>> a[:100]
+    [1, 2]
+    ```
+
+- 리스트 슬라이싱 결과로 얻은 리스트를 변경해도 원래 리스트는 변하지 않는다.
+    ```python
+    >>> a = [1, 2, 3]
+    >>> b = a[:2]
+    >>> a
+    [1, 2, 3]
+    >>> b
+    [1, 2]
+    >>> b[0] = -1
+    >>> b
+    [-1, 2]
+    >>> a
+    [1, 2, 3]
+    ```
+
+- 대입되는 배열의 길이와 다른 시퀀스를 대입하게 되면 배열의 길이가 변한다.
+    ```python
+    >>> a = [1, 2, 3, 4, 5, 6, 7]
+    >>> a[1:2] = [-1, -2, -3]
+    >>> a
+    [1, -1, -2, -3, 3, 4, 5, 6, 7]
+
+    >>> a = [1, 2, 3, 4, 5, 6, 7]
+    >>> a[2:5] = [1]
+    >>> a
+    [1, 2, 1, 6, 7]
+    ```
+
+- 시작과 끝 생략시 복사본을 얻음.
+    ```python
+    b = a[:]
+    assert b == a and b is not a
+    ```
+
+- 시작과 끝 생략한 곳에 대입하면 변수 전체를 덮어씀.
+    ```python
+    >>> a = [1, 2, 3]
+    >>> b = a
+    >>> a[:] = [-1, -2]
+    >>> a
+    [-1, -2]
+    >>> b
+    [-1, -2]
+    ```
+
+#### 스트라이드와 슬라이스를 한 식에 함께 사용하지 마라
+
+- 파이썬에서 제공하는 list[start:end:stride]를 활용해 증가값을 1이 아닌 수로 지정할
+  수 있다.
+    ```python
+    >>> a = [1, 2, 3, 4, 5, 6, 7]
+    >>> a[::2]
+    [1, 3, 5, 7]
+    >>> a[::3]
+    [1, 4, 7]
+    >>> a[1::2]
+    [2, 4, 6]
+    ```
+
+- 리스트 거꾸로 뒤집기 (unicode -> utf-8로 인코딩된 텍스트에선 동작안함)
+    ```python
+    >>> a = [1, 2, 3]
+    >>> a[::-1]
+    [3, 2, 1]
+    ```
+
+- 슬라이싱 구문과 스트라이딩까지 함께 들어가면 혼란스러우므로, 함께 사용하지 말 것을
+  권함. 함께 사용해야하는 경우 스트라이딩 -> 슬라이싱 순서로 진행
+    ```python
+    # 혼란스럽다. 무슨 값이 나올지 예측이 잘 안된다.
+    >>> x = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+    >>> x[-2:2:-2]
+    ['g', 'e']
+
+    # 스트라이딩후 슬라이싱하기
+    >>> y = x[::2]
+    >>> z = y[1:-1]
+    >>> z
+    ['c', 'e']
+    ```
+
+#### 슬라이싱보다는 나머지를 모두 잡아내는 언패킹하기
+
+- 언패킹은 *를 사용해 한다.
+    ```python
+    >>> car_ages = [0, 9, 4, 8, 7, 20, 19, 1, 6, 15]
+    >>> car_ages_descending = sorted(car_ages, reverse=True)
+    >>> car_ages_descending
+    [20, 19, 15, 9, 8, 7, 6, 4, 1, 0]
+
+    # BAD
+    >>> oldest = car_ages_descending[0]
+    >>> second_oldest = car_ages_descending[1]
+    >>> others = car_ages_descending[2:]
+    >>> oldest, second_oldest, others
+    (20, 19, [15, 9, 8, 7, 6, 4, 1, 0])
+
+    # GOOD
+    >>> oldest, second_oldest, *others = car_ages_descending
+    >>> oldest, second_oldest, others
+    (20, 19, [15, 9, 8, 7, 6, 4, 1, 0])
+    ```
+
+- 별표식 단독으로 언패킹을 할 수 없고, 한 수준의 언패킹에 두개 이상의 별 표식을 사용할
+  수 없다.
+    ```python
+    >>> *others = car_age_descending
+      File "<stdin>", line 1
+    SyntaxError: starred assignment target must be in a list or tuple
+    >>> oldest, *others, *anothers = car_age_descending
+      File "<stdin>", line 1
+    SyntaxError: two starred expressions in assignment
+    ```
+
+- 여러 계층으로 이뤄진 구조를 언패킹할 때는 별표식을 여럿 사용해도 된다.
+    ```python
+    >>> car_inventory = {
+    ...     'town' : ('grandeur', 'avante', 'tico'),
+    ...     'airport': ('genesis', 'sonata', 'k5')
+    ... }
+    >>> ((loc1, (best1, *rest1)), (loc2, (best2, *rest2))) = car_inventory.items()
+    >>> loc1, best1, rest1, loc2, best2, rest2
+    ('town', 'grandeur', ['avante', 'tico'], 'airport', 'genesis', ['sonata', 'k5'])
+    ```
+
+- 별표 식은 항상 list 인스턴스가 된다. 남은 원소가 없으면 빈 리스트가 된다. 최소 N개라는
+  특성을 알 때 유리하다
+    ```python
+    >>> min_short_list = [1, 2]
+    >>> first, second, *rest = min_short_list
+    >>> print(first, second, rest)
+    1 2 []
+    ```
+
+- 2중 배열에 관해서도 별표식 언패킹을 진행하면 유용한 경우
+    ```python
+    def generate_csv():
+        return [
+            ['날짜', '제조사', '모델', '연식'],
+            ['12/20', '삼성', 'MK-123', 3],
+            ...
+        ]
+
+    # BAD
+    all_csv_rows = generate_csv()
+    header = all_csv_rows[0]
+    rows = all_csv_rows[1:]
+
+    # GOOD
+    header, *rows = all_csv_rows()
+    ```
+
+#### 복잡한 기준을 사용해 정렬할 때는 key 파라미터를 사용하라.
+
+- 파이썬에서는 튜플을 이용해 대소비교를 하면, 인덱스 0부터 차례대로 비교한다. 이걸
+  이용해서 하나 이상의 기준으로 정렬이 가능.
+    ```python
+    power_tools.sort(key=lambda x: (x.weight, -x.name), reverse=True)
+    ```
+
+- 파이썬 sort 메서드는 key 함수가 반환하는 값이 서로 같은 경우 리스트에 들어 있던 원래
+  순서를 그대로 유지해준다. 이는 같은 리스트에 대해 서로 다른 기준으로 sort를 여러 번 호출해도 된다는 뜻이다. (꼭 필요한 경우만 하자.)
+    ```python
+    power_tools.sort(key=lambda x: x.name)
+    power_tools.sort(key=lambda x: x.weight, reverse=True)
+    ```
+
+- 문자열에 대해 sort를 진행하면, 알파벳순으로 정렬해준다. (한글도 가나다순)
+    ```python
+    >>> names = ["한글", "가볍다", "다람쥐", "노랑"]
+    >>> names.sort()
+    >>> names
+    ['가볍다', '노랑', '다람쥐', '한글']
+    ```
+
+#### 딕셔너리 삽입 순서에 의존할 때는 조심하라.
+
+- python 3.7 이상부터는 딕셔너리 삽입 순서대로 내용을 표시해준다고 보장받을 수 있음.
+    ```python
+    # python 3.7
+    def my_func(**kwargs):
+        for key, value in kwargs.items():
+            print(f"{key} = {value}")
+
+    my_func(goose="gosling", kangaroo="joey")
+
+    [out]
+    goose = gosling
+    kangaroo = joey
+    ```
+
+- 파이썬은 dict는 아니지만 dict와 비슷하게 동작하는 객체를 만들어내기 쉬우므로, 모든
+  형태가 순서에 맞추어 보장된다고 생각하면 안된다.
+
+- 방어적으로 코드를 짜려면, 순서에 의존하지 않는다고 생각하고 짜거나, 타입
+  애너테이션으로 dict객체를 요구하기, 혹은 dict타입인지를 사용 시점에 검사하는 방법이 있다.
+
+#### in을 사용하고 딕셔너리 키가 없을 때 KeyError를 처리하기보다는 get을 사용해라.
+
+- 딕셔너리에 키가 있는지 없는지를 in 혹은 error로 검사하기
+    ```python
+    # in 사용하기
+    counters = {
+        "폼퍼니켈": 2,
+        "사워도우": 1
+    }
+
+    key = "밀"
+
+    if key in counters:
+        count = counters[key]
+    else:
+        count = 0
+
+    # try/except 사용하기
+    try:
+        count = counters[key]
+    except KeyError:
+        count = 0
+
+    counters[key] = count + 1
+    ```
+
+- get을 이용해 코드 깔끔하게 쓰기
+    ```python
+    votes = {
+        "바게트": ["철수", "순이"],
+        "치아바타": ["하니", "유리"]
+    }
+    key = "브리오슈"
+    who = "단이"
+
+    # BAD
+    if key in votes:
+        names = votes[key]
+    else:
+        votes[key] = names = []
+
+    names.append(who)
+
+    # BAD
+    try:
+        names = votes[key]
+    except KeyError:
+        votes[key] = names = []
+
+    names.append(who)
+
+    # GOOD
+    if (names := votes.get(key)) is None:
+        votes[key] = names = []
+
+    names.append(who)
+    ```
+
+- 디폴트값이 변경가능한 값이거나, 리스트 인스턴스처럼 값을 만들어낼 때 예외가 발생할
+  가능성이 없으면 setdefault를 고려해볼 만 하다. 하지만 defaultdict를 사용할지 먼저 고려해보는게 좋다.
+    ```python
+    count = counters.setdefault(key, 0)
+    counters[key] = count + 1
+    ```
+
+#### 내부 상태에서 원소가 없는 경우를 처리할때 setdefault보다 defaultdict를 사용하라.
+- defaultdict
+    ```python
+    visitor = {
+        "미국": {"뉴욕", "로스엔젤레스"},
+        "일본": {"하코네"}
+    }
+
+    visitors.setdefault('프랑스', set()).add("칸")
+
+    if (japan := visits.get("일본")) is None:
+        visits["일본"] = japan = set()
+    japan.add("교토")
+
+    from collections import defaultdict
+
+    class Visits:
+        def __init__(self):
+            self.data = defaultdict(set)
+
+        def add(self, country, city):
+            self.data[country].add(city)
+
+    visits = Visits()
+    visits.add("영국", "바스")
+    visits.add("영국", "런던")
+    ```
+
+#### __ missing __을 사용해 키에 따라 다른 디폴트 값을 생성하는 방법을 알아두라.
+
+- setdefault는 항상 불리기 때문에, 디폴트 값을 만드는 계산 비용이 높은 곳에서는 사용하기
+  적합하지 않다.
+  ```python
+    try:
+        handle = pictures.setdefault(path, open(path, 'a+b'))
+    except OSError:
+        print(f'경로를 열 수 없습니다.')
+        raise
+    else:
+        handle.seek(0)
+        image_data = handle.read()
+  ```
+
+- defaultdict에 전달되는 함수는 인자를 받지 않으므로, 접근에 사용한 키 값에 맞는
+  디폴트값을 생성하는 것은 불가능하다.
+  ```python
+    from collections import defaultdict
+    
+    def open_picture(profile_path):
+        return open(profile_path, 'a+b')
+    except OSError:
+        print(f'경로를 열 수 없습니다: {profile_path}')
+        raise
+
+    pictures = defaultdict(open_picture)
+    handle = pictures[path]
+    handle.seek(0)
+  ```
+
+- 디폴트 키를 만들 때 어떤 키를 사용했는지 반드시 알아야 하는 상황이라면 missing을
+  정의한다.
+    ```python
+    class Picture(dict):
+        def __missing__(self, key):
+            value = open_picture(key)
+            self[key] = value
+            return value
+
+    pictures = Pictures()
+    handle = pictures[path]
+    handle.seek(0)
+    image_data = handle.read()
+    ```
