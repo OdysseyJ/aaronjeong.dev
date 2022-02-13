@@ -30,7 +30,7 @@ const getSlugFromFileName = (path: PATHS, filePath: string) => {
 };
 
 export const getPathSlugs = (path: PATHS)=> fs.readdirSync(POSTS_PATH+path).map((filename)=>getSlugFromFileName(path, filename))
-const allPostSlugs = paths.map((path)=>fs.readdirSync(POSTS_PATH+path).map((filename)=>getSlugFromFileName(path, filename)))
+const allPostSlugs: any[] = paths.map((path)=>fs.readdirSync(POSTS_PATH+path).map((filename)=>getSlugFromFileName(path, filename)))
 export const getAllPostSlugs = [].concat(...allPostSlugs)
 
 export const getPostBySlug = async (path: PATHS, slug: string) => {
@@ -62,7 +62,7 @@ export const getPathPosts :(path: PATHS)=> Promise<PostReturnType> = async (path
 };
 
 export const getAllPosts :()=> Promise<PostReturnType> = async () => {
-  const allPostsByPath = await Promise.all(
+  const allPostsByPath: any[] = await Promise.all(
       paths.map(async (path)=> await Promise.all(getPathSlugs(path).map(async ({slug})=> await getPostBySlug(path, slug)))))
 
   const allPosts: PostType[] = [].concat(...allPostsByPath)
@@ -82,7 +82,7 @@ export const getTags = async () => {
 
 export const getTagsWithOccurrences = async () => {
   const tags = await getTags();
-  return tags.reduce(function (obj, item) {
+  return tags.reduce(function (obj: any, item) {
     obj[item] = (obj[item] || 0) + 1;
     return obj;
   }, {});

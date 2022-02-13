@@ -6,7 +6,7 @@ interface NavbarContextProps {
   onNavbarToggle: () => void;
 }
 
-const NavbarContext = createContext<NavbarContextProps>(undefined);
+const NavbarContext = createContext<NavbarContextProps>({isNavbarOpen: false, onNavbarToggle: ()=>{}});
 
 export const NavbarProvider: React.FC = ({ children }) => {
   const { isOpen: isNavbarOpen, onToggle: onNavbarToggle } = useDisclosure();

@@ -4,11 +4,11 @@ import { H2 } from "@src/components/Typography/Headings";
 import { getTagsWithOccurrences } from "@src/lib/posts";
 import { NextSeo } from "next-seo";
 
-const Tags = ({ tags }) => {
+const Tags = ({ tags }: any) => {
   return (
     <>
       <NextSeo title={`Tags`} />
-      <H2 as={`h1`}>Tags</H2>
+      <H2>Tags</H2>
       <HStack spacing={2} my={4}>
         {Object.keys(tags).map((tag) => (
           <>

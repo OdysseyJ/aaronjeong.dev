@@ -10,9 +10,13 @@ const calculateLinesToHighlight = (meta: string) => {
   if (!RE.test(meta)) {
     return () => false;
   }
-  const lineNumbers = RE.exec(meta)[1]
-    .split(`,`)
-    .map((v) => v.split(`-`).map((x) => parseInt(x, 10)));
+  let lineNumbers: number[][] = [[]]
+  const execResult = RE.exec(meta)
+  if (execResult){
+    lineNumbers = execResult[1]
+        .split(`,`)
+        .map((v) => v.split(`-`).map((x) => parseInt(x, 10)));
+  }
 
   return (index: number) => {
     const lineNumber = index + 1;
@@ -26,18 +30,18 @@ const calculateLinesToHighlight = (meta: string) => {
 interface HighlightProps {
   codeString: string;
   language: Language;
-  metastring?: string;
+  metaString: string;
   showLines?: boolean;
 }
 
 function Highlight({
   codeString,
   language,
-  metastring,
+  metaString,
   showLines,
   ...props
 }: HighlightProps) {
-  const shouldHighlightLine = calculateLinesToHighlight(metastring);
+  const shouldHighlightLine = calculateLinesToHighlight(metaString);
 
   return (
     <BaseHighlight

@@ -1,23 +1,8 @@
 import {
-    Avatar,
-    Badge,
-    Box,
-    Center,
     Grid,
     GridItem,
-    Heading,
-    Link,
-    Stack,
-    StackDivider,
-    Text,
-    useColorModeValue,
-    VStack,
 } from "@chakra-ui/react";
-import PostItem from "@src/components/Posts/PostItem";
-import { H2 } from "@src/components/Typography/Headings";
-import { getPosts } from "@src/lib/posts";
 import { NextSeo } from "next-seo";
-import NextLink from "next/link";
 
 type HomeStaticProps = {
    allTexts: string
@@ -38,7 +23,7 @@ const Statistics = ({ allTexts, counts: {ps, note, dev} }: HomeStaticProps) => (
             gap={12}
         >
             <GridItem colSpan={{ md: 4 }}>
-                Hello world
+                준비중
             </GridItem>
         </Grid>
     </>

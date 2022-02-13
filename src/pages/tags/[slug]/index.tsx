@@ -2,7 +2,7 @@ import PostList from "@src/components/Posts";
 import { POSTS_PER_PAGE } from "@src/lib/consts";
 import { getPostsByTag, getTagsWithOccurrences } from "@src/lib/posts";
 
-const PostsByTag = ({ slug, posts, total }) => (
+const PostsByTag = ({ slug, posts, total }: any) => (
   <PostList
     posts={posts}
     page={1}
@@ -26,7 +26,7 @@ export const getStaticPaths = async () => {
   };
 };
 
-export const getStaticProps = async ({ params }) => {
+export const getStaticProps = async ({ params }: any) => {
   const { slug } = params;
   const { posts, total } = await getPostsByTag(slug);
   return {

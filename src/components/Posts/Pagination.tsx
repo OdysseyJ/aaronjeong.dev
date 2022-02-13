@@ -3,7 +3,7 @@ import { Box, Flex, Link, Spacer } from "@chakra-ui/react";
 import { POSTS_PER_PAGE } from "@src/lib/consts";
 import NextLink from "next/link";
 
-const Pagination = ({ page, total, urlPrefix = "" }) => {
+const Pagination = ({ page, total, urlPrefix = "" }: any) => {
   const hasNextPage = Math.ceil(total / POSTS_PER_PAGE) > page;
   const hasPreviousPage = page > 1;
 

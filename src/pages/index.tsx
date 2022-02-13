@@ -17,9 +17,8 @@ import PostItem from "@src/components/Posts/PostItem";
 import { H2 } from "@src/components/Typography/Headings";
 import { getAllPosts } from "@src/lib/posts";
 import { NextSeo } from "next-seo";
-import NextLink from "next/link";
 
-const Home = ({ posts }) => (
+const Home = ({ posts }: any) => (
   <>
     <NextSeo title={"Home"} />
     <Grid
@@ -100,7 +99,7 @@ const Home = ({ posts }) => (
             mb={2}
           >
             {posts &&
-              posts.map((post) => <PostItem key={post.slug} post={post} />)}
+              posts.map((post: any) => <PostItem key={post.slug} post={post} />)}
           </VStack>
         </Box>
       </GridItem>

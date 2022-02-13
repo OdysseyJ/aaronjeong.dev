@@ -2,7 +2,7 @@ import PostList from "@src/components/Posts";
 import { POSTS_PER_PAGE } from "@src/lib/consts";
 import {DEV_PATH, getPathPosts, getPathSlugs} from "@src/lib/posts";
 
-const DevPerPage = ({ posts, page, total }) => (
+const DevPerPage = ({ posts, page, total }: any) => (
   <PostList
     posts={posts}
     page={page}
@@ -26,7 +26,7 @@ export const getStaticPaths = async () => {
   };
 };
 
-export const getStaticProps = async ({ params }) => {
+export const getStaticProps = async ({ params }: any) => {
   const { page } = params;
   const { posts, total } = await getPathPosts(DEV_PATH);
 

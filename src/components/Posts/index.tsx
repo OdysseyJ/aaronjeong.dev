@@ -13,7 +13,7 @@ import { POSTS_PER_PAGE } from "@src/lib/consts";
 import { NextSeo } from "next-seo";
 import NextLink from "next/link";
 
-const PostList = ({ posts, page, total, title, urlPrefix }) => {
+const PostList = ({ posts, page, total, title, urlPrefix }: any) => {
   const hasNextPage = Math.ceil(total / POSTS_PER_PAGE) > page;
   const hasPreviousPage = page > 1;
   const pageTitle = `${title} ${hasPreviousPage ? ` - Page ${page}` : ""}`;
@@ -29,7 +29,7 @@ const PostList = ({ posts, page, total, title, urlPrefix }) => {
       >
         {posts && (
           <>
-            {posts.map((post) => (
+            {posts.map((post: any) => (
               <PostItem key={post.slug} post={post} />
             ))}
           </>

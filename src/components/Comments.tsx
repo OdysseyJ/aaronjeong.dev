@@ -2,13 +2,17 @@ import { useColorMode } from "@chakra-ui/react";
 import { DiscussionEmbed } from "disqus-react";
 import { FC } from "react";
 
-const Comments: FC = (props) => {
+type CommentsProps = {
+  config: any
+}
+
+const Comments: React.FC<CommentsProps> = ({config}) => {
   const { colorMode } = useColorMode();
 
   return (
     <DiscussionEmbed
-      {...props}
-      theme={colorMode === "light" ? "dark" : "light"}
+        shortname="Aaron"
+        config={config}
     />
   );
 };

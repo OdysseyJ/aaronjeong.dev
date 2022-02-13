@@ -19,7 +19,6 @@ import {
 } from "react-icons/md";
 import { AiOutlineUser } from "react-icons/ai";
 import { FaFacebook, FaTwitter } from "react-icons/fa";
-import Lorem from "react-lorem-component";
 import * as Loaders from "react-spinners";
 
 const CircleIcon: FC = (props) => (
@@ -63,7 +62,6 @@ const ReactLiveScope = {
   ...reactIcons,
   StarIcon,
   FocusLock,
-  Lorem,
   CircleIcon,
 };
 

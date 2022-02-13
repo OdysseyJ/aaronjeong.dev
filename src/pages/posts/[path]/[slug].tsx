@@ -9,7 +9,7 @@ import { MDXRemote } from "next-mdx-remote";
 import { ArticleJsonLd, NextSeo } from "next-seo";
 import { useRouter } from "next/router";
 
-const PostPage = ({ source, frontMatter, slug }) => {
+const PostPage = ({ source, frontMatter, slug }: any) => {
   const router = useRouter();
 
   if (router.isFallback) {
@@ -51,16 +51,15 @@ const PostPage = ({ source, frontMatter, slug }) => {
         publisherLogo={process.env.host + "/images/logo.png"}
         description={description}
       />
-      <H2 as={"h1"}>{title}</H2>
+      <H2>{title}</H2>
       <H6>{dayjs(date).format("YYYY-MM-DD")}</H6>
       <MDXRemote {...source} components={MDXComponents} />
       <HStack spacing={2} py={4}>
-        {tags.map((tag) => (
-          <TagLink key={tag} tag={tag} />
+        {tags.map((tag: any) => (
+          <TagLink key={tag} tag={tag} count={0} />
         ))}
       </HStack>
       <Comments
-        shortname="Aaron"
         config={{
           url: canonical,
           identifier: slug,
@@ -72,7 +71,7 @@ const PostPage = ({ source, frontMatter, slug }) => {
 };
 export default PostPage;
 
-export const getStaticProps = async ({ params }) => {
+export const getStaticProps = async ({ params }: any) => {
   const { slug, path } = params;
   const { mdxSource, data } = await getPostBySlug(path, slug);
 

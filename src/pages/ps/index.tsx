@@ -3,7 +3,7 @@ import { POSTS_PER_PAGE } from "@src/lib/consts";
 import {getPathPosts,  PS_PATH} from "@src/lib/posts";
 import { NextPage } from "next";
 
-const Ps: NextPage = ({ posts, total }) => (
+const Ps: NextPage = ({ posts, total }: any) => (
   <>
     <PostList
       posts={posts}

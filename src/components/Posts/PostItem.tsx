@@ -3,7 +3,7 @@ import { H5 } from "@src/components/Typography/Headings";
 import dayjs from "dayjs";
 import NextLink from "next/link";
 
-const PostItem = ({ post }) => (
+const PostItem = ({ post }: any) => (
   <NextLink href={`/posts/${post.path}/${post.slug}`} passHref>
     <Link
       _hover={{
@@ -26,11 +26,7 @@ const PostItem = ({ post }) => (
           <H5>{dayjs(post.data.date).format("YYYY MMM D")} </H5>
         </GridItem>
         <GridItem colSpan={{ base: 1, md: 10 }} order={{ base: -1, md: 0 }}>
-          <H5
-            _hover={{
-              textDecoration: "none",
-            }}
-          >
+          <H5>
             {post.data.title}
           </H5>
         </GridItem>
