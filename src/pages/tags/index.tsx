@@ -1,4 +1,4 @@
-import { HStack } from "@chakra-ui/react";
+import { HStack, Box } from "@chakra-ui/react";
 import TagLink from "@src/components/TagLink";
 import { H2 } from "@src/components/Typography/Headings";
 import { getTagsWithOccurrences } from "@src/lib/posts";
@@ -9,13 +9,15 @@ const Tags = ({ tags }: any) => {
     <>
       <NextSeo title={`Tags`} />
       <H2>Tags</H2>
-      <HStack spacing={2} my={4}>
-        {Object.keys(tags).map((tag) => (
-          <>
-            <TagLink key={tag} tag={`${tag}`} count={tags[tag]} />
-          </>
-        ))}
-      </HStack>
+      <Box w="100%" overflow={"fit"}>
+          <HStack spacing={2} my={4}>
+            {Object.keys(tags).map((tag) => (
+              <>
+                <TagLink key={tag} tag={`${tag}`} count={tags[tag]} />
+              </>
+            ))}
+          </HStack>
+      </Box>
     </>
   );
 };
