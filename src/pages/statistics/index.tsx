@@ -6,11 +6,15 @@ import {
 import { NextSeo } from "next-seo";
 import WordCloud from "@src/components/Charts/WordCloud";
 import PieChart from "@src/components/Charts/Pie";
-import {getPathSlugs} from "@src/lib/posts";
+import {getAllPosts, getPathPosts, getPathSlugs} from "@src/lib/posts";
 import HeatMap from "@src/components/Charts/HeatMap";
 
 type HomeStaticProps = {
-   allTexts: string
+   texts: {
+       ps: string,
+       note: string,
+       dev: string
+   },
     counts: {
         ps: number,
         note : number,
@@ -18,32 +22,35 @@ type HomeStaticProps = {
     }
 }
 
-const Statistics = ({ allTexts, counts: {ps, note, dev} }: HomeStaticProps) => (
+const Statistics = ({ texts: {note: note_text}, counts: {ps, note, dev} }: HomeStaticProps) => (
     <>
         <NextSeo title={"Statistics"} />
-        <WordCloud />
-        <Box padding={"20px"}></Box>
+        <WordCloud allTexts={note_text}/>
         <PieChart data={[{key: 'ps', value: ps}, {key: "note", value: note}, {key: "dev", value: dev}]}/>
-        <Box padding={"20px"}></Box>
-        <HeatMap width={500} height={250} data={[]}/>
+        <Box padding={"10px"}/>
+        <HeatMap width={500} height={200} data={[]}/>
     </>
 );
 
 export default Statistics;
 
 export const getStaticProps = async () => {
-    const psCount = getPathSlugs("ps").length
-    const devCount = getPathSlugs("dev").length
-    const noteCount = getPathSlugs("note").length
-    const allTexts = ""
+    const {posts: note_posts, total: note_total} = await getPathPosts("note")
+    const ps_total = getPathSlugs("ps").length
+    const dev_total = getPathSlugs("dev").length
+    const allNoteTexts =note_posts.map((p)=>p.content).join(" ")
 
     return {
         props: {
-            allTexts : allTexts,
+            texts : {
+                "ps": "",
+                "dev": "",
+                "note": allNoteTexts
+            },
             counts : {
-                "ps": psCount,
-                "dev": devCount,
-                "note": noteCount
+                "ps": ps_total,
+                "dev": dev_total,
+                "note": note_total
             }
         },
     };

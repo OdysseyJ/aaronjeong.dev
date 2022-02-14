@@ -16,6 +16,7 @@ type PATHS = typeof paths[number]
 type PostType = {
   slug: string;
   mdxSource : MDXRemoteSerializeResult<Record<string, unknown>>;
+  content: string;
   data: {[p: string]: any};
   path: PATHS;
 }
@@ -42,6 +43,7 @@ export const getPostBySlug = async (path: PATHS, slug: string) => {
   const mdxSource = await serialize(content);
   return {
     slug,
+    content,
     mdxSource,
     data,
     path,
