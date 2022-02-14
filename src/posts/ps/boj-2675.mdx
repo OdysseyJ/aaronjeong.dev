@@ -1,0 +1,19 @@
+---
+title: boj-2675
+date: 2021/12/19
+description: backjoon online judge
+tags: [PS]
+---
+
+```python
+n = int(input())
+inputs = [input() for _ in range(n)]
+
+for i in inputs:
+    iter_num = int(i.split(" ")[0])
+    string = i.split(" ")[1]
+    result = ""
+    for s in string:
+        result += s*iter_num
+    print(result)
+```

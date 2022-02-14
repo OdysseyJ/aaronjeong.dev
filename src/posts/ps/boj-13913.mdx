@@ -1,0 +1,44 @@
+---
+title: boj-13913 숨바꼭질4 python
+date: 2022/2/8
+description: backjoon online judge 13913
+tags: [PS]
+---
+
+https://www.acmicpc.net/problem/13913
+
+#### 시간제한 : 1초
+
+### 접근
+bfs이긴 한데, 평소에 풀던거랑 좀 다르게 풀었다. 원래는 queue안에 직접 히스토리를 관리하는 방법을 선호했으나, 이제는 그렇게 풀면 시간초과가 나기 때문에 배열을 따로 밖으로 빼서 관리했다. 마지막에 정답을 도출하는 부분에서 moved 히스토리를 직접 하나씩 탐방해가며 역순으로 답을 출력했다.
+```python
+from collections import deque
+
+MAX = 100001
+n, k = map(int, input().split(" "))
+step = [0 for _ in range(MAX)]
+moved = [0 for _ in range(MAX)]
+
+def bfs(start):
+    queue = deque([start])
+    while queue:
+        top = queue.popleft()
+
+        if top == k:
+            time = step[top]
+            result = []
+            for _ in range(time+1):
+                result.append(top)
+                top = moved[top]
+            print(time)
+            print(" ".join(map(str, result[::-1])))
+            break
+
+        for i in [top+1, top-1, top*2]:
+            if 0 <= i < MAX and step[i] == 0:
+                queue.append(i)
+                step[i] = step[top] + 1
+                moved[i] = top
+
+bfs(n)
+```

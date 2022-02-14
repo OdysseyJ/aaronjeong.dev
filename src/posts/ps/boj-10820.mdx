@@ -1,0 +1,47 @@
+---
+title: boj-10820 문자열 분석 python
+date: 2022/1/4
+description: backjoon online judge 10820
+tags: [PS]
+---
+
+https://www.acmicpc.net/problem/10820
+
+#### 시간제한 : 1초
+
+### 접근
+1. n이 안주어져서 (1~100) while로 입력을 받는 신선한 문제라 포스팅. sys.std.in.readline().rstrip('\n')을 사용했는데, 그 이유는 평소에 하던것처럼 strip()하면 우측 공백도 같이 날아가기 때문에 rstrip은 우측부터 특정 문자만 strip을 진행한다.
+
+브론즈 문제라 어렵진 않음. 특징은 ord()를 이용해 아스키 코드 값을 비교했다.
+```python
+import sys
+
+# under / UPPER / num / blank
+def get_counts(sentence):
+    under = 0
+    upper = 0
+    num = 0
+    blank = 0
+    for c in sentence:
+        ord_c = ord(c)
+        if c == " ":
+            blank += 1
+        if ord("A") <= ord_c and ord_c <= ord("Z"):
+            upper += 1
+        if ord("a") <= ord_c and ord_c <= ord('z'):
+            under += 1
+        if c.isdigit():
+            num += 1
+    return under, upper, num, blank
+
+import sys
+
+while True:
+    line = sys.stdin.readline().rstrip('\n')
+
+    if not line:
+        break
+
+    under, upper, num, blank = get_counts(line)
+    print(under, upper, num, blank)
+```

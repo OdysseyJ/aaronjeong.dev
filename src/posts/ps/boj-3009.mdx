@@ -1,0 +1,27 @@
+---
+title: boj-3009
+date: 2021/12/19
+description: backjoon online judge
+tags: [PS]
+---
+
+```python
+points = [input() for _ in range(3)]
+
+dx = {}
+dy = {}
+for point in points:
+    x = point.split(" ")[0]
+    y = point.split(" ")[1]
+    if x in dx:
+        dx[x] += 1
+    else:
+        dx[x] = 1
+    if y in dy:
+        dy[y] += 1
+    else:
+        dy[y] = 1
+
+print(sorted(dx.items(), key=lambda x:x[1])[0][0], sorted(dy.items(), key=lambda x:x[1])[0][0])
+```
+

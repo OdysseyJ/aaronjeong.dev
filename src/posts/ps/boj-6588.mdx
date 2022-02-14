@@ -1,0 +1,68 @@
+---
+title: boj-6588 골드바흐의 추측 python
+date: 2021/12/25
+description: backjoon online judge 17425
+tags: [PS]
+---
+
+https://www.acmicpc.net/problem/6588
+
+#### 시간제한 : 2초
+
+### 문제
+1742년, 독일의 아마추어 수학가 크리스티안 골드바흐는 레온하르트 오일러에게 다음과 같은 추측을 제안하는 편지를 보냈다.
+
+> 4보다 큰 모든 짝수는 두 홀수 소수의 합으로 나타낼 수 있다.
+예를 들어 8은 3 + 5로 나타낼 수 있고, 3과 5는 모두 홀수인 소수이다. 또, 20 = 3 + 17 = 7 + 13, 42 = 5 + 37 = 11 + 31 = 13 + 29 = 19 + 23 이다.
+
+이 추측은 아직도 해결되지 않은 문제이다.
+
+백만 이하의 모든 짝수에 대해서, 이 추측을 검증하는 프로그램을 작성하시오.
+
+### 입력
+입력은 하나 또는 그 이상의 테스트 케이스로 이루어져 있다. 테스트 케이스의 개수는 100,000개를 넘지 않는다.
+
+각 테스트 케이스는 짝수 정수 n 하나로 이루어져 있다. (6 ≤ n ≤ 1000000)
+
+### 출력
+각 테스트 케이스에 대해서, n = a + b 형태로 출력한다. 이때, a와 b는 홀수 소수이다. 숫자와 연산자는 공백 하나로 구분되어져 있다. 만약, n을 만들 수 있는 방법이 여러 가지라면, b-a가 가장 큰 것을 출력한다. 또, 두 홀수 소수의 합으로 n을 나타낼 수 없는 경우에는 "Goldbach's conjecture is wrong."을 출력한다.
+
+### 접근
+1. 에라토스테네스의 체를 통해 먼저 소수를 구한다음, 그 소수들을 이용해 합이 n이 되는 소수의 조합이 있는지 찾는다. 이때, 두 소수의 합을 구할 것이므로 n/2 까지 확인하면 된다.
+```python
+MAX = 1000000
+
+DECIMAL = 1
+NON_DECIMAL = 0
+dp = [DECIMAL] * (MAX+1)
+dp[1] = NON_DECIMAL
+for i in range(2, MAX+1):
+    if dp[i] == DECIMAL:
+        for j in range(i*i, MAX+1, i):
+            dp[j] = NON_DECIMAL
+
+
+while True:
+    n = int(input())
+    if n == 0:
+        break
+    for i in range(3, int(n/2)+1):
+        if dp[i] == DECIMAL and dp[n-i] == DECIMAL:
+            print("{} = {} + {}".format(n, i, n-i))
+            break
+        if i == int(n/2):
+            print("Goldbach's conjecture is wrong")
+            break
+```
+
+흥미로운점은, 같은 코드를 pypy3 로 제출했을 때는 맞았는데, python으로 제출했을때는 틀렸다는 것이다.  다음 포스팅은,  이 둘의 차이점을 비교하는 글을 써야겠다.
+
+<Image
+  src="https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2021-12-25/difference.png"
+  alt="Photo"
+  width={1125}
+  height={250}
+  layout={"responsive"}
+  priority
+  className="next-image"
+/>

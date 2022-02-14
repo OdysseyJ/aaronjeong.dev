@@ -1,0 +1,22 @@
+---
+title: boj-1463 1로만들기 python
+date: 2021/12/21
+description: backjoon online judge
+tags: [PS]
+---
+
+```python
+1. 기본적인 dp문제다. dp[i-1]+1 까지의 접근은 성공했고, 이후에 dp[i//2]+1, dp[i//3]+1 까지의 사고를 하는데 조금 오래 걸렸다. 조금 더 풀어보면서 익숙해지는 시간이 필요하다
+x = int(input())
+
+dp = [0] * 1000001
+
+for i in range(2, x+1):
+    dp[i] = dp[i-1]+1
+    if i % 2 == 0:
+        dp[i] = min(dp[i], dp[i//2]+1)
+    if i % 3 == 0:
+        dp[i] = min(dp[i], dp[i//3]+1)
+
+print(dp[x])
+```

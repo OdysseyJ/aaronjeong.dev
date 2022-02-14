@@ -1,0 +1,48 @@
+---
+title: boj-11724 연결 요소의 개수 python
+date: 2022/1/27
+description: backjoon online judge
+tags: [PS]
+---
+
+https://www.acmicpc.net/problem/11724
+
+### 접근
+1. 이전에 graph를 통한 bfs/dfs 를 구현하는 문제를 했었기 때문에 굉장히 쉬웠다. 일단 그래프 노드와 간선을 2차원 배열로 모두 만들어 준 뒤에, 각 노드별로 bfs를 돌려서 결과가 있는지만 보면 된다.
+```python
+import sys
+from collections import deque
+
+n, m, = map(int, sys.stdin.readline().strip().split(" "))
+nodes = [[0 for _ in range(n+1)] for _ in range(n+1)]
+visited = [False for _ in range(n+1)]
+
+for i in range(m):
+    n1, n2 = map(int, sys.stdin.readline().strip().split(" "))
+    nodes[n1][n2] = 1
+    nodes[n2][n1] = 1
+
+def g_bfs(start_node):
+    queue = deque([start_node])
+    result = []
+    while queue:
+        top = queue.popleft()
+        if visited[top]:
+            continue
+
+        result.append(str(top))
+        visited[top] = True
+
+        for idx, linked in enumerate(nodes[top][1:]):
+            if linked == 1 and not visited[idx+1]:
+                queue.append(idx+1)
+
+    return result
+
+result = 0
+for i in range(1, n+1):
+    if len(g_bfs(i)) != 0:
+        result += 1
+
+print(result)
+```

@@ -1,0 +1,23 @@
+---
+title: boj-1934
+date: 2021/12/19
+description: backjoon online judge
+tags: [PS]
+---
+
+```python
+n = int(input())
+cases = [input() for _ in range(n)]
+
+def gcd(a, b):
+    if b==0:
+        return a
+    return gcd(b, a%b)
+
+for case in cases:
+    a = int(case.split(" ")[0])
+    b = int(case.split(" ")[1])
+    lcm = a*b / gcd(a, b)
+    print(int(lcm))
+```
+

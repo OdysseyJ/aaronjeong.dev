@@ -1,0 +1,56 @@
+---
+title: boj-1707 이분그래프
+date: 2022/2/2
+description: backjoon online judge 1707
+tags: [PS]
+---
+
+https://www.acmicpc.net/problem/1707
+
+<Image
+  src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/bipartite_graph.png'
+  alt="Photo"
+  width={800}
+  height={400}
+  priority
+  className="next-image"
+/>
+
+### 접근
+1. 처음에는 이분 그래프 정의를 파악하기 힘들어서 다른 그림을 참고했다.
+
+그래프를 이해하고 나니, 1과 -1을 사용해 노드들을 구분해나가면서 그래프를 이분하였다. 이때 마지막에 visited[i] == 0을 체크해준 이유는, 해당 노드가 다른 노드 엣지의 사이클에 포함되지 않을 수 있기 때문에 새로 시작하는 노드들은 전부 다 체크해줘야 한다.
+```python
+import sys
+from collections import deque
+input = sys.stdin.readline
+
+def bipartite_graph(start_node, visited):
+    queue = deque([(start_node, 1)])
+    visited[start_node] = 1
+
+    while queue:
+        node, flag = queue.popleft()
+        for linked_node in nodes[node]:
+            if visited[linked_node] == 0:
+                queue.append((linked_node, -flag))
+                visited[linked_node] = -flag
+            elif visited[linked_node] == flag:
+                return False
+    return True
+
+k = int(input().strip())
+for _ in range(k):
+    v, e = map(int, input().strip().split(" "))
+    nodes = [[] for _ in range(v+1)]
+    visited = [0 for _ in range(v+1)]
+
+    for i in range(e):
+        n1, n2 = map(int, input().strip().split(" "))
+        nodes[n1].append(n2)
+        nodes[n2].append(n1)
+
+    print("YES" if all(
+        [bipartite_graph(i, visited) for i in range(1, v+1) if visited[i] == 0]
+    ) else "NO")
+```

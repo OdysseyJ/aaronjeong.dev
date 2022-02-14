@@ -1,0 +1,36 @@
+---
+title: boj-2476
+date: 2021/12/19
+description: backjoon online judge
+tags: [PS]
+---
+
+```python
+n = int(input())
+dices = [input() for _ in range(n)]
+
+def roll(a, b, c):
+    dices = {}
+    for num in [a, b, c]:
+        if num in dices:
+            dices[num] += 1
+        else:
+            dices[num] = 1
+
+    items = sorted(dices.items())
+    sorted_items = sorted(items, key=lambda x:x[1])
+    if len(sorted_items) == 3:
+        return (max([a, b, c])*100)
+    if len(sorted_items) == 2:
+        return (1000 + (sorted_items[1][0]*100))
+    if len(sorted_items) == 1:
+        return (10000 + (sorted_items[0][0]*1000))
+
+result = []
+for dice in dices:
+    a, b, c = dice.split(" ")
+    result.append(roll(int(a), int(b), int(c)))
+
+print(max(result))
+```
+

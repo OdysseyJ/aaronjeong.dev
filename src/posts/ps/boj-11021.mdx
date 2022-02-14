@@ -1,0 +1,15 @@
+---
+title: boj-11021
+date: 2021/12/18
+description: backjoon online judge
+tags: [PS]
+---
+
+```python
+n = int(input())
+inputs = [input() for _ in range(n)]
+for idx, i in enumerate(inputs):
+    a = i.split(" ")[0]
+    b = i.split(" ")[1]
+    print("Case #{}: {}".format(idx+1, int(a)+int(b)))
+```

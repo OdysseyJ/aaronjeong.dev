@@ -111,6 +111,7 @@ export default Home;
 
 export const getStaticProps = async () => {
   const { posts, total } = await getAllPosts();
+  console.log(posts.slice(0, 5))
 
   return {
     props: {

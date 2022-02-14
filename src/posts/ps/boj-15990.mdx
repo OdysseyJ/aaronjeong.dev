@@ -1,0 +1,42 @@
+---
+title: boj-15990 1, 2, 3, 더하기 5 python
+date: 2022/1/13
+description: backjoon online judge 15990
+tags: [PS]
+---
+
+#### 시간제한 : 1초
+
+### 접근
+1. 2중 dp를 사용해, dp[n][i] = 합의 마지막수가 i일때, [1, 2, 3]을 이용해 n을 만드는 방법으로 정의한다.
+
+이때, [1,2,3] 세 수가 연속해서 올 수 없기 때문에
+
+dp[n][1] = (n-1이 2나 3으로 끝나는 경우 끝에 1을 더해 붙인다)
+
+dp[n][2] = (n-2가 1나 3으로 끝나는 경우 끝에 2을 더해 붙인다)
+
+dp[n][3] = (n-3가 1나 2으로 끝나는 경우 끝에 3을 더해 붙인다)
+
+이때 원하는것은 dp[n]이다.
+
+```python
+import sys
+
+mod = 1000000009
+t = int(input())
+
+# dp[n][i] = 합의 마지막 수가 i일때, [1,2,3]을 이용해 n을 만드는 방법
+dp = [[0 for _ in range(4)] for _ in range(100001)]
+
+dp[1][1] = dp[2][2] = dp[3][1] = dp[3][2] = dp[3][3] = 1
+
+for i in range(4, 100001):
+    dp[i][1] = (dp[i-1][2] + dp[i-1][3]) % mod
+    dp[i][2] = (dp[i-2][1] + dp[i-2][3]) % mod
+    dp[i][3] = (dp[i-3][1] + dp[i-3][2]) % mod
+
+for i in range(t):
+    n = int(sys.stdin.readline().strip())
+    print(sum(dp[n])%mod)
+```

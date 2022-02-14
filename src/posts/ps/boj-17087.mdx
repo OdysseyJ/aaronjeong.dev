@@ -1,0 +1,35 @@
+---
+title: boj-17087 숨바꼭질6 python
+date: 2022/1/10
+description: backjoon online judge
+tags: [PS]
+---
+
+https://www.acmicpc.net/problem/17087
+
+### 접근
+1. s의 위치로부터 각 위치까지의 차의 절대값 abs(num-s)의 최소값을 구하면 된다.
+
+이때, 나는 처음에 combinations를 직접 구해서 계산했는데, 이건 시간초과가 났다.
+
+사실 배열 내의 최대공약수를 구하려면, 배열의 최소값을 구해놓고, gcd를 계속 해서 공약수를 계속 구해주기만 하면 된다. 이걸 몰라서 좀 헤맸다.
+
+```python
+def gcd(a, b):
+    if b==0:
+        return a
+    return gcd(b, a%b)
+
+n, s = map(int, input().split(" "))
+nums = map(int, input().split(" "))
+
+if n==1:
+    print(list(nums)[0]-s)
+else:
+    diffs = set([abs(num-s) for num in nums])
+    d = min(diffs)
+    for diff in diffs:
+        d = gcd(d, diff)
+    print(d)
+```
+

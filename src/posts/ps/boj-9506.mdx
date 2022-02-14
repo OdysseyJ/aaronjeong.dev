@@ -1,0 +1,23 @@
+---
+title: boj-9506
+date: 2021/12/21
+description: backjoon online judge
+tags: [PS]
+---
+
+```python
+while True:
+    n = int(input())
+    if n == -1:
+        break
+    d = {}
+    for i in range(1, n):
+        if n%i == 0:
+            d[i] = 1
+    s = list(map(lambda x:x[0], d.items()))
+    if sum(s) == n:
+        k = list(map(str, s))
+        print("{} = {}".format(n, " + ".join(k)))
+    else:
+        print("{} is NOT perfect.".format(n))
+```

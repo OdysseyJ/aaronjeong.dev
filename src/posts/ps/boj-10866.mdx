@@ -1,0 +1,28 @@
+---
+title: boj-10866 덱 python
+date: 2022/1/7
+description: backjoon online judge 10866
+tags: [PS]
+---
+
+https://www.acmicpc.net/problem/10866
+
+#### 시간제한 : 0.5초
+
+### 접근
+1. 큐를 이용해 풀면 되겠다는 생각을 했고, 처음에 해당 방식으로 구현했다. 포인트는 queue.pop(0
+```python
+n, k = map(int, input().split(" "))
+
+queue = [str(i) for i in range(1, n+1)]
+result = []
+
+while queue:
+    for i in range(k-1):
+        queue.append(queue.pop(0))
+    result.append(queue.pop(0))
+
+answer = ", ".join(result)
+print('<{}>'.format(answer))
+```
+

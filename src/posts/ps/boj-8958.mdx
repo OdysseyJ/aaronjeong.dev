@@ -1,0 +1,25 @@
+---
+title: boj-8958
+date: 2021/12/21
+description: backjoon online judge
+tags: [PS]
+---
+
+```python
+n = int(input())
+results = [input() for _ in range(n)]
+
+for result in results:
+    stack = []
+    score = 0
+    for r in result:
+        if r=="O":
+            stack.append("O")
+        else:
+            n = len(stack)
+            score += n * (n+1) / 2
+            stack = []
+    n = len(stack)
+    score += n * (n+1) / 2
+    print(int(score))
+```

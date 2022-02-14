@@ -1,0 +1,70 @@
+---
+title: boj-1929 소수 구하기 python
+date: 2021/12/24
+description: backjoon online judge 17425
+tags: [PS]
+---
+
+#### 시간제한 : 2초
+
+### 문제
+M이상 N이하의 소수를 모두 출력하는 프로그램을 작성하시오.
+
+### 입력
+첫째 줄에 자연수 M과 N이 빈 칸을 사이에 두고 주어진다. (1 ≤ M ≤ N ≤ 1,000,000) M이상 N이하의 소수가 하나 이상 있는 입력만 주어진다.
+
+### 접근
+1. 소수 : 1과 자기 자신으로만 나누어 떨어지는 수
+만약에, 기존 소수를 구하는 방식을  택할 경우(1-N까지 1과 자기자신을  제외한 나머지 수로 나누어 떨어지는지 체크) * 최대 N-1개의 수가 가능하므로 O(N^2)의 시간 복잡도를 가지고, 이는 시간제한을 통과할 수 없다.
+
+2. 해당 수의 제곱근까지만 탐색을 해도, 약수는 대칭이기 때문에 문제가 없다. 따라서 O(n*root(n))이 된다.
+```python
+m, n = map(int, input().split(" "))
+
+def is_decimal(num):
+    if num==1: return False
+    for i in range(2, int(num**0.5)+1):
+        if num%i == 0:
+            return False
+    return True
+
+count = 0
+for num in range(m, n+1):
+    if is_decimal(num):
+        print(num)
+
+```
+
+3. 에라토스테네스의 체를 이용한다.
+메모리에 MAX 범위까지 특정 소수들의 배수를 전부 제외해 나가는 방식으로 저장한다. 그리고 특정 범위의  소수 여부를 판단하려면 해당 메모리의 소수 여부만을 체크한다.
+```python
+m, n = map(int, input().split(" "))
+
+DECIMAL = 1
+NON_DECIMAL = 0
+dp = [DECIMAL] * (n+1)
+dp[1] = NON_DECIMAL
+for i in range(2, n+1):
+    if dp[i] == DECIMAL:
+        for j in range(i*i, n+1, i):
+            dp[j] = NON_DECIMAL
+
+count = 0
+for num in range(m, n+1):
+    if dp[num] == DECIMAL:
+        print(num)
+```
+
+<Image
+  src="https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2021-12-24/result.png"
+  alt="Photo"
+  width={1125}
+  height={250}
+  priority
+  className="next-image"
+/>
+(위 : 에라토스테네스의 체)
+
+(아래 : 2번의 방법)
+
+확실히, 에라토스테네스의 체가 훨씬 빠르지만, 메모리 소모량이 큰 것을 볼 수 있다.

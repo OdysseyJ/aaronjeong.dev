@@ -1,0 +1,15 @@
+---
+title: boj-2884
+date: 2021/12/19
+description: backjoon online judge
+tags: [PS]
+---
+
+```python
+import datetime
+hour, minute = map(int, input().split(" "))
+
+answer = datetime.datetime(year=2000, month=1, day=1, hour=hour, minute=minute) - datetime.timedelta(minutes=45)
+print(answer.strftime("%-H %-M"))
+```
+

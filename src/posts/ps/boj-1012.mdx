@@ -1,0 +1,49 @@
+---
+title: boj-1012 유기농 배추 python
+date: 2022/2/9
+description: backjoon online judge
+tags: [PS]
+---
+
+https://www.acmicpc.net/problem/1012
+
+### 접근
+1. visited 배열을 관리하지 않았었기 때문에 삽질을 많이해서 포스팅한다. 기본적인거 실수하지말자...
+```python
+from collections import deque
+
+moves = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+
+def bfs(x, y):
+    queue = deque([(x, y)])
+
+    while queue:
+        x, y = queue.popleft()
+
+        cabbages[y][x] = 0
+        for i, j in moves:
+            if 0 <= x+i < m and 0 <= y+j < n and cabbages[y+j][x+i] == 1 and not visited[y+j][x+i]:
+                queue.append((x+i, y+j))
+                visited[y+j][x+i] = True
+
+t = int(input().strip())
+
+for _ in range(t):
+    m, n, k = map(int, input().split())
+
+    cabbages = [[0 for _ in range(m)] for _ in range(n)]
+    visited = [[False for _ in range(m)] for _ in range(n)]
+
+    for _ in range(k):
+        x, y = map(int, input().split())
+        cabbages[y][x] = 1
+
+    result = 0
+    for i in range(n):
+        for j in range(m):
+            if cabbages[i][j] == 1:
+                result += 1
+                bfs(j, i)
+
+    print(result)
+```

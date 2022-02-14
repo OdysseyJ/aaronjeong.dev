@@ -1,0 +1,52 @@
+---
+title: boj-1918 후위표기식 python
+date: 2022/1/9
+description: backjoon online judge 1918
+tags: [PS]
+---
+
+https://www.acmicpc.net/problem/1918
+
+#### 시간제한 : 2초(PyPy3)
+
+### 접근
+1. operator별로 우선순위를 정하고, 해당 우선순위의 dict를 먼저 만들었다. 이후에는
+    1. ( 일 경우 stack에 추가
+    2. ) 일 경우 ( 가 나올때까지 stack에서 빼기
+    3. operator의 경우 stack의 top과 우선순위를 비교해 top의 우선순위가 더 높거나 __같으면__ 스택에서 다 빼 정답에 더해주면 된다.
+
+    생각보다 간단하지만, 코드 정리 전에는 더럽게 풀었다. 특히, 우선순위가 같은 경우에 A+B-C일 경우에 +를 먼저 연산한다는 조건을 일찍 깨우치지 못해서 반례를 찾아봤다.
+```python
+sentence = input()
+
+stack = []
+operators = {
+    "+": 1,
+    "-": 1,
+    "(": 0,
+    ")": 0,
+    "*": 2,
+    "/": 2
+}
+result = ""
+
+for c in sentence:
+    if (priority := operators.get(c)) is not None:
+        if c == "(":
+            pass
+        elif c == ")":
+            while (top := stack.pop()) != "(":
+                result += top
+            continue
+        else:
+            while stack and operators[stack[-1]] >= priority:
+                result += stack.pop()
+        stack.append(c)
+    else:
+        result += c
+
+while stack:
+    result += stack.pop()
+
+print(result)
+```

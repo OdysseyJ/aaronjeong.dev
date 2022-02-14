@@ -1,0 +1,94 @@
+---
+title: 실버러시 1/18
+date: 2022/1/10
+description: backjoon online judge
+tags: [PS]
+---
+
+# 실버러시 1/18
+
+https://www.acmicpc.net/problem/2156
+
+```python
+import sys
+
+n = int(sys.stdin.readline().strip())
+wines = [0] + [int(input()) for _ in range(n)]
+MAX = 100001
+
+# dp[n][k] = n번째 와인을 k번째 연속으로 마실때의 최대값 (0은 안마신다는 뜻)
+dp = [[0 for _ in range(3)] for _ in range(MAX)]
+
+dp[1][0] = 0
+dp[1][1] = wines[1]
+dp[1][2] = 0
+
+for i in range(2, n+1):
+    dp[i][0] = max(dp[i-1])
+    dp[i][1] = dp[i-1][0] + wines[i]
+    dp[i][2] = dp[i-1][1] + wines[i]
+
+print(max(dp[n]))
+```
+
+https://www.acmicpc.net/problem/1932
+
+```
+import sys
+
+n = int(sys.stdin.readline().strip())
+steps = [[int(n) for n in input().split(" ")] for _ in range(n)]
+
+if n==1:
+    print(steps[0][0])
+else:
+    # dp[n][k] = n번째 줄의 k번째 에서의 최대값
+    dp = [[0 for _ in range(i+1)] for i in range(n)]
+
+    dp[0][0] = steps[0][0]
+    dp[1][0] = dp[0][0] + steps[1][0]
+    dp[1][1] = dp[0][0] + steps[1][1]
+
+    for i in range(2, n):
+        dp[i][0] = dp[i-1][0] + steps[i][0]
+        for j in range(1, i):
+            dp[i][j] = max(dp[i-1][j-1], dp[i-1][j]) + steps[i][j]
+        dp[i][i] = dp[i-1][i-1] + steps[i][i]
+
+    print(max(dp[n-1]))
+```
+
+https://www.acmicpc.net/problem/11055
+
+```
+import sys
+
+n = int(sys.stdin.readline().strip())
+nums = [int(num) for num in input().split(" ")]
+
+dp = [nums[i] for i in range(n)]
+
+for i in range(1, n):
+    for j in range(i):
+        if nums[j] < nums[i]:
+            dp[i] = max(dp[i], dp[j] + nums[i])
+
+print(max(dp))
+```
+
+https://www.acmicpc.net/problem/11722
+```
+import sys
+
+n = int(sys.stdin.readline().strip())
+nums = [int(num) for num in input().split(" ")]
+
+dp = [1 for _ in range(n)]
+
+for i in range(1, n):
+    for j in range(i):
+        if nums[j] > nums[i]:
+            dp[i] = max(dp[i], dp[j] + 1)
+
+print(max(dp))
+```

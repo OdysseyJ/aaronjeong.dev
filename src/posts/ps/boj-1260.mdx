@@ -1,0 +1,63 @@
+---
+title: boj-1260 DFS와 BFS python
+date: 2022/1/26
+description: backjoon online judge 1406
+tags: [PS]
+---
+
+https://www.acmicpc.net/problem/1260
+
+#### 시간제한 : 2초
+
+### 접근
+1. 그래프에서 DFS와 BFS를 구현하면 되는 굉장히 명확한 명세의 문제였다. 노드간에 연결되어있는 간선이 있으면 1, 없으면 0으로 두고 2차원 배열을 선언해서 초기화 한 다음, stack과 queue를 이용해서 dfs와 bfs를 구현했다. 이때, 주의해야할 점은 간선이 연결되어있고, 방문하지 않은 노드에 대해서만 순회를 해야한다는 점이다.
+```python
+import sys
+from collections import deque
+
+n, m, v = map(int, sys.stdin.readline().strip().split(" "))
+nodes = [[0 for _ in range(n+1)] for _ in range(n+1)]
+
+for i in range(m):
+    n1, n2 = map(int, sys.stdin.readline().strip().split(" "))
+    nodes[n1][n2] = 1
+    nodes[n2][n1] = 1
+
+def g_dfs(start_node):
+    visited = [False for _ in range(n+1)]
+    stack = [start_node]
+    result = []
+    while stack:
+        top = stack.pop()
+        if visited[top]:
+            continue
+
+        result.append(str(top))
+        visited[top] = True
+
+        for idx, linked in enumerate(list(reversed(nodes[top][1:]))):
+            if linked == 1 and not visited[n-idx]:
+                stack.append(n-idx)
+    return result
+
+def g_bfs(start_node):
+    queue = deque([start_node])
+    result = []
+    visited = [False for _ in range(n+1)]
+    while queue:
+        top = queue.popleft()
+        if visited[top]:
+            continue
+
+        result.append(str(top))
+        visited[top] = True
+
+        for idx, linked in enumerate(nodes[top][1:]):
+            if linked == 1 and not visited[idx+1]:
+                queue.append(idx+1)
+
+    return result
+
+print(" ".join(g_dfs(v)))
+print(" ".join(g_bfs(v)))
+```

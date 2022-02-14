@@ -1,0 +1,34 @@
+---
+title: boj-1978 소수 찾기 python
+date: 2021/12/23
+description: backjoon online judge 17425
+tags: [PS]
+---
+
+#### 시간제한 : 2초
+
+### 문제
+주어진 수 N개 중에서 소수가 몇 개인지 찾아서 출력하는 프로그램을 작성하시오.
+
+### 입력
+첫 줄에 수의 개수 N이 주어진다. N은 100이하이다. 다음으로 N개의 수가 주어지는데 수는 1,000 이하의 자연수이다.
+
+### 접근
+1. 소수 : 1과 자기 자신으로만 나누어 떨어지는 수
+```python
+n = int(input())
+nums = list(map(int, input().split(" ")))
+
+def is_decimal(num):
+    if num==1: return False
+    for i in range(2, num):
+        if num%i == 0:
+            return False
+    return True
+
+count = 0
+for num in nums:
+    if is_decimal(num):
+        count+=1
+print(count)
+```

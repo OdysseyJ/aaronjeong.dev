@@ -1,0 +1,153 @@
+---
+title: 2022년 1월 회고
+date: 2022/1/31
+description: retrospect 2022 january
+tags: [Daily]
+---
+
+블로그를 시작하면서, 매달 내가 얼마나 성장했는지 회고를 작성하기로 마음먹었었다.
+
+https://www.aaronjeong.dev/notes/attitude-for-development
+
+그래서, 조금 낯설지만 글 형태로 내 스스로의 한달을 되돌아보는 시간을 가진다.
+
+### 커리어의 성장
+
+2022년 1월 3일, 새해를 맞아 새로운 팀에 합류했다. 새로운 팀은 내 생각 이상으로 멋졌다.
+
+처음 근무하며 적응이 필요한 내게, 기존 팀원들은 많은 인내심으로 필요한 부분을 잘 알려주셨다.
+
+내게는 과분할 정도로 좋은 사람들이었고, 이런 사람들과 일할 수 있는 기회가 있다는것에 감사했다.
+
+그래서 다른 사람의 코드 읽는 일이 생각보다 간단한 일은 아니지만, 최대한 빨리 스스로 1이 되고 싶어 더 노력해야겠다는 마음이 생겼다.
+
+나는 인생이 곱하기와 같다는 말을 좋아한다. 내게 주어지는 여러가지 큰 수들을 내게 곱하며 성장하는데
+
+내 스스로가 1도 되지 못한다면 내게 주어지는 여러가지 큰 기회의 수들이 그 가치를 잃어버릴것이다.
+
+지금 내게 주어진 기회는 내가 인생에서 한번도 겪어보지 못한 커다란 수였다. 좋은 기회가 가치를 잃어버리지 않도록 하고 싶었다.
+
+지금 회사가 굉장히 폭발적으로 성장하고 있어, 1이라는 기준이 계속해서 높아지는 것을 느낀다. 지금은 욕심내지 말고 최소한 회사가 그리는 커브에 맞춰서 성장할 수 있도록 최선을 다하고 싶다.
+
+### 개발자로서의 성장
+
+
+#### 읽은 책들
+
+- Two Scoops of Django
+- 파이썬 코딩의 기술 개정 2판
+- 누구나 쉽게 SQL
+- SQL 레벨업
+- Docker관련 책 (이름이 기억이 안난다)
+
+#### 강좌
+
+1. Pycon의 강좌
+    - Django ORM의 원리와 최적화 전략
+        - https://www.youtube.com/watch?v=EZgLfDrUlrk (강좌)
+        - https://www.aaronjeong.dev/posts/deep-inside-django-queryset (정리)
+    - 라이브 서비스의 친구 Sentry
+        - https://www.youtube.com/watch?v=28PAPRLit4Q (강좌)
+    - Django를 Django답게 뉴스 사이트 만들기
+        - https://www.youtube.com/watch?v=SbIQuDKmig0 (강좌)
+        - https://www.aaronjeong.dev/posts/make-news-site-by-django (정리)
+    - Django 웹 서비스 5년간의 운영기
+        - https://www.youtube.com/watch?v=r6c9Us0vgRg (강좌)
+        - https://www.aaronjeong.dev/posts/drf-yasg (정리)
+    - Django DB Router와 RDS cluster read replica 100% 활용하기
+        - https://www.youtube.com/watch?v=eAP8zimx05M (강좌)
+        - https://www.aaronjeong.dev/posts/django-db-router-and-rds-cluster (정리)
+
+#### AWS
+- DMS : DMS target, instance, source등의 사용법 이해, dms table filter 수정해보기.
+- VPC : VPC 새로 만들어보기, 라우팅 테이블, 인터넷 게이트웨이 및 VPC 피어링. CIDR에 대한
+  이해와 Subnet에 대해 이해하기.
+    - https://www.aaronjeong.dev/posts/learn-vpc-cidr-and-subnet
+- RDS : 새로운 클러스터 생성, custom domain 적용해보기
+- ECR : 레포지토리 생성해보기, 도커 이미지 빌드 후 업로드해서 ECS생성시 활용해보기
+- ECS : ECS Cluster, Fargate Service, 작업 정의 생성 및 ELB를 활용해 ECS service로 라우팅해보기
+
+#### 파이썬(Python)
+눈에띄는 개선이라고 하면 이전에도 파이썬으로 개발을 몇번 해봤지만 파이써닉하게 코드를 작성했다고 생각하지 않는데, 파이썬 코딩의 기술이라는 책을 읽고 나서 내가 봐도 코드 퀄리티가 많이 좋아짐을 느꼈다. 그래서 주변에 있는 파이썬 개발자들에게도 모두 추천했다.
+
+<Image
+  src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/effective-python.png'
+  alt="Photo"
+  width={300}
+  height={400}
+  layout={"responsive"}
+  priority
+  className="next-image"
+/>
+
+#### SQL
+
+또한, 나는 개발할 때 항상 ORM으로만 해왔기 때문에 Raw SQL을 작성할 일이 없었는데, 이번에 일을 해 보면서 SQL optimization을 할 일이 많이 있어서 공부의 필요성을 느꼈다. 그러다보니 Raw SQL 작성을 위해 도서들을 읽고, 연습을 시작하게 되었다. 아직까지 경험이 많지 않아 잘 하지는 못하지만 어느정도 기본적인 구문은 작성하고 이해할 수 있는 정도의 수준까지는 올라온 것 같다.
+
+앞으로 쿼리 최적화 할 일이 있으면 무조건 내가 받아서 하고싶다고 해야 겠다. 그리고 프로그래머스에 여러가지 쿼리 문제도 있는것 같아서, 해당 문제들도 2월 안에 꼭 다 풀어봐야 겠다.
+
+<Image
+  src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/programmers-sql.png'
+  alt="Photo"
+  width={400}
+  height={400}
+  layout={"responsive"}
+  priority
+  className="next-image"
+/>
+
+### PS
+Problem solving은 한 80문제정도 한것 같다. 목표는 다이아5인데, 목표만큼 공부를 잘 해나가고 있는건지 잘 모르겠다. 이 페이스로 가면 6개월내 다이아는 힘드려나? 찍어본 사람한테 물어봐야지
+
+<Image
+  src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/boj-gold.png'
+  alt="Photo"
+  width={500}
+  height={120}
+  priority
+  className="next-image"
+/>
+
+<Image
+  src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/boj-commits.png'
+  alt="Photo"
+  width={500}
+  height={300}
+  priority
+  className="next-image"
+/>
+
+하루 빠진 기간이 있는데, 이전에 누나가 서울에 올라와서 자소서 쓰는걸 도와달라는 요청을 받아서 그냥 하루 포기하기로 했다. 마음이 아팠지만, 여태까지 그렇게 진지한 누나 얼굴을 본 적이 없어서 나도 최선을 다하고 싶었다. 후회하지는 않는다.
+
+#### 블로그
+
+포스팅을 몇개한건지 잘 모르겠지만, PS를 포함하면 한 100개는 한것같다.
+
+정확한 수치는 계산하기 귀찮아서 안했는데, 이게 내가 만든 블로그의 단점인것 같다.
+
+날짜를 기준으로 월별 통계, 연도별 통계 같은 통계 기능을 만들어볼까 싶다.
+
+2월중 사이드 프로젝트로 해봐야겠다. 생각보다 블로그 포스팅이 내게 잘 맞고 재밌다고 느낀다.
+
+### 이외 성장했다고 느끼는 것들
+
+0. 커뮤니케이션 스킬이  많이 늘었다. 특히 비즈니스 커뮤니케이션 능력이 많이 상승했다고 느꼈다.
+    - 다른 사람의 시간은 내 시간만큼 소중하다.  요약해서, 구조화해서 전달하기
+    - 팀원들에게 간접적으로 배운 소프트 스킬들
+
+
+1. 강남으로 이사를 하게 되었다. 삶의 질이 성장함을 느꼈다.
+
+2. 여러가지 책을 읽었다.
+
+    - 제로투원이라는 책을 읽었다. 창조적 독점이라는 것에 대해 배웠고, 경쟁은 항상 건강한것이 아니라는 것을 배웠다. 회사를 만든다면 어떤 사람들과 함께하고 싶은지 생각해보게 되었다. 세일즈와 마케팅의 중요성을 알게 되었고, 기술을 만든다고 사람들이 알아서 찾아와서 쓰지 않는다는 것에 공감했다. 개발자가 가지기 쉬운 기술 만능주의를 좀 내려놓게 되었다.
+    - 제인에어라는 고전 소설을 읽었다. 평소에 로맨스 소설은 별로 좋아하지 않는데, 누군가가
+      책을 읽고 감명을 많이 받았다고 해서 궁금해서 읽어봤다. 생각보다 로맨스 소설도 재미가 있어서 놀랬다. 여주인공이 여느 로맨스소설처럼 백마탄 왕자를 기다리는 공주가 아니어서 그랬던 것 같다.
+
+3. 노션 데이터베이스 기능을 활용해 스스로 업무와 일정을 정리하는 템플릿을 만들었는데, 더이상 까먹어서 진행하지 못하는 일들이 없어졌다.
+
+4. 어머니와 누나가 졸업 선물로 엄청 좋은 면도기를 사줬다. 이젠 면도좀 제대로 하고 다녀야겠다.
+
+### 아쉬웠던 점
+
+0. 등산 한번도 하지 못했고, 하루도 운동을 안했다. 2월에는 헬스장 등록도 해서 점심시간에는 꼭 헬스장에 다녀야지. 그리고 날씨가 조금 따뜻해지면 주말에 등산도 1번 이상은 꼭 가야지.

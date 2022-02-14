@@ -1,0 +1,116 @@
+---
+title: boj-4963 섬의 개수
+date: 2022/1/29
+description: backjoon online judge
+tags: [PS]
+---
+
+https://www.acmicpc.net/problem/4963
+
+### 접근
+1. 정사각형의 한 타일을 1개의 노드로 보고, land가 이어져있는 부분을 find_edges 함수를 통해 찾는다. 이때 노드의 순서는 w*y+1로 정했다.
+
+2. 이어져있는 edge를 bfs로 돌면서 연결된 edge들의 총 개수를 찾는다. 이때 bfs를 돌기 전에 미리 "Land" 영역이 아닌 "Sea" 영역에 대해서는 방문 여부를 True로 저장해두어 BFS에서 탐색하는 조건에서 제외시켰다. 
+```python
+import sys
+from collections import deque
+
+
+def find_edges(islands, x, y, w, h):
+    results = []
+    for i in range(y-1, y+2):
+        for j in range(x-1, x+2):
+            if 0 <= i < h and 0 <= j < w:
+                if i == y and j == x:
+                    continue
+                if islands[i][j] == "1":
+                    results.append((w*y+x, w*i+j))
+    return results
+
+
+while True:
+    w, h = map(int, sys.stdin.readline().strip().split(" "))
+    if w == 0 and h == 0:
+        break
+    n = w * h
+    nodes = [[0 for _ in range(n)] for _ in range(n)]
+    islands = [input().split(" ") for _ in range(h)]
+    visited = [False for _ in range(n)]
+
+    for y in range(h):
+        for x in range(w):
+            if islands[y][x] == "1":
+                edges = find_edges(islands, x, y, w, h)
+                for edge in edges:
+                    n1, n2 = edge
+                    nodes[n1][n2] = 1
+            else:
+                visited[w*y+x] = True
+
+    def g_bfs(start_node):
+        queue = deque([start_node])
+        result = []
+        while queue:
+            top = queue.popleft()
+            if visited[top]:
+                continue
+
+            result.append(str(top))
+            visited[top] = True
+
+            for idx, linked in enumerate(nodes[top][1:]):
+                if linked == 1 and not visited[idx+1]:
+                    queue.append(idx+1)
+
+        return result
+
+    result = 0
+    for i in range(n):
+        r = g_bfs(i)
+        if len(r) != 0:
+            result += 1
+
+    print(result)
+```
+
+다른 사람의 코드 중에서, 간결한 코드를 발견해 따로 확인해봤다.
+1. 해당 맵 자체를 직접 돌면서 visited를 2차원으로 관리하면서 돈다. 이게 더 쉽다.
+```python
+import sys
+Input = sys.stdin.readline
+
+dx = [1, -1, 0, 0, 1, -1, 1, -1]
+dy = [1, -1, 1, -1, 0, 0, -1, 1]
+
+def check_area():
+  queue = []
+  count = 0
+  for a in range(h):
+    for b in range(w):
+      if Map[a][b] == 1 and not visited[a][b]:
+        count += 1
+        visited[a][b] = True
+      else:
+        continue
+      queue.append((a, b))
+      while queue:
+        x, y = queue.pop()
+        for i in range(8):
+          nx = dx[i] + x
+          ny = dy[i] + y
+          if ny >= w or ny < 0 or nx >= h or nx < 0:
+            continue
+          if not visited[nx][ny] and Map[nx][ny] == 1:
+            queue.append((nx, ny))
+            visited[nx][ny] = True
+  print(count)                  
+
+
+while True:
+  w, h = map(int, input().split())
+  if w == 0 and h == 0:
+    break
+  Map = [list(map(int, Input().split())) for _ in range(h)]
+  visited = [[False] * w for _ in range(h)]
+  check_area()  
+```

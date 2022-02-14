@@ -1,0 +1,23 @@
+---
+title: boj-10103
+date: 2021/12/21
+description: backjoon online judge
+tags: [PS]
+---
+
+```python
+n = int(input())
+rounds = [input() for _ in range(n)]
+
+s1 = 100
+s2 = 100
+for round_ in rounds:
+    d1 = int(round_.split(" ")[0])
+    d2 = int(round_.split(" ")[1])
+    if d1 > d2:
+        s2 -= d1
+    if d1 < d2:
+        s1 -= d2
+print(s1)
+print(s2)
+```

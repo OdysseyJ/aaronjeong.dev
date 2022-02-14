@@ -1,0 +1,41 @@
+---
+title: boj-1992 python
+date: 2022/2/12
+description: backjoon online judge 1992
+tags: [PS]
+---
+
+https://www.acmicpc.net/problem/1992
+
+#### 시간제한 : 2초
+
+### 접근
+1. 재귀가 조금 익숙해졌는지, 풀만한 문제였다. 다만 모든 a, b, c, d가 1일때, 0일때의 조건을 처음에 생각하지 않고 짰다가
+돌려보니 전부다 괄호쌍으로 나오길래 수정했다.
+```python
+import sys
+sys.setrecursionlimit(100000)
+input = sys.stdin.readline
+
+k = int(input().strip())
+lines = [input() for _ in range(k)]
+video = [[i for i in line] for line in lines]
+
+
+def solve(n, x, y):
+    if n == 1:
+        return video[y][x]
+    h = int(n/2)
+    a = solve(h, x, y)
+    b = solve(h, x+h, y)
+    c = solve(h, x, y+h)
+    d = solve(h, x+h, y+h)
+    if all(map(lambda r: r == "1", [a, b, c, d])):
+        return "1"
+    if all(map(lambda r: r == "0", [a, b, c, d])):
+        return "0"
+    return f"({a}{b}{c}{d})"
+
+
+print(solve(k, 0, 0))
+```

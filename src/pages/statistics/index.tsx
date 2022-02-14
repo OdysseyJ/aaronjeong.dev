@@ -3,6 +3,7 @@ import {
     GridItem,
 } from "@chakra-ui/react";
 import { NextSeo } from "next-seo";
+import WordCloud from "@src/components/Charts/WordCloud";
 
 type HomeStaticProps = {
    allTexts: string
@@ -16,16 +17,7 @@ type HomeStaticProps = {
 const Statistics = ({ allTexts, counts: {ps, note, dev} }: HomeStaticProps) => (
     <>
         <NextSeo title={"Statistics"} />
-        <Grid
-            templateColumns={{
-                md: "repeat(12, 1fr)",
-            }}
-            gap={12}
-        >
-            <GridItem colSpan={{ md: 4 }}>
-                준비중
-            </GridItem>
-        </Grid>
+        <WordCloud />
     </>
 );
 

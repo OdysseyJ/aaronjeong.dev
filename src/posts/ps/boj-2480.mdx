@@ -1,0 +1,27 @@
+---
+title: boj-2480
+date: 2021/12/19
+description: backjoon online judge
+tags: [PS]
+---
+
+```python
+a, b, c = map(int, input().split(" "))
+
+dices = {}
+for num in [a, b, c]:
+    if num in dices:
+        dices[num] += 1
+    else:
+        dices[num] = 1
+
+items = sorted(dices.items())
+sorted_items = sorted(items, key=lambda x:x[1])
+if len(sorted_items) == 3:
+    print(max([a, b, c])*100)
+if len(sorted_items) == 2:
+    print(1000 + (sorted_items[1][0]*100))
+if len(sorted_items) == 1:
+    print(10000 + (sorted_items[0][0]*1000))
+```
+

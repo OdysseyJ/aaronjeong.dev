@@ -1,0 +1,54 @@
+---
+title: boj-13023 ABCDE python
+date: 2022/1/26
+description: backjoon online judge 13023
+tags: [PS]
+---
+
+https://www.acmicpc.net/problem/13023
+
+#### 시간제한 : 2초
+
+### 접근
+1. 평소같이 iteration을 이용해서 dfs를 구하니 구하기가 힘들어서, 재귀를 이용해 풀어야겠다는 생각이 들었다.  이때 재귀로 구현하는데 구현이 익숙치 않아서 다른분의 코드를 참고했다.
+
+global 예약어에 대해서 배웠고, visited 배열을 재귀로 컨트롤 해주는 방법에 대해 익혔다.
+```python
+import sys
+input = sys.stdin.readline
+
+sys.setrecursionlimit(100000)
+
+def dfs(node, cnt):
+    global result
+
+    visited[node] = True
+    if cnt == 5:
+        result = 1
+
+    for i in nodes[node]:
+        if not visited[i]:
+            dfs(i, cnt+1)
+            visited[i] = False
+            if result:
+                return
+
+n, m = map(int, input().strip().split(" "))
+nodes = [[] for _ in range(n)]
+visited = [False for _ in range(n)]
+result = 0
+
+for i in range(m):
+    n1, n2 = map(int, input().strip().split(" "))
+    nodes[n1].append(n2)
+    nodes[n2].append(n1)
+
+for i in range(n):
+    if not visited[i]:
+        dfs(i, 1)
+        visited[i] = False
+        if result:
+            break
+
+print(result)
+```

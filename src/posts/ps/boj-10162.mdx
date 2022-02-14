@@ -1,0 +1,21 @@
+---
+title: boj-10162
+date: 2021/12/21
+description: backjoon online judge
+tags: [PS]
+---
+
+```python
+t = int(input())
+
+a = int(t/300)
+t = t%300
+b = int(t/60)
+t = t%60
+c = int(t/10)
+t = t%10
+if t != 0:
+    print(-1)
+else:
+    print("{} {} {}".format(a, b, c))
+```

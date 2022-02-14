@@ -1,0 +1,28 @@
+---
+title: boj-9613
+date: 2022/1/10
+description: backjoon online judge
+tags: [PS]
+---
+
+https://www.acmicpc.net/problem/9613
+
+```python
+import itertools
+
+n = int(input())
+cases = [input() for _ in range(n)]
+
+def gcd(a, b):
+    if b == 0:
+        return a
+    return gcd(b, a%b)
+
+for case in cases:
+    _, *possibles = map(int, case.split(' '))
+    sum_ = 0
+    for a, b in itertools.combinations(possibles, 2):
+        sum_ += gcd(a, b)
+
+    print(sum_)
+```

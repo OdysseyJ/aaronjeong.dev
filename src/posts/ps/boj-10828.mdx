@@ -1,0 +1,76 @@
+---
+title: boj-10828 스택 python
+date: 2022/1/4
+description: backjoon online judge 10828
+tags: [PS]
+---
+
+#### 시간제한 : 0.5초
+
+### 문제
+정수를 저장하는 스택을 구현한 다음, 입력으로 주어지는 명령을 처리하는 프로그램을 작성하시오.
+
+명령은 총 다섯 가지이다.
+
+- push X: 정수 X를 스택에 넣는 연산이다.
+- pop: 스택에서 가장 위에 있는 정수를 빼고, 그 수를 출력한다. 만약 스택에 들어있는 정수가 없는 경우에는 -1을 출력한다.
+- size: 스택에 들어있는 정수의 개수를 출력한다.
+- empty: 스택이 비어있으면 1, 아니면 0을 출력한다.
+- top: 스택의 가장 위에 있는 정수를 출력한다. 만약 스택에 들어있는 정수가 없는 경우에는 -1을 출력한다.
+
+### 입력
+첫째 줄에 주어지는 명령의 수 N (1 ≤ N ≤ 10,000)이 주어진다. 둘째 줄부터 N개의 줄에는 명령이 하나씩 주어진다. 주어지는 정수는 1보다 크거나 같고, 100,000보다 작거나 같다. 문제에 나와있지 않은 명령이 주어지는 경우는 없다.
+
+### 출력
+출력해야하는 명령이 주어질 때마다, 한 줄에 하나씩 출력한다.
+
+### 접근
+1. 굉장히 쉬울것이라 예상했으나, 생각보다 많이 틀린 문제였다. 처음에는 input()으로 접근했는데, 아무리 제출해도 시간초과가 나서 도대체 뭐때문인지 몰랐다.
+```python
+import sys
+
+count = int(input())
+
+stack = []
+for i in range(count):
+    command = input()
+    if command == "pop":
+        print(stack.pop() if stack else -1)
+        continue
+    if command == "size":
+        print(len(stack))
+        continue
+    if command == "empty":
+        print(1 if not stack else 0)
+        continue
+    if command == "top":
+        print(stack[-1] if stack else -1)
+        continue
+    num = command.split(" ")[1]
+    stack.append(num)
+```
+
+2. 인터넷 검색을 통해 sys.stdin.readline이 더 빠르다는 사실을 알아냈다. strip()은 맨 뒤의 개행문자를 제거하기 위해 넣었다. 아마, 내 생각에는 처음에 count를 읽기 위한 input은 문제가 없으나, for 안에서 input()을 통해 연산하는 과정이 시간이 많이 걸리는 듯 하다.(케이스 10000개가 가능하므로)
+```python
+import sys
+
+count = int(sys.stdin.readline().strip())
+
+stack = []
+for i in range(count):
+    command = sys.stdin.readline().strip()
+    if command == "pop":
+        print(stack.pop() if stack else -1)
+        continue
+    if command == "size":
+        print(len(stack))
+        continue
+    if command == "empty":
+        print(1 if not stack else 0)
+        continue
+    if command == "top":
+        print(stack[-1] if stack else -1)
+        continue
+    num = command.split(" ")[1]
+    stack.append(num)
+```

@@ -1,0 +1,16 @@
+---
+title: boj-2530
+date: 2021/12/18
+description: backjoon online judge
+tags: [PS]
+---
+
+```python
+import datetime
+
+hour, minute, second = map(int, input().split())
+cooking_seconds = int(input())
+
+time = datetime.datetime(year=2021, month=1, day=1, hour=hour, minute=minute, second=second) + datetime.timedelta(seconds=cooking_seconds)
+print("{} {} {}".format(time.hour, time.minute, time.second))
+```

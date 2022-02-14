@@ -1,0 +1,21 @@
+---
+title: boj-5063
+date: 2021/12/20
+description: backjoon online judge
+tags: [PS]
+---
+
+```python
+n = int(input())
+cases = [input() for _ in range(n)]
+
+for case in cases:
+    r, e, c = case.split(" ")
+    if int(r) < int(e) - int(c):
+        print("advertise")
+    elif int(r) == int(e) - int(c):
+        print("does not matter")
+    else:
+        print("do not advertise")
+```
+

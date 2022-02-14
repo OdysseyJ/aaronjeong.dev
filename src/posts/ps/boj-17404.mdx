@@ -1,0 +1,49 @@
+---
+title: boj-17404 RGB 거리2 python
+date: 2022/1/25
+description: backjoon online judge
+tags: [PS]
+---
+
+https://www.acmicpc.net/problem/17404
+
+### 접근
+1. 이전 집의 색과 동일한 색이 나오면 안되므로,
+
+dp[n][0] = n번째 지붕이 red일때 최소값
+
+dp[n][1] = n번째 지붕이 green일때 최소값
+
+dp[n][2] = n번째 지붕이 blue일때 최소값으로 놓고 구하는데
+
+이때 마지막 n번째와 1번째 지붕이 일치하면 안된다는 조건이 있으므로,
+
+n번째 지붕에서 red를 고르면 첫번째 지붕의 가격을 1001로 바꾸어 절대 선택되지 않도록 만든다.
+
+```python
+import sys
+
+n = int(sys.stdin.readline().strip())
+nums = [[int(n) for n in sys.stdin.readline().strip().split(" ")] for _ in range(n)]
+
+RED = 0
+GREEN = 1
+BLUE = 2
+
+def rgb_distance(k):
+    dp = [[0 for _ in range(3)] for _ in range (n+1)]
+    for i in range(3):
+        if i == k:
+            dp[1][i] = 1001
+        else:
+            dp[1][i] = nums[0][i]
+
+    for i in range(2, n+1):
+        dp[i][RED] = min(dp[i-1][GREEN], dp[i-1][BLUE]) + nums[i-1][0]
+        dp[i][GREEN] = min(dp[i-1][RED], dp[i-1][BLUE]) + nums[i-1][1]
+        dp[i][BLUE] = min(dp[i-1][RED], dp[i-1][GREEN]) + nums[i-1][2]
+
+    return dp[n][k]
+
+print(min(rgb_distance(0), rgb_distance(1), rgb_distance(2)))
+```

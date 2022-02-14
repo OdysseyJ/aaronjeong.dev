@@ -1,0 +1,44 @@
+---
+title: boj-16940 BFS 스페셜 저지 python
+date: 2022/2/6
+description: backjoon online judge 16940
+tags: [PS]
+---
+
+https://www.acmicpc.net/problem/16940
+
+#### 시간제한 : 2초
+
+### 접근
+1. answer를 줬으므로, 해당 answer를 돌면서 연결되어있는 모든 노드 리스트를 검사해준다. 이때 주의해야 할 점은 앞전에 나왔던 모든 답들에 연결되어 있는 엣지가 하나라도 있는지 모두 검사해줘야한다.
+```python
+import sys
+
+input = sys.stdin.readline
+
+n = int(input().strip())
+nodes = [[] for _ in range(n+1)]
+nodes[0].append(1)
+
+for _ in range(n-1):
+    n1, n2 = map(int, input().strip().split(" "))
+    nodes[n1].append(n2)
+    nodes[n2].append(n1)
+
+answer = list(map(int, input().strip().split(" ")))
+
+
+def find():
+    queue = [0]
+    idx = 0
+    for a in answer:
+        while a not in nodes[queue[idx]]:
+            idx += 1
+            if idx == len(queue):
+                return 0
+        queue.append(a)
+    return 1
+
+
+print(find())
+```

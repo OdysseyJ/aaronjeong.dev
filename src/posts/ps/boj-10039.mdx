@@ -1,0 +1,17 @@
+---
+title: boj-10039
+date: 2021/12/19
+description: backjoon online judge
+tags: [PS]
+---
+
+```python
+scores = [int(input()) for _ in range(5)]
+
+total = 0
+for score in scores:
+    s = score if score>40 else 40
+    total += s
+print(int(total/5))
+```
+

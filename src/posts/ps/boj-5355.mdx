@@ -1,0 +1,23 @@
+---
+title: boj-5355
+date: 2021/12/18
+description: backjoon online judge
+tags: [PS]
+---
+
+```python
+n = int(input())
+inputs = [input() for _ in range(n)]
+
+for i in inputs:
+    cases = i.split(" ")
+    num = float(cases[0])
+    for case in cases[1:]:
+        if case=="@":
+            num *= 3
+        if case=="%":
+            num += 5
+        if case=="#":
+            num -= 7
+    print("{:.2f}".format(num))
+```

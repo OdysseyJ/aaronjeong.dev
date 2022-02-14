@@ -1,0 +1,21 @@
+---
+title: boj-7567
+date: 2021/12/20
+description: backjoon online judge
+tags: [PS]
+---
+
+```python
+bowls = input()
+
+height = 10
+for idx, bowl in enumerate(bowls):
+    if idx==0:
+        continue
+    if bowls[idx-1] == bowl:
+        height += 5
+    else:
+        height += 10
+print(height)
+```
+

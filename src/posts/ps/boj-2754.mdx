@@ -1,0 +1,22 @@
+---
+title: boj-2754
+date: 2021/12/19
+description: backjoon online judge
+tags: [PS]
+---
+
+```python
+score = input()
+
+grade = score[0]
+sub_grade = score[1] if len(score)>=2 else ""
+
+score = ["F", "D", "C", "B", "A"].index(grade)
+if sub_grade == "+":
+    score += 0.3
+if sub_grade == "-":
+    score -= 0.3
+
+print("{:.1f}".format(score))
+```
+

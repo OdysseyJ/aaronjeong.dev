@@ -10,6 +10,8 @@ import { Li, Ol, Ul } from "@src/components/Typography/List";
 import P from "@src/components/Typography/P";
 import Pre from "@src/components/Typography/Pre";
 import Image from "@src/components/Images/Image";
+import YoutubePlayer from "@src/components/Videos/YoutubePlayer";
+import {URLS} from "@src/lib/consts";
 
 const MDXComponents = {
   h1: H1,
@@ -36,6 +38,7 @@ const MDXComponents = {
   th: Th,
   td: Td,
   a: A,
-  Image: Image
+  Image: Image,
+  YoutubePlayer: YoutubePlayer,
 };
 export default MDXComponents;

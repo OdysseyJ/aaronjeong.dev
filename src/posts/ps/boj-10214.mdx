@@ -1,0 +1,16 @@
+---
+title: boj-10214
+date: 2021/12/21
+description: backjoon online judge
+tags: [PS]
+---
+
+```python
+n = int(input())
+cases = [[input() for _ in range(9)] for _ in range(n)]
+
+for case in cases:
+    s1 = sum(map(lambda x:int(x[0]), case))
+    s2 = sum(map(lambda x:int(x[2]), case))
+    print("Yonsei") if s1 > s2 else print("Korea") if s1 < s2 else print("Draw")
+```

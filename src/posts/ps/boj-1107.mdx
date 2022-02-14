@@ -1,0 +1,122 @@
+---
+title: boj-1107 리모컨 python
+date: 2021/12/23
+description: backjoon online judge 17427
+tags: [PS]
+---
+
+https://www.acmicpc.net/problem/1107
+
+#### 시간제한 : 2초
+
+### 문제
+수빈이는 TV를 보고 있다. 수빈이는 채널을 돌리려고 했지만, 버튼을 너무 세게 누르는 바람에, 일부 숫자 버튼이 고장났다.
+
+리모컨에는 버튼이 0부터 9까지 숫자, +와 -가 있다. +를 누르면 현재 보고있는 채널에서 +1된 채널로 이동하고, -를 누르면 -1된 채널로 이동한다. 채널 0에서 -를 누른 경우에는 채널이 변하지 않고, 채널은 무한대 만큼 있다.
+
+수빈이가 지금 이동하려고 하는 채널은 N이다. 어떤 버튼이 고장났는지 주어졌을 때, 채널 N으로 이동하기 위해서 버튼을 최소 몇 번 눌러야하는지 구하는 프로그램을 작성하시오. 
+
+수빈이가 지금 보고 있는 채널은 100번이다.
+
+### 입력
+첫째 줄에 수빈이가 이동하려고 하는 채널 N (0 ≤ N ≤ 500,000)이 주어진다.  둘째 줄에는 고장난 버튼의 개수 M (0 ≤ M ≤ 10)이 주어진다. 고장난 버튼이 있는 경우에는 셋째 줄에는 고장난 버튼이 주어지며, 같은 버튼이 여러 번 주어지는 경우는 없다.
+
+### 출력
+첫째 줄에 채널 N으로 이동하기 위해 버튼을 최소 몇 번 눌러야 하는지를 출력한다.
+
+### 접근
+1. 처음에는 들어오는 숫자의 가장 근처 넘버를 구해서, 그 숫자가 원래 수보다 적으면 나머지 수들을 전부 최대 숫자들로 선택해주고, 그 숫자가 원래 수보다 크면 나머지 수들을 전부 최소 숫자로 선택해주면서 마지막에 up/down으로 이동하는 케이스만을 구하려고 시도했다.
+
+하지만 수많은 예외 케이스를 만나면서, 코드가 점점 더러워지기 시작했고 해당 방법이 무언가 이상하다는것을 깨달았다.
+```python
+n = input()
+m = int(input())
+buttons = []
+if m != 0:
+    buttons = input().split(" ")
+possibles = set([str(p) for p in range(10)]) - set(buttons)
+possibles_without_0 = set([str(p) for p in range(1, 10)]) - set(buttons)
+
+diff = abs(int(n) - 100)
+trials = []
+press = 0
+nearest_diff = 0
+
+for idx, num in enumerate(n):
+    # 작은수를 잡았으므로, 최대 선택지 선택
+    if nearest_diff > 0:
+        press += 1
+        max_possible = str(max(map(int, possibles)))
+        continue
+    # 큰 수를 잡았으므로, 최소 선택지 선택
+    if nearest_diff < 0:
+        press += 1
+        min_possible = str(min(map(int, possibles)))
+        continue
+    if num not in buttons:
+        press += 1
+        trials.append(num)
+    else:
+        min_ = 10
+        nearest = "0"
+        if not possibles:
+            nearest = num
+            continue
+        for p in possibles:
+            absolute = abs(int(num)-int(p))
+            if absolute < min_:
+                min_ = absolute
+                nearest = p
+        a = int(nearest)
+        b = int(str(min(map(int, possibles_without_0))) + str(min(map(int, possibles))))
+        print(a, b)
+        nearest = str(a) if abs(a-int(num)) < abs(b-int(num)) else str(b)
+        print(nearest)
+        trials.append(nearest)
+        nearest_diff = int(num) - int(nearest)
+        press += len(nearest)
+
+nearest_channel = "".join(trials) if trials else n
+result = abs(int(nearest_channel) - int(n)) + press
+
+print(min([diff, result]) if possibles else diff)
+```
+결과 : 틀렸습니다.
+
+너무 많은 예외 케이스를 잡아야 해서 막막했다.
+
+2. 아예 다른 접근법으로, 가능한 모든 채널을 다 돌면서 (0~1000000) 리모컨으로 갈 수 있는지 확인한 다음, 리모컨으로 갈 수 있는 경우에는 리모컨으로 간 후에 직접 up/down버튼을 눌러 해당 채널까지 이동하는 케이스를 모두 구하고, 그다음 그 케이스중에서 가장 작은 수를 선택하게끔 했다.
+```python
+n = int(input())
+m = int(input())
+broken = []
+if m != 0:
+    broken = list(map(int, input().split(" ")))
+
+buttons = [True] * 10
+answer = 1000000000
+
+for b in broken:
+    buttons[b] = False
+
+def can_move_by_num(num):
+    for k in str(num):
+        if not buttons[int(k)]:
+            return False
+    return True
+
+
+# 0 <= N <= 500000
+# 가능한 채널 = 무한대
+# 검사해야하는 범위 = 0~1000000
+for i in range(1000001):
+    if can_move_by_num(i):
+        answer = min(answer, len(str(i)) + abs(i-n))
+
+answer = min(answer, abs(n - 100))
+
+print(answer)
+```
+결과 : 성공
+
+훨씬 쉽다... 이걸로 왜이렇게 고생했을까. 가끔은 브루트포스가 훨씬 쉬운 결과를 도출해 낸다.

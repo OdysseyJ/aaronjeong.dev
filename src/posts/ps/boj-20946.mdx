@@ -1,0 +1,102 @@
+---
+title: boj-20946 합성인수분해 python
+date: 2022/1/18
+description: backjoon online judge 20946
+tags: [PS]
+---
+
+#### 시간제한 : 1초
+
+#### 제한 :
+- `2 <= N <= 10^12`
+- N은 정수다.
+
+### 접근
+큰 수를 다루는 문제 때문에 여러가지 시도를 많이 했다. (1조)
+
+1. 처음에는, 문제 이해자체를 제대로 못했다. 수열이 사전순으로 앞선다는게게 무슨소리인지 잘 몰랐는데, 알고보니 아래쪽에 정의가 나와 있었다.
+    > 수열 A = a1, a2, ..., an, B = b1, b2, ..., bm 이라고 두면 앞선다는 것의 정의는
+
+    > 1. a1=b1, a2=b2, ..., ai-1=bi-1이고 ai< bi인 i가 존재한다.
+
+    > 2. a1=b1, a2=b2, ..., an=bn이고 n < m이다.
+
+    > 의 다음중 하나를 만족한다는 것이다.
+
+
+솔직히 읽자마자 감이 안와서 몇번을 다시 생각해봤다. 나는 1번에서 작은 수가 앞에 오는게 사전순으로 앞선다 라고 이해를 했고, 2번에서 완전히 같은 수열에 대해서는 더 짧은 수열이 먼저 온다고 이해했다.
+
+2. 문제를 이해하고나서, 어떻게 풀지에 대해 생각해보았다.
+- 에라토스테네스의 체로 소수 필터하기
+- 필터링된 합성수들 가지고 나눠 떨어지는지 확인하기
+
+의 방법을 생각했으나, N의 범위가 10^12이라 에라토스테네스의 체를 끝까지 사용해 시간안에 풀수 없어 보였다.
+
+3. 그래서, 아래와 같은 알고리즘으로 구현했다.
+- sqrt(n)까지 소수 체크하기
+- 소수면 -1, 소수가 아니면 소인수분해하기
+- 소인수분해후 2개씩 소인수를 묶어 합성수로 만들기
+- 짝수 -> 그대로 출력, 홀수 -> 마지막 수에 곱해서 출력(사전순이므로 마지막 수에
+  곱해야 함)
+
+이때 소인수 분해를 노멀하게 0부터 계속해서 나눠가면서 1씩 증가해서 n이 될때까지 시켰더니 엄~~~~청 큰 소수가 나오면 어김없이 시간초과를 뱉았다. 그래서 sqrt까지만 소인수분해 하고, 나머지는 직접 더하도록 방어코드를 넣었는데, 솔직히 좀 구리다고 생각한다.
+```python
+import math
+
+def is_prime(n):
+    if n == 1:
+        return False
+    MAX = int(math.sqrt(n))+1
+    for i in range(2, MAX):
+        if (n % i) == 0:
+            return False
+    return True
+
+
+# 처음에 짰던 소인수분해
+def factorization_before(n):
+    result = []
+    temp, i = n, 2
+    while temp != 1:
+        if temp % i == 0:
+            result.append(i)
+            temp = int(temp/i)
+        else:
+            i += 1
+    return result
+
+def factorization(n):
+    result = []
+    temp, i = n, 2
+    while temp != 1 and i < math.sqrt(n)+1:
+        if temp % i == 0:
+            result.append(i)
+            temp = int(temp/i)
+        elif i == 2:
+            i += 1
+        else:
+            i += 2
+
+    # 소인수가 너무 커서 sqrt(n)에 들어가지 못하는 경우... 망할녀석
+    if temp != 1 and is_prime(temp):
+        result.append(temp)
+    return result
+
+n = int(input())
+
+if is_prime(n):
+    print(-1)
+else:
+    result = factorization(n)
+    printer = []
+    for even, odd in zip(result[::2], result[1::2]):
+        printer.append(even*odd)
+
+    if len(result) % 2 != 0:
+        if printer:
+            printer[-1] *= result[-1]
+        else:
+            printer.append(result[-1])
+
+    print(" ".join(map(str, printer)))
+```

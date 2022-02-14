@@ -1,0 +1,100 @@
+---
+title: boj-17427 약수의합2 python
+date: 2021/12/23
+description: backjoon online judge 17427
+tags: [PS]
+---
+
+#### 시간제한 : 0.5초
+
+### 문제
+두 자연수 A와 B가 있을 때, A = BC를 만족하는 자연수 C를 A의 약수라고 한다. 예를 들어, 2의 약수는 1, 2가 있고, 24의 약수는 1, 2, 3, 4, 6, 8, 12, 24가 있다. 자연수 A의 약수의 합은 A의 모든 약수를 더한 값이고, f(A)로 표현한다. x보다 작거나 같은 모든 자연수 y의 f(y)값을 더한 값은 g(x)로 표현한다.
+
+자연수 N이 주어졌을 때, g(N)을 구해보자.
+
+### 입력
+첫째 줄에 자연수 N(1 ≤ N ≤ 1,000,000)이 주어진다.
+
+### 약수 구하기
+1. 1-n까지 나머지가 0인 값 모두 찾기 => O(n)
+```python
+def f(num):
+    possibles = set()
+    for i in range(1, n+1):
+        if num%i == 0:
+            possibles.add(i)
+    return possibles
+```
+
+2. 1-root(n)까지 나머지가 0인 값 모두  찾고, 그 보수 구하기 => O(root(n))
+```python
+def f(num):
+    possibles = set()
+    for i in range(1, int(math.sqrt(num))+1):
+        if num%i == 0:
+            possibles.add(i)
+            possibles.add(num//i)
+    return possibles
+```
+
+### 접근
+1. 첫번째 시도 (root(n)) O(n*root(n))
+```python
+import math
+
+n = int(input())
+
+def f(num):
+    possibles = set()
+    for i in range(1, int(math.sqrt(num))+1):
+        if num%i == 0:
+            possibles.add(i)
+            possibles.add(num//i)
+    return sum(possibles)
+
+g = [0]*1000001
+g[0] = 0
+g[1] = 1
+
+for i in range(2, n+1):
+    g[i] = g[i-1] + f(i)
+
+print(g[n])
+```
+결과 : 시간초과
+(1,000,000) * 1,000의 케이스시 10억번의 연산
+
+2. 기존에 알고 있던 방법을 버리고, 새로운 약수의 성질 계산
+n의 배수는(k*n) k, n을 항상 약수로 가진다.
+
+따라서 자연수 N 이하의 모든 자연수들 중 n을 약수로 가지는 경우를 찾으려면, n의 배수의 개수를 찾으면 된다. (ex. 10 이하의 자연수들 중 2를 약수로 가지는 경우 => 2의 배수 2, 4, 6, 8, 10을 찾는다. 해당 수들은 2를 약수로 가지는가? YES)
+
+N이하의  자연수들 중 (예시의 수는 직관적인 이해를 위해 N=10으로 두었다.)
+
+1을 약수로 가지는 수들의 개수 => N//1 (1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+
+2를 약수로 가지는 수들의 개수 =>  N//2 (2, 4, 6, 8, 10)
+
+3을 약수로 가지는 수들의 개수 =>  N//3 (3, 6, 9)
+
+4을 약수로 가지는 수들의 개수 =>  N//4 (4, 8)
+
+...
+
+N을 약수로 가지는 수들의 개수 => N//N (N)
+
+따라서 우리가 계산하고자 하는 N이하의 g(n)은 N이하의 자연수들 중 k를 약수로 가지는 자연수의 개수(N//k)와 k의 곱들의 합으로 정의할 수 있다.
+
+> g(n) = sum( i * (N//i) ) (i=1~N)
+
+이 된다.
+
+```python
+n = int(input())
+
+sum_ = 0
+for i in range(1, n+1):
+    sum_ += i * (n//i)
+
+print(sum_)
+```

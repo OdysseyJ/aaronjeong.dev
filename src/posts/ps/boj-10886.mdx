@@ -1,0 +1,15 @@
+---
+title: boj-10886
+date: 2021/12/20
+description: backjoon online judge
+tags: [PS]
+---
+
+```python
+n = int(input())
+opinions = [input() for _ in range(n)]
+
+cute_count = opinions.count("1")
+print("Junhee is cute!" if cute_count >= n/2 else "Junhee is not cute!")
+```
+

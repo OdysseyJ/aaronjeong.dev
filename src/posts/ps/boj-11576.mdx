@@ -1,0 +1,32 @@
+---
+title: boj-11576 Base Conversion python
+date: 2022/1/11
+description: backjoon online judge
+tags: [PS]
+---
+
+### 접근
+1. 나머지는 다 간단한 일이다. 진법 변환은 크게
+    - n -> 10진법 변환 : int
+    - 10 -> n진법 변환 : convert함수
+    - 10 -> 2, 8, 16 진법 변환 : bin, oct, hex
+```python
+a, b = map(int, input().split(" "))
+m = int(input())
+nums = map(int, input().split(" "))
+
+possibles = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+
+target = "".join([possibles[num] for num in nums])
+
+ten = int(target, a)
+
+def convert(num, base) :
+    q, r = divmod(num, base)
+    if q == 0 :
+        return possibles[r]
+    else :
+        return convert(q, base) + possibles[r]
+
+print(" ".join([str(possibles.index(a)) for a in convert(ten, b)]))
+```

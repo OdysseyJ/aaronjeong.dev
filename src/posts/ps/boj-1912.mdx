@@ -1,0 +1,20 @@
+---
+title: boj-1912 연속합 python
+date: 2022/1/17
+description: backjoon online judge 1912
+tags: [PS]
+---
+
+#### 시간제한 : 1초
+
+### 접근
+1. dp[0]에 a[0]를 채워주는걸 까먹어서 오류가 났다. 기본 dp문제인데 생각이 잘 안난다. 연습을 더해야겠다.
+```python
+n = int(input())
+a = [int(i) for i in input().split(" ")]
+dp = [0] * n
+dp[0] = a[0]
+for i in range(1, n):
+    dp[i] = max(a[i], dp[i-1] + a[i])
+print(max(dp))
+```

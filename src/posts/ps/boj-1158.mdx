@@ -1,0 +1,45 @@
+---
+title: boj-1158 요세푸스 문제 python
+date: 2022/1/6
+description: backjoon online judge 1158
+tags: [PS]
+---
+
+https://www.acmicpc.net/problem/1158
+
+#### 시간제한 : 2초
+
+### 접근
+1. 큐를 이용해 풀면 되겠다는 생각을 했고, 처음에 해당 방식으로 구현했다. 포인트는 queue.pop(0)
+```python
+n, k = map(int, input().split(" "))
+
+queue = [str(i) for i in range(1, n+1)]
+result = []
+
+while queue:
+    for i in range(k-1):
+        queue.append(queue.pop(0))
+    result.append(queue.pop(0))
+
+answer = ", ".join(result)
+print('<{}>'.format(answer))
+```
+
+2. queue.pop(0)의 시간복잡도는 O(n)이다. 충격적. deque를 활용해야 한다. deque.popleft()는 O(1)이다.
+```python
+import collections
+
+n, k = map(int, input().split(" "))
+
+queue = collections.deque([str(i) for i in range(1, n+1)])
+result = []
+
+while queue:
+    for i in range(k-1):
+        queue.append(queue.popleft())
+    result.append(queue.popleft())
+
+answer = ", ".join(result)
+print('<{}>'.format(answer))
+```

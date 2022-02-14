@@ -1,0 +1,126 @@
+---
+title: boj-3085 사탕게임 python
+date: 2021/12/26
+description: backjoon online judge 3085
+tags: [PS]
+---
+
+https://www.acmicpc.net/problem/3085
+
+#### 시간제한 : 1초
+
+### 문제
+상근이는 어렸을 적에 "봄보니 (Bomboni)" 게임을 즐겨했다.
+
+가장 처음에 N×N크기에 사탕을 채워 놓는다. 사탕의 색은 모두 같지 않을 수도 있다. 상근이는 사탕의 색이 다른 인접한 두 칸을 고른다. 그 다음 고른 칸에 들어있는 사탕을 서로 교환한다. 이제, 모두 같은 색으로 이루어져 있는 가장 긴 연속 부분(행 또는 열)을 고른 다음 그 사탕을 모두 먹는다.
+
+사탕이 채워진 상태가 주어졌을 때, 상근이가 먹을 수 있는 사탕의 최대 개수를 구하는 프로그램을 작성하시오.
+
+### 입력
+첫째 줄에 보드의 크기 N이 주어진다. (3 ≤ N ≤ 50)
+
+다음 N개 줄에는 보드에 채워져 있는 사탕의 색상이 주어진다. 빨간색은 C, 파란색은 P, 초록색은 Z, 노란색은 Y로 주어진다.
+
+사탕의 색이 다른 인접한 두 칸이 존재하는 입력만 주어진다.
+
+### 출력
+첫째 줄에 상근이가 먹을 수 있는 사탕의 최대 개수를 출력한다.
+
+### 접근
+1. 브루트포스
+
+정직하게, 2차원 배열 만들고, 만약 인접한 사탕이 다른 사탕이라면(check_difference)
+
+arr를 딥카피한 후에, 위치를 뒤바꾼 배열의 가장 긴 sequence를 찾는다.
+
+메모리를 많이 소모하는 방식이다. 더 나은 방식이 있을거라 생각한다.
+
+```python
+import copy
+
+n = int(input())
+lines = [input() for _ in range(n)]
+
+arr = [["X" for _ in range(n)] for _ in range(n)]
+
+for y, line in enumerate(lines):
+    for x, a in enumerate(line):
+        arr[y][x] = a
+
+def check_difference(arr, p1, p2, n):
+    x1, y1 = p1
+    x2, y2 = p2
+    if x1 < 0 or x2 < 0 or y1 < 0 or y2 < 0:
+        return False
+    if x1 >= n or x2 >= n or y1 >=  n or y2 >= n:
+        return False
+    if arr[y1][x1] == arr[y2][x2]:
+        return False
+    return True
+
+
+def find_longest_seq(arr, n):
+    max_sequence = 1
+
+    # horizontal
+    for y in range(n):
+        max_line_seq = 1
+        for x in range(n-1):
+            if arr[y][x] == arr[y][x+1]:
+                max_line_seq += 1
+                if max_line_seq > max_sequence:
+                    max_sequence = max_line_seq
+            else:
+                max_line_seq = 1
+
+    # vertical
+    for x in range(n):
+        max_line_seq = 1
+        for y in range(n-1):
+            if arr[y][x] == arr[y+1][x]:
+                max_line_seq += 1
+                if max_line_seq > max_sequence:
+                    max_sequence = max_line_seq
+            else:
+                max_line_seq = 1
+
+    return max_sequence
+
+total_max_sequence = 1
+for y in range(n):
+    for x in range(n):
+        if check_difference(arr, (x, y), (x-1, y), n):
+            arr_ = copy.deepcopy(arr)
+            temp = arr_[y][x]
+            arr_[y][x] = arr_[y][x-1]
+            arr_[y][x-1] = temp
+            max_seq = find_longest_seq(arr_, n)
+            if max_seq > total_max_sequence:
+                total_max_sequence = max_seq
+        if check_difference(arr, (x, y), (x+1, y), n):
+            arr_ = copy.deepcopy(arr)
+            temp = arr_[y][x]
+            arr_[y][x] = arr_[y][x+1]
+            arr_[y][x+1] = temp
+            max_seq = find_longest_seq(arr_, n)
+            if max_seq > total_max_sequence:
+                total_max_sequence = max_seq
+        if check_difference(arr, (x, y), (x, y-1), n):
+            arr_ = copy.deepcopy(arr)
+            temp = arr_[y][x]
+            arr_[y][x] = arr_[y-1][x]
+            arr_[y-1][x] = temp
+            max_seq = find_longest_seq(arr_, n)
+            if max_seq > total_max_sequence:
+                total_max_sequence = max_seq
+        if check_difference(arr, (x, y), (x, y+1), n):
+            arr_ = copy.deepcopy(arr)
+            temp = arr_[y][x]
+            arr_[y][x] = arr_[y+1][x]
+            arr_[y+1][x] = temp
+            max_seq = find_longest_seq(arr_, n)
+            if max_seq > total_max_sequence:
+                total_max_sequence = max_seq
+
+print(total_max_sequence)
+```

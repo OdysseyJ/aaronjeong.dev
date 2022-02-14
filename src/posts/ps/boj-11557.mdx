@@ -1,0 +1,22 @@
+---
+title: boj-11557
+date: 2021/12/21
+description: backjoon online judge
+tags: [PS]
+---
+
+```python
+t = int(input())
+for _ in range(t):
+    n = int(input())
+    univs = [input() for _ in range(n)]
+    m = -1
+    name = ""
+    for univ in univs:
+        s = univ.split(" ")[0]
+        l = int(univ.split(" ")[1])
+        if l > m:
+            m = l
+            name = s
+    print(name)
+```

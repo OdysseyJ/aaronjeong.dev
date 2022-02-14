@@ -1,0 +1,42 @@
+---
+title: boj-2447 별 찍기 - 10 python
+date: 2022/2/11
+description: backjoon online judge 2447
+tags: [PS]
+---
+
+#### 시간제한 : 1초
+
+### 접근
+1. 이중 배열 생각을 못하고, 처음에는 1차원으로 어떻게든 풀어보려고 하다가 출력 형식을 맞추기가 너무 힘들어서 포기하고
+2차원으로 풀어야겠다는 생각을 했다. 아직 재귀에 익숙하지 않다.
+```python
+import sys
+sys.setrecursionlimit(100000)
+
+k = int(input())
+stars = [[" " for _ in range(k)] for _ in range(k)]
+
+
+def solve(x, y, n):
+    if n == 1:
+        stars[y][x] = "*"
+        return
+
+    d = int(n/3)
+    solve(x, y, d)
+    solve(x, y+d, d)
+    solve(x, y+d+d, d)
+    solve(x+d, y, d)
+    # 가운데 생략
+    solve(x+d, y+d+d, d)
+    solve(x+d+d, y, d)
+    solve(x+d+d, y+d, d)
+    solve(x+d+d, y+d+d, d)
+
+
+solve(0, 0, k)
+for i in range(k):
+    print("".join(stars[i]))
+```
+

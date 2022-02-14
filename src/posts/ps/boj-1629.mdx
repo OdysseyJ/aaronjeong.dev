@@ -1,0 +1,27 @@
+---
+title: boj-1629 곱셈 python
+date: 2022/2/10
+description: backjoon online judge 1629
+tags: [PS]
+---
+
+https://www.acmicpc.net/problem/1629
+
+### 접근
+1. 요즘 바킹독님 영상을 보면서 부족한 개념을 공부하고 있다. 부족한 개념을 무작정 푸는것보다 훨씬 도움이 되는 것 같다.
+오늘 풀었던건 재귀였는데, 내가 너무 절차 지향적 사고에 익숙했다는걸 깨달았다. 생각보다 어려웠던듯. 블로그는 복습용으로 썼다k
+```python
+def solve(a, b, c):
+    if b == 1:
+        return a
+    half = solve(a, int(b/2), c)
+    result = half * half % c
+    if b % 2 != 0:
+        result = result * a % c
+    return result
+
+
+a, b, c = map(int, input().split(" "))
+
+print(solve(a, b, c))
+```
