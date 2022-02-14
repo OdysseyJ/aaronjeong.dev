@@ -1,4 +1,5 @@
 import {
+    Box,
     Grid,
     GridItem,
 } from "@chakra-ui/react";
@@ -21,8 +22,10 @@ const Statistics = ({ allTexts, counts: {ps, note, dev} }: HomeStaticProps) => (
     <>
         <NextSeo title={"Statistics"} />
         <WordCloud />
+        <Box padding={"20px"}></Box>
         <PieChart data={[{key: 'ps', value: ps}, {key: "note", value: note}, {key: "dev", value: dev}]}/>
-        <HeatMap/>
+        <Box padding={"20px"}></Box>
+        <HeatMap width={500} height={250}/>
     </>
 );
 

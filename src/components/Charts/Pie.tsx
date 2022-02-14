@@ -3,8 +3,6 @@ import { Pie } from "@visx/shape";
 import { Group } from "@visx/group";
 import { scaleOrdinal } from "@visx/scale";
 import { LegendOrdinal } from '@visx/legend';
-import {ParentSize} from "@visx/responsive";
-import {Text} from "@chakra-ui/react";
 
 const colors = ['#688F4E', '#B1D182', '#2B463C']
 
