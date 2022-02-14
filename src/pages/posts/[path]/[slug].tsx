@@ -18,7 +18,7 @@ const PostPage = ({ source, frontMatter, slug }: any) => {
 
   const { title, description, date, tags } = frontMatter;
   const canonical = process.env.host + router.asPath;
-  console.log(source)
+
   return (
     <>
       <NextSeo
