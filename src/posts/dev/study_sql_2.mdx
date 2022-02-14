@@ -1,0 +1,61 @@
+---
+title: SQL - SELECT, FROM, WHERE, ORDER_BY, LIKE, IN, BETWEEN
+date: 2022/1/25
+description: raw sql study for writing sql without orm
+tags: [Dev, SQL]
+---
+
+### SELECT, FROM, WHERE
+- 기본 사용법
+    ```sql
+    SELECT (column1, column2, ...)
+    FROM 테이블명
+    WHERE 조건문
+    ```
+    ```sql
+    SELECT *
+    FROM subway_statistics
+    WHERE station_name = '잠실(216)'
+    ```
+
+### AND, LIKE, IN, BETWEEN
+- AND문을 이용한 연속 조건
+    ```sql
+    SELECT *
+    FROM subway_statistics
+    WHERE station_name = "잠실(216)"
+    AND ( boarding_time = 7 OR boarding_time = 9 )
+    ```
+
+- LIKE 연산자
+    ```sql
+    SELECT *
+    FROM subway_statistics
+    WHERE station_name LIKE "잠실%"
+    ```
+
+- IN 연산자
+    ```sql
+    ### station_name이 잠실로 시작하면서, boarding_time이 7 또는 9인 데이터
+    SELECT *
+    FROM subway_statistics
+    WHERE station_name LIKE "잠실%"
+    AND boarding_time IN [7, 9]
+    ```
+
+- BETWEEN 연산자
+    ```sql
+    ### station_name이 잠실로 시작하면서, passenger_number가 500~1000사이인 데이터
+    SELECT *
+    FROM subway_statistics
+    WHERE station_name LIKE "잠실%"
+    AND passenger_number BETWEEN 500 AND 1000
+    ```
+
+### ORDER_BY
+- ORDER BY col1, col2 : col1 오름차순, col2 오름차순
+
+- ORDER BY col1 DESC, col2 ASC : col1 내림차순, col2 오름차순
+
+- ORDER BY 1, 2 : select 절에 명시한 첫 번째와 두 번째 칼럼을 순서대로 오름차순
+

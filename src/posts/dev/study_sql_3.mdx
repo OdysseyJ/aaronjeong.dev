@@ -1,0 +1,78 @@
+---
+title: SQL - SQL에서의 연산자 및 함수(operators)
+date: 2022/1/25
+description: raw sql study for writing sql without orm
+tags: [Dev, SQL]
+---
+
+### 연산자의 종류
+
+#### 기본
+
+| **Operator** | **Description** |
+| - | - |
+| + | 두 수를 더하거나 날짜면 두 날짜를 더한다. |
+| - | 두 수나, 날짜면 두 날짜를 뺀다. |
+| * | 두 수를 곱한다. |
+| / | 왼쪽 수를 오른쪽 수로 나눈다. |
+
+#### 특수
+|| : 두 문자열 이어붙여준다.
+
+```sql
+SELECT 'A' || 'B'
+
+=> 'AB'
+```
+
+### 주요 함수
+
+#### 숫자형 함수
+
+| **함수명** | **기능** | **사용예** |
+| - | - | - |
+| ABS( n ) | n의 절댓값을 반환. | SELECT ABS ( -1 ) => 1 |
+| CEIL( n ) | n과 같거나 큰 최소 정수 반환. | SELECT CEIL( 10.6 ) => 11 |
+| EXP( n ) | e(e=2.71828183..)의 n승을 반환 | SELECT EXP( 10 ) => 22026.46... |
+| FLOOR( n ) | n과 같거나 작은 최대 정수 반환 | SELECT FLOOR( 10.6 ) => 10 |
+| LN( n ) | n의 자연로그 값을 반환, n>0이어야 한다.  | SELECT LN( 10 ) => 2.3025... |
+| LOG( n2, n1 ) | log값 반환 (n2=밑, n1=진수) | SELECT LOG( 10, 100 ) => 2 |
+| MOD( n2, n1 ) | n2를 n1으로 나눈 나머지 | SELECT MOD( 11, 4 ) => 3 |
+| POWER( n2, n1 ) | n2의 n1승 | SELECT POWER( 3, 2 ) => 9 |
+| ROUND( n, i ) | n의 소숫점 기준 (i+1)번째에서 반올림한 값을 반환 | SELECT ROUND( 10.545, 2 ) => 10.55 |
+| SIGN( n ) | n의 부호 반환 | SELECT SIGN( -110 ) => -1 |
+| SQRT( n ) | n의 제곱근 반환 | SELECT SQRT( 2 ) => 1.41423.. |
+| TRUNC ( n1, n2 ) | n1의 소숫점 기준 n2 자리에서 절삭, n2생략시 0 | SELECT TRUNC( 10.545, 2 ) => 10.54 |
+
+#### 문자형 함수
+
+| **함수명** | **기능** | **사용예** |
+| - | - | - |
+| CHR( n ) | n은 숫자로 n값에 해당하는 문자를 반환 | SELECT CHR( 65 ) => A |
+| CONCAT( a, b ) | a와 b문자를 결합한 결과를 반환. | SELECT CONCAT( 'A', 'B' ) => 'AB' |
+| INITCAP( char ) | char의 첫번째 문자를 대문자로 반환 | SELECT INITCAP( 'the' ) => The |
+| LOWER( char ) | char를 소문자로 반환 | SELECT LOWER( 'THE' ) => 'the' |
+| UPPER( char ) | char를 대문자로 반환 | SELECT UPPER( 'the' ) => 'THE' |
+| LPAD( expr1, n, expr2 ) | expr1을 반환하는데, expr2를 (n-expr1 길이) 만큼 왼쪽을 채워 반환 | SELECT LPAD( 'THE', 5, '*' ) => '**THE' |
+| RPAD( expr1, n, expr2 ) | expr1을 반환하는데, expr2를 (n-expr1 길이) 만큼 오른쪽을 채워 반환 | SELECT RPAD( 'THE', 5, '*' ) => 'THE**' |
+| LTRIM( expr1, expr2 ) | expr1의 왼쪽에서 expr2를 제거한 결과 반환 | SELECT LTRIM( '**the**', '*' ) => 'THE**' |
+| RTRIM( expr1, expr2 ) | expr1의 오른쪽에서 expr2를 제거한 결과 반환 | SELECT RTRIM( '**the**', '*' ) => '**THE' |
+| SUBSTR( char, n1, n2 ) | char에서 n1위치에서 n2의 길이만큼 부분문자열 반환. | SELECT RSUBSTR( 'ABCDEFG', 3, 2 ) => 'CD' |
+| TRIM( char ) | char의 양쪽 끝 공백을 제거한 결과 | SELECT TRIM( '  ABC  ' ) => 'ABC' |
+
+#### 숫자형 데이터를 반환하는 문자형 함수
+
+| **함수명** | **기능** | **사용예** |
+| - | - | - |
+| ASCII( char ) | char 문자의 ASCII 코드 값을 반환. | SELECT ASCII( 'A' ) => 65 |
+| INSTR( char1, char2, n1, n2 ) | char1에서 char2 문자를 찾아 그 시작 위치를 반환, n1은 몇번째 문자부터 찾을 것인지, n2는 일치하는 문자의 몇번째 위치를 반환할지 | SELECT INSTR( 'ABABAB', 'A', 2 ) => 3 |
+| LENGTH( char ) | char 문자의 글자 수를 반환함. | SELECT LENGTH( 'the' ) => 3 |
+
+#### 형 변환 함수
+
+| **함수명** | **기능** | **사용예** |
+| - | - | - |
+| TO_NUMBER( char ) | char를 숫자로 변환 | SELECT TO_NUMBER( '12345' ) => 12345 |
+| TO_CHAR( n, number_format ) | 숫자 n을 문자로 변환 | SELECT TO_CHAR( 12345, '99,999' ) => '12,345' |
+| TO_CHAR( date, date_format ) | date 를 문자로 변환 | SELECT TO_CHAR( SYSDATE, 'YYYY-MM-DD HH24:MI:SS' ) => '2019-04-08 23:52:01' |
+| TO_DATE( char, date_format ) | char를 date형태로 변환 | SELECT TO_DATE( '2019-04-08 23:52:01', 'YYYY-MM-DD HH24:MI:SS' ) => 2019-04-08 23:52:01 |

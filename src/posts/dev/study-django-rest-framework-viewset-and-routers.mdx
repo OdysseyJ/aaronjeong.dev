@@ -1,0 +1,98 @@
+---
+title: Django REST Framework(DRF) - Viewset and Routers
+date: 2022/1/13
+description: RESTful api with django rest framework
+tags: [Dev, DRF, Django]
+---
+
+https://www.django-rest-framework.org/tutorial/6-viewsets-and-routers/
+
+### ViewSets and Routers
+
+#### Viewset을 사용해 리팩토링하기
+
+- List / Detail view를 하나로 합칠 수 있음.
+    ```python
+    from rest_framework import viewsets
+
+    class UserViewSet(viewsets.ReadOnlyModelViewSet):
+        """
+        This viewset automatically provides `list` and `retrieve` actions.
+        """
+        queryset = User.objects.all()
+        serializer_class = UserSerializer
+    ```
+
+    ```python
+    from rest_framework.decorators import action
+    from rest_framework.response import Response
+    from rest_framework import permissions
+
+    class SnippetViewSet(viewsets.ModelViewSet):
+        """
+        This viewset automatically provides `list`, `create`, `retrieve`,
+        `update` and `destroy` actions.
+
+        Additionally we also provide an extra `highlight` action.
+        """
+        queryset = Snippet.objects.all()
+        serializer_class = SnippetSerializer
+        permission_classes = [permissions.IsAuthenticatedOrReadOnly,
+                              IsOwnerOrReadOnly]
+
+        @action(detail=True, renderer_classes=[renderers.StaticHTMLRenderer])
+        def highlight(self, request, *args, **kwargs):
+            snippet = self.get_object()
+            return Response(snippet.highlighted)
+
+        def perform_create(self, serializer):
+            serializer.save(owner=self.request.user)
+    ```
+
+- Viewset을 url로 각각 바인딩하기
+    ```python
+    from snippets.views import SnippetViewSet, UserViewSet, api_root
+    from rest_framework import renderers
+
+    snippet_list = SnippetViewSet.as_view({
+        'get': 'list',
+        'post': 'create'
+    })
+    snippet_detail = SnippetViewSet.as_view({
+        'get': 'retrieve',
+        'put': 'update',
+        'patch': 'partial_update',
+        'delete': 'destroy'
+    })
+    snippet_highlight = SnippetViewSet.as_view({
+        'get': 'highlight'
+    }, renderer_classes=[renderers.StaticHTMLRenderer])
+    user_list = UserViewSet.as_view({
+        'get': 'list'
+    })
+    user_detail = UserViewSet.as_view({
+        'get': 'retrieve'
+    })
+    ```
+    ```python
+    urlpatterns = format_suffix_patterns([
+        path('', api_root),
+        path('snippets/', snippet_list, name='snippet-list'),
+        path('snippets/<int:pk>/', snippet_detail, name='snippet-detail'),
+        path('snippets/<int:pk>/highlight/', snippet_highlight, name='snippet-highlight'),
+        path('users/', user_list, name='user-list'),
+        path('users/<int:pk>/', user_detail, name='user-detail')
+    ])
+    ```
+
+#### View와 Viewset의 TradeOff
+- viewset은 간편하지만, 항상 옳은 방법은 아니다.
+- 직접 view를 정의하는것보다 불명확할 수 있다.
+
+### 번외
+
+#### DRF에서 CORS다루기
+- DRF에서 CORS를 다루는 베스트 방법은 미들웨어를 정의해 필요한 요청을 헤더에 담는
+  것이다.
+- 이렇게 구현해야 뷰에서 내가 구현한 로직을 변경하지 않고, 상속적으로 전달할 수 있다.
+- django-cors-headers를 사용하면 DRF랑 쉽게 연동 가능.

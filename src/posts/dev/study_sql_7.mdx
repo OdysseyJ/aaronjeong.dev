@@ -1,0 +1,78 @@
+---
+title: SQL - 조인
+date: 2022/1/30
+description: raw sql study for writing sql without orm
+tags: [Dev, SQL]
+---
+
+### INNER JOIN
+- 조인 중 가장 기본이 되는 조인. WHERE절에서 동등 연산자를 사용해 연결고리 컬럼을
+  비교하는 조인
+    ```sql
+    SELECT a.emp_id, a.emp_name, a.gender, a.age, a.dept_id, b.dept_id, b.dept_name, b.use_yn
+    FROM emp_master a
+         ,dept_master b
+    WHERE a.dept_id = b.dept_id
+    ORDER BY a.emp_id;
+    ```
+
+    ```sql
+    SELECT *
+    FROM emp_master a
+    INNER JOIN dept_master b
+    ON a.dept_id = b.dept_id
+    WHERE a.gender = "남성"
+    ORDER_BY a.emp_id;
+    ```
+
+### OUTER JOIN
+- outer join은 두 테이블 중 한 테이블의 조인 컬럼값이 없더라도 없는 건까지 모두 포함해
+  조회하는 조인.
+    ```sql
+    # WHERE문으로 쓰면 이렇게 쓸수 있음.
+    SELECT *
+    FROM emp_master a
+        ,dept_master b
+    WHERE a.dept_id = b.dept_id (+)
+    ORDER BY a.emp_id
+    ```
+
+- left join은 이전 테이블을 기준으로 다음 테이블의 조건이 일치하지 않아도 가져오라는
+  뜻임.
+    ```sql
+    # emp_master를 기준으로 dept_master가 일치하지 않아도 다 들고온다.
+    SELECT *
+    FROM emp_master a
+    LEFT JOIN dept_master b
+    ON a.dept_id = b.dept_id
+    ORDER BY a.emp_id;
+    ```
+
+- right join은 이후 테이블을 기준으로 이전 테이블의 조건이 일치하지 않아도 가져오라는
+  뜻
+    ```sql
+    SELECT *
+    FROM emp_master a
+    RIGHT JOIN dept_master b
+    ON a.dept_id = b.dept_id
+    ORDER BY a.emp_id;
+    ```
+
+- full outer join은 left join과 right join의 결과를 합쳐서 가져온것.
+    ```sql
+    SELECT *
+    FROm emp_master a
+    FULL OUTER JOIN dept_master b
+    ON a.dept_id = b.dept_id
+    ORDER BY a.emp_id;
+    ```
+
+### Cartesian Product
+- 카티션 곱은 where절에서 조인 조건을 주지 않는 것으로, 가능한 모든 경우의수가
+  다 조회됨
+    ```sql
+    SELECT *
+    FROM emp_master a
+        ,dept_master b
+    ORDER BY a.emp_id
+    ```

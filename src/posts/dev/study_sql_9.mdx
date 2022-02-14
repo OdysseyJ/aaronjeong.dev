@@ -1,0 +1,56 @@
+---
+title: SQL - 데이터 입력 및 삭제 두번째
+date: 2022/1/30
+description: raw sql study for writing sql without orm
+tags: [Dev, SQL]
+---
+
+### CREATE - AS
+
+- create table을 하면서 동시에 데이터를 테이블에 복사해 생성하는 방법
+    ```sql
+    CREATE TABLE subway_dml_test AS
+    SELECT *
+    FROM subway_statistics
+    WHERE ROWNUM < 1;
+
+    ALTER TABLE subway_dml_test
+    ADD PRIMARY KEY ( seq_id );
+    ```
+
+- INSERT시에 여러 데이터를 추가하는 방법
+    ```sql
+    INSERT INTO subway_dml_test
+    SELECT *
+      FROM subway_statistics
+     WHERE station_name LIKE '종합운동장%'
+
+    COMMIT;
+    ```
+
+### DELETE
+- where을 이용해 조건 걸기
+    ```sql
+    DELETE FROM subway_dml_test
+    WHERE station_name LIKE '종합운동장%'
+
+    COMMIT;
+    ```
+
+### UPDATE
+- UPDATE구문은 데이터 수정에 사용하는데, SET과 함께 이용한다.
+    ```sql
+    UPDATE 테이블명
+       SET COLUMN1 = 값1
+          ,COLUMN2 = 값2
+          ...
+    WHERE 절;
+    ```
+    ```sql
+    UPDATE subway_dml_test
+       SET passenger_number = passenger_number + 10
+          ,boarding_date    = ADD_MONTHS(boarding_date, 1)
+     WHERE station_name LIKE '삼성%'
+
+    COMMIT;
+    ```

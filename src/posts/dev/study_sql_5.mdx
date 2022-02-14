@@ -1,0 +1,67 @@
+---
+title: SQL - GROUP BY 절과 집계 함수
+date: 2022/1/26
+description: raw sql study for writing sql without orm
+tags: [Dev, SQL]
+---
+
+### 집계 함수
+- COUNT (expr) : expr의 전체 개수를 반환.
+- MAX (expr) : expr의 최대값을 반환.
+- MIN (expr) : expr의 최소값을 반환.
+- SUM (expr) : expr의 합계를 반환.
+- AVG (expr) : expr의 평균값을 반환.
+- VARIANCE (expr) : expr의 분산을 반환.
+- STDDEV (expr) : expr의 표준편차를 반환.
+
+
+### GROUP BY 절
+
+- 기본 사용법
+    ```sql
+    SELECT expr1, expr2, ...
+    FROM ...
+    WHERE ...
+    AND ...
+    GROUP BY expr1, expr2, ...
+    ORDER BY ...
+    ```
+
+- GROUP BY와 집계함수를 함께 이용해야 의마가 있다.
+    ```sql
+    SELECT station_name
+        ,COUNT(*) cnt
+        ,MIN(passenger_number) min_value
+        ,MAX(passenger_number) max_value
+        ,SUM(passenger_number) sum_value
+        ,AVG(passenger_number) avg_value
+    FROM subway_statistics
+    WHERE gubun = "승차"
+    GROUP BY station_name
+    ORDER BY station_name;
+    ```
+
+### HAVING 절
+- GROUP BY와 함께 사용해 집계함수에 조건을 걸때 사용한다.
+    ```sql
+    SELECT station_name
+          ,boarding_time
+          ,gubun
+          ,MIN(passenger_number) min_value
+          ,MAX(passenger_number) max_value
+          ,SUM(passenger_number) sum_value
+    FROM subway_statistics
+    GROUP BY station_name, boarding_time, gubun
+    HAVING SUM(passenger_number) BETWEEN 15000 AND 16000
+    ORDER BY 6 DESC;
+    ```
+
+### DISTINCT
+- SELECT절에 DISTINCT 컬럼명 형태로 사용하면 해당 컬럼에 들어 있는 값에서 중복 값을
+  제외한 유일한 값들만 조회되어 GROUP BY 절을 사용한 효과를 낼 수 있다.
+    ```sql
+    SELECT DISTINCT station_name
+    FROM subway_statistics
+    WHERE gubun = "승차"
+    ORDER BY 1
+    ```

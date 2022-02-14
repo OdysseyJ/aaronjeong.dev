@@ -1,0 +1,74 @@
+---
+title: SQL - 집합 함수
+date: 2022/1/26
+description: raw sql study for writing sql without orm
+tags: [Dev, SQL]
+---
+
+### UNION ALL
+- UNION ALL은 중복을 포함하는 합집합 개념
+    ```sql
+    SELECT col1, col2, ...
+    FROM ...
+    WHERE ...
+    UNION ALL
+    SELECT col1, col2, ...
+    FROM ...
+    WHERE ...
+    ```
+
+- 컬럼의 수가 다르거나, 컬럼의 데이터 타입이 다른 경우 에러가 난다.
+    ```sql
+    # 수가 다른 경우
+    SELECT emp_id, emp_name, gender, age
+    FROM ...
+    WHERE ...
+    UNION ALL
+    SELECT emp_id, emp_name, gender
+    FROM ...
+    WHERE ...
+    ```
+
+    ```sql
+    # 타입이 다른 경우(age <=> school)
+    SELECT emp_id, emp_name, gender, age
+    FROM ...
+    WHERE ...
+    UNION ALL
+    SELECT emp_id, emp_name, gender, school
+    FROM ...
+    WHERE ...
+    ```
+
+### UNION
+- UNION은 중복을 포함하지 않는 합집합 개념
+    ```sql
+    SELECT emp_name
+    FROM emp03
+    UNION ALL
+    SELECT emp_name2
+    FROM emp08
+    ORDER BY 1;
+    ```
+
+### INTERSECT
+- 두 집합의 공통 원소만 추출하는 교집합
+    ```sql
+    SELECT emp_name
+    FROM emp03
+    INTERSECT
+    SELECT emp_name2
+    FROM emp03
+    ORDER BY 1;
+    ```
+
+### MINUS
+- 두 쿼리 결과의 차집합
+    ```sql
+    SELECT emp_name
+    FROM emp03
+    MINUS
+    SELECT emp_name2
+    FROM emp08
+    ORDER BY 1
+    ```

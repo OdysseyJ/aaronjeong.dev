@@ -1,0 +1,67 @@
+---
+title: SQL - 기타함수 및 케이스 표현식
+date: 2022/1/26
+description: raw sql study for writing sql without orm
+tags: [Dev, SQL]
+---
+
+### 기타함수
+
+#### NULL 관련 함수
+- NVL ( expr1, expr2 )
+    - expr1값이 NULL인 경우 expr2를 반환하는 함수.
+    - 보통, NULLABLE한 값을 조회할 때 해당 컬럼에 데이터가 있는 경우는 그대로, 없는 경우는
+      대체해서 보여줄때 유용하다.
+
+- NVL2 ( expr1, expr2 )
+    - expr1이 NULL인 경우 expr3, 아닌 경우 expr2를 반환하는 함수
+
+- COALESCE ( expr1, expr2 )
+    - 매개 변수인 expr1, expr2, expr3, ... 에서 첫 번째로 NULL이 아닌 값 반환.
+
+- NULLIF ( expr1, expr2 )
+    - 매개 변수인 expr1, expr2 를 비교해 두 값이 같으면 NULL, 같지 않으면 expr1
+
+#### 분류가 애매한 기타 함수
+- GREATEST( expr1, expr2, ... )
+    - 최대값 반환
+- LEAST( expr1, expr2, ... )
+    - 최소값 반환
+- DECODE( expr, comp_val1, result1, comp_val2, result2, ... )
+    - 첫번째 매개변수인 expr의 값이 comp_val1과 같으면 result1, comp_val2와 같으면
+      result2...로 반환하는 방식
+
+### CASE 표현식
+- 단순형 CASE 표현식의 기본 동작은 아래와 같다. 코드의 case문과 같이 동작한다.
+```sql
+# expr 값이 when다음의 comparision_expr1과 같으면 return_expr1을, comparison_expr2와
+# 같으면 return_expr2를 반환한다.
+CASE expr WHEN comparison_expr1 THEN return_expr1
+          WHEN comparison_expr2 THEN return_expr2
+          ...
+          ELSE else_expr
+END
+```
+
+- 검색형 CASE 표현식은 WHEN 절 자체에 비교 조건이 들어간다.
+```sql
+CASE WHEN condition1 THEN return_expr1
+     WHEN condition2 THEN return_expr2
+     ...
+     ELSE else_expr
+END
+```
+
+```sql
+SELECT emp_name
+       ,age
+       ,CASE WHEN age BETWEEN 0  AND 19 THEN '10대'
+             WHEN age BETWEEN 20 AND 29 THEN '20대'
+             WHEN age BETWEEN 30 AND 39 THEN '30대'
+             WHEN age BETWEEN 40 AND 49 THEN '40대'
+             WHEN age BETWEEN 50 AND 59 THEN '50대'
+             ELSE '60대 이상'
+        END ages
+    FROM EMP03;
+```
+

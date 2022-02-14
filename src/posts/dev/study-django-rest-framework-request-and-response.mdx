@@ -1,0 +1,34 @@
+---
+title: Django REST Framework(DRF) - Request and Response
+date: 2022/1/12
+description: RESTful api with django rest framework
+tags: [Dev, DRF, Django]
+---
+
+https://www.django-rest-framework.org/
+
+### Request and Response
+
+#### Request objects
+- DRF를 사용해 리퀘스를 받았을 때는 Request object를 조작하게 된다.
+    ```python
+    request.POST  # Only handles form data.  Only works for 'POST' method.
+    request.data  # Handles arbitrary data.  Works for 'POST', 'PUT' and 'PATCH' methods.
+    ```
+
+#### Response objects
+- DRF에서 기본적으로 제공하는 응답 객체 형태이다. 해당 객체에 응답을 담아서 제출하면
+  알아서 json 형태로 파싱이 된다.
+    ```python
+    from rest_framework.response import Response
+    return Response(data)  # Renders to content type as requested by the client.
+    ```
+
+#### Status codes
+- RESTful api에서 통상적으로 사용되는 여러가지 응답 약속을 미리 규정해놓은 객체다.
+    ```python
+    from rest_framework import status
+
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    ```

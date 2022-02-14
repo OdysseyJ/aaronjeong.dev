@@ -1,0 +1,93 @@
+---
+title: SQL - 서브쿼리
+date: 2022/1/30
+description: raw sql study for writing sql without orm
+tags: [Dev, SQL]
+---
+
+### 스칼라 서브쿼리
+- 스칼라 서브쿼리는 메인쿼리의 SELECT 절에서 마치 컬럼이나 표현식처럼 사용된다.
+    ```sql
+    SELECT a.emp_id
+          ,a.emp_name
+          ,a.gender
+          ,( SELECT b.dept_name
+               FROM dept_master b
+              WHERE a.dept_id = b.dept_id ) dept_name
+    FROM emp_master a;
+    ```
+- 스칼라 서브쿼리는 반환하는 컬럼수가 2이상이면 안되고, 반환되는 로우수가 1개여야 한다.
+
+### 인라인 뷰
+- 인라인 뷰는 메인 쿼리의 FROM절에서 사용하는 서브쿼리를 말한다. FROM 절에서는 서브쿼리
+  자체가 하나의  테이블처럼 사용된다. 따라서 인라인 뷰는 스칼라 서브쿼리와 다르게 여러개의 컬럼이나 표현식, 여러개의 로우 반환 가능
+    ```sql
+    SELECT a.dept_id
+          ,a.dept_name
+          ,k.emp_id
+          ,k.emp_name
+          ,k.address
+      FROM dept_master a
+          ,( SELECT b.emp_id
+                   ,b.emp_name
+                   ,c.city || c.gu || c.address_name AS address 
+                   ,b.dept_id
+               FROM emp_master b
+                   ,address_master c
+               WHERE b.address_id = c.address_id
+            ) k
+      WHERE a.use_ty = 'Y'
+      ORDER BY 1, 3;
+    ```
+
+### 중첩 서브쿼리
+- 중첩 서브쿼리는 WHERE절에서 사용되는 서브쿼리로, 조건절의 일부로 사용된다는 뜻이다.
+  중첩 서브쿼리는 인라인 뷰처럼 여러개의 컬럼, 로우를 반환 할 수 있다.
+    ```sql
+    SELECT *
+    FROM dept_master a
+    WHERE a.dept_id = ( SELECT b.dept_id
+                        FROM emp_master b
+                        WHERE b.emp_name = '세종대왕'
+                      );
+    ```
+    ```sql
+    SELECT *
+    FROM dept_master a
+    WHERE a.dept_id IN ( SELECT b.dept_id
+                        FROM emp_master b
+                        WHERE b.emp_name = '세종대왕'
+                      );
+    ```
+
+### 세미 조인과 안티 조인
+- 세미 조인은 중첩 서브쿼리에서 사용한 조인방법을 말한다.
+    ```sql
+    SELECT *
+    FROM dept_master a
+    WHERE EXISTS ( SELECT 1
+                    FROM emp_master b
+                    WHERE b.age BETWEEN 40 AND 49
+                    AND a.dept_id = b.dept_id
+                );
+    ```
+- 안티 조인은 세미 조인과 형식은 같으나 NOT 연산자가 들어가 반대의 결과를 가져오게
+  된다.
+    ```sql
+    SELECT *
+    FROM dep_master a
+    WHERE a.dept_id NOT IN (SELECT b.dept_id
+                            FROM emp_master b
+                            WHERE b.age BETWEEN 40 AND 49
+                            );
+    ```
+
+    ```sql
+    SELECT *
+    FROM dep_master a
+    WHERE a.dept_id NOT EXISTS (SELECT 1
+                            FROM emp_master b
+                            WHERE b.age BETWEEN 40 AND 49
+                            AND a.dept_id = b.dept_id
+                            );
+    ```
