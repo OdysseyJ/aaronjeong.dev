@@ -25,7 +25,7 @@ const Statistics = ({ allTexts, counts: {ps, note, dev} }: HomeStaticProps) => (
         <Box padding={"20px"}></Box>
         <PieChart data={[{key: 'ps', value: ps}, {key: "note", value: note}, {key: "dev", value: dev}]}/>
         <Box padding={"20px"}></Box>
-        <HeatMap width={500} height={250}/>
+        <HeatMap width={500} height={250} data={[]}/>
     </>
 );
 
