@@ -44,8 +44,8 @@ const SEO: () => JSX.Element = () => (
       },
       {
         rel: "mask-icon",
-        href: "/safari-pinned-tab.svg",
-        color: "#5bbad5",
+        href: "/img.png",
+        sizes: "32x32",
       },
       {
         rel: "manifest",
