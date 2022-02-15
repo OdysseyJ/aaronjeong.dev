@@ -10,7 +10,7 @@ const Comments: React.FC<CommentsProps> = ({config}) => {
 
   return (
     <DiscussionEmbed
-        shortname="Aaron"
+        shortname="aaronjeong"
         config={config}
     />
   );
