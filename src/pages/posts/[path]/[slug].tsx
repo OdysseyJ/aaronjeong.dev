@@ -49,7 +49,7 @@ const PostPage = ({ source, frontMatter, slug }: any) => {
         dateModified={dayjs(date).format()}
         authorName={["Aaron jeong"]}
         publisherName="Aaron jeong"
-        publisherLogo={process.env.host + "/images/logo.png"}
+        publisherLogo={process.env.host + "/images/sweet-potato.png"}
         description={description}
       />
       <H2>{title}</H2>
