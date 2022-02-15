@@ -73,7 +73,7 @@ const Navbar = () => {
                       size={"sm"}
                       variant={"ghost"}
                       aria-label={"Toggle Color Mode"}
-                      icon={<IoHome size={18} />}
+                      icon={<img src={"/images/sweet-potato.png"} width={30} />}
                   />
               </Stack>
             </NextLink>

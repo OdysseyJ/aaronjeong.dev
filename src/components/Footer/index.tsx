@@ -8,7 +8,7 @@ import {
   VisuallyHidden,
 } from "@chakra-ui/react";
 import { ReactNode } from "react";
-import { FaGithub, FaTwitter } from "react-icons/fa";
+import { FaGithub } from "react-icons/fa";
 
 const SocialButton = ({
   children,
@@ -21,7 +21,6 @@ const SocialButton = ({
 }) => {
   return (
     <chakra.button
-      bg={useColorModeValue("blackAlpha.100", "whiteAlpha.100")}
       rounded={"full"}
       w={8}
       h={8}
@@ -56,7 +55,10 @@ const Footer = () => (
       <Text>© {new Date().getFullYear()} Seongwoon Jeong. All rights reserved</Text>
       <Stack direction={"row"} spacing={6}>
         <SocialButton label={"Github"} href={"https://github.com/Odysseyj"}>
-          <FaGithub />
+          <FaGithub size={25}/>
+        </SocialButton>
+        <SocialButton label={"Backjoon"} href={"https://www.acmicpc.net/user/ggogumalove"}>
+          <img width={30} height={30} src="/images/backjoon.png"/>
         </SocialButton>
       </Stack>
     </Container>
