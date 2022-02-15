@@ -44,7 +44,8 @@
     "react-live": "2.3.0",
     "react-player": "^2.9.0",
     "react-spinners": "0.11.0",
-    "react-table": "7.7.0"
+    "react-table": "7.7.0",
+    "slugify": "^1.6.5"
   },
   "devDependencies": {
     "@types/node": "16.11.6",

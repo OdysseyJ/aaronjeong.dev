@@ -14,7 +14,8 @@ import { NextSeo } from "next-seo";
 import NextLink from "next/link";
 
 const PostList = ({ posts, page, total, title, urlPrefix }: any) => {
-  const hasNextPage = Math.ceil(total / POSTS_PER_PAGE) > page;
+  const allPageCount = Math.ceil(total / POSTS_PER_PAGE)
+  const hasNextPage = allPageCount > page;
   const hasPreviousPage = page > 1;
   const pageTitle = `${title} ${hasPreviousPage ? ` - Page ${page}` : ""}`;
 
@@ -41,7 +42,7 @@ const PostList = ({ posts, page, total, title, urlPrefix }: any) => {
             {hasPreviousPage && (
               <NextLink href={urlPrefix + `/${page - 1}`} passHref>
                 <Link>
-                  <ChevronLeftIcon /> Previous {page - 1}/{total}
+                  <ChevronLeftIcon /> 이전 페이지 {page - 1}/ {allPageCount}
                 </Link>
               </NextLink>
             )}
@@ -51,7 +52,7 @@ const PostList = ({ posts, page, total, title, urlPrefix }: any) => {
             {hasNextPage && (
               <NextLink href={urlPrefix + `/${page + 1}`} passHref>
                 <Link>
-                  Next {page + 1}/{total} <ChevronRightIcon />
+                  다음 페이지 {page + 1}/ {allPageCount} <ChevronRightIcon />
                 </Link>
               </NextLink>
             )}
