@@ -1,11 +1,11 @@
 import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import {
-  Box,
-  Flex,
-  Link,
-  Spacer,
-  StackDivider,
-  VStack,
+    Box, Button,
+    Flex,
+    Link,
+    Spacer,
+    StackDivider,
+    VStack,
 } from "@chakra-ui/react";
 import PostItem from "@src/components/Posts/PostItem";
 import { H2 } from "@src/components/Typography/Headings";
@@ -41,9 +41,11 @@ const PostList = ({ posts, page, total, title, urlPrefix }: any) => {
           <Box>
             {hasPreviousPage && (
               <NextLink href={urlPrefix + `/${page - 1}`} passHref>
-                <Link>
-                  <ChevronLeftIcon /> 이전 페이지 {page - 1}/ {allPageCount}
-                </Link>
+                  <Button variant="outline" colorScheme="blue">
+                    <Link>
+                      <ChevronLeftIcon /> 이전 페이지 {page - 1}/ {allPageCount}
+                    </Link>
+                  </Button>
               </NextLink>
             )}
           </Box>
@@ -51,9 +53,11 @@ const PostList = ({ posts, page, total, title, urlPrefix }: any) => {
           <Box>
             {hasNextPage && (
               <NextLink href={urlPrefix + `/${page + 1}`} passHref>
-                <Link>
-                  다음 페이지 {page + 1}/ {allPageCount} <ChevronRightIcon />
-                </Link>
+                  <Button variant="outline" colorScheme="blue">
+                    <Link>
+                      다음 페이지 {page + 1}/ {allPageCount} <ChevronRightIcon />
+                    </Link>
+                  </Button>
               </NextLink>
             )}
           </Box>
