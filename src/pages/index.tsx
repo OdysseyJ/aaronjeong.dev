@@ -41,6 +41,7 @@ const Home = ({ posts }: any) => (
             <Avatar
               size={"2xl"}
               alt={"Aaron"}
+              src={"/images/profile-image.jpeg"}
               mb={4}
               pos={"relative"}
             />
@@ -50,40 +51,68 @@ const Home = ({ posts }: any) => (
             <Text fontWeight={600} color={"gray.500"} mb={4}>
               @Aaron
             </Text>
+            <Text fontWeight={600} color={"gray.500"} >
+              ggogumalove@gmail.com
+            </Text>
             <Text
               textAlign={"center"}
               color={useColorModeValue("gray.700", "gray.400")}
               px={3}
             >
-              Python /
-              Javascript
-              Developer
+              who love sweet potato
             </Text>
-
             <Stack align={"center"} justify={"center"} direction={"row"} mt={6}>
               <Badge
-                px={2}
-                py={1}
-                bg={useColorModeValue("gray.50", "gray.800")}
-                fontWeight={"400"}
+                  px={2}
+                  py={1}
+                  bg={useColorModeValue("gray.50", "gray.800")}
+                  fontWeight={"400"}
               >
                 #PYTHON
               </Badge>
               <Badge
-                px={2}
-                py={1}
-                bg={useColorModeValue("gray.50", "gray.800")}
-                fontWeight={"400"}
+                  px={2}
+                  py={1}
+                  bg={useColorModeValue("gray.50", "gray.800")}
+                  fontWeight={"400"}
               >
-                #REACTJS
+                #DJANGO
+              </Badge>
+            </Stack>
+            <Stack align={"center"} justify={"center"} direction={"row"}>
+              <Badge
+                  px={2}
+                  py={1}
+                  bg={useColorModeValue("gray.50", "gray.800")}
+                  fontWeight={"400"}
+              >
+                #REACT
               </Badge>
               <Badge
-                px={2}
-                py={1}
-                bg={useColorModeValue("gray.50", "gray.800")}
-                fontWeight={"400"}
+                  px={2}
+                  py={1}
+                  bg={useColorModeValue("gray.50", "gray.800")}
+                  fontWeight={"400"}
               >
-                #VIM
+                #NextJS
+              </Badge>
+            </Stack>
+            <Stack align={"center"} justify={"center"} direction={"row"}>
+              <Badge
+                  px={2}
+                  py={1}
+                  bg={useColorModeValue("gray.50", "gray.800")}
+                  fontWeight={"400"}
+              >
+                #AWS
+              </Badge>
+              <Badge
+                  px={2}
+                  py={1}
+                  bg={useColorModeValue("gray.50", "gray.800")}
+                  fontWeight={"400"}
+              >
+                #Vim
               </Badge>
             </Stack>
           </Box>
@@ -91,7 +120,7 @@ const Home = ({ posts }: any) => (
       </GridItem>
       <GridItem colSpan={{ md: 8 }}>
         <Box>
-          <H2>최근 글</H2>
+          <H2>Recents</H2>
           <VStack
             divider={<StackDivider borderColor="gray.200" />}
             spacing={2}

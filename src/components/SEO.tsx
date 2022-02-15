@@ -12,7 +12,7 @@ const SEO: () => JSX.Element = () => (
       description: process.env.description,
       images: [
         {
-          url: process.env.host + `/images/logo.png`,
+          url: process.env.host + `/images/profile-image.jpeg`,
           width: 600,
           height: 600,
           alt: process.env.title,
