@@ -1,3 +1,20 @@
+---
+title: boj-2448 python
+date: 2022/2/15
+description: backjoon online judge 2448
+tags: [PS]
+---
+
+https://www.acmicpc.net/problem/2448
+
+### 접근
+1. 재귀가 점점 익숙해지는지, 규칙을 유추해서 풀어냈다.
+
+> solve(n, x, y) - (x, y)는 삼각형의 상단 꼭짓점
+> 3 * 2^n 형태로 주어지기 때문에,
+> div = int(n/2)
+
+```python
 import sys
 sys.setrecursionlimit(100000)
 input = sys.stdin.readline
@@ -20,3 +37,4 @@ paper = [[" " for _ in range(2*n-1)] for _ in range(n)]
 solve(n, int((2*n-1)/2), 0)
 for l in paper:
     print("".join(l))
+```
