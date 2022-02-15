@@ -27,45 +27,44 @@ prompt([
           ? true
           : "directory not exist";
     },
-  }]).then((r)=>{
-  const { directory } = r;
-    prompt([
-  {
-    type: "input",
-        name: "filename",
-      message: `What is the file name?`,
-      required: true,
-      validate: (filename) => {
-    return fs.existsSync(getFilePath(directory, filename))
-        ? `${getFilePath(directory, filename)} exists.`
-        : true;
-  },
-  },
-  {
-    type: "input",
-        name: "title",
-      message: "What is the post title?",
-      required: true,
-  },
-  {
-    type: "input",
-        name: "description",
-      message: "What is the post description?",
-  },
-])
-.then((response) => {
-    const { title, description, filename } = response;
-    const filePath = getFilePath(directory, filename);
-    const data = matter.stringify("", {
-      title: title,
-      description: description,
-      date: `${dayjs().format()}`,
-      tags: [],
-    });
+  }
+  ]).then((r)=>{
+      const { directory } = r;
+      prompt([
+          {
+            type: "input",
+                name: "filename",
+              message: `What is the file name?`,
+              required: true,
+              validate: (filename) => {
+            return fs.existsSync(getFilePath(directory, filename))
+                ? `${getFilePath(directory, filename)} exists.`
+                : true;
+          },
+          },
+          {
+            type: "input",
+                name: "title",
+              message: "What is the post title?",
+              required: true,
+          },
+          {
+            type: "input",
+                name: "description",
+              message: "What is the post description?",
+          },
+      ]).then((response) => {
+            const { title, description, filename } = response;
+            const filePath = getFilePath(directory, filename);
+            const data = matter.stringify("", {
+              title: title,
+              description: description,
+              date: `${dayjs().format()}`,
+              tags: [],
+            });
 
-    fs.writeFileSync(filePath, data);
-    console.log(`Post ${title} was created at ${filePath}`);
-    console.log(data);
+            fs.writeFileSync(filePath, data);
+            console.log(`Post ${title} was created at ${filePath}`);
+            console.log(data);
+      }).catch(console.log);
   })
-      .catch(console.log);
-})
