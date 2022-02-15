@@ -1,3 +1,20 @@
+---
+title: boj-9184 python
+date: 2022/2/15
+description: backjoon online judge 9184
+tags: [PS]
+---
+
+https://www.acmicpc.net/problem/9184
+
+### 접근
+1. 재귀 문제인 줄 알았는데, 사실 dp문제에 더 가깝다.
+재귀 함수를 미리 주기 때문에, 결과를 그냥 dp에 저장하기만 하면 되는데
+이때 dp의 크기를 100*100*100으로 잡았다가 처음에 틀렸다.
+
+> dp[101][101][101]
+
+```python
 import sys
 sys.setrecursionlimit(100000)
 input = sys.stdin.readline
@@ -25,3 +42,4 @@ while True:
         break
     w(a, b, c)
     print(f"w({a}, {b}, {c}) = {dp[a][b][c]}")
+```

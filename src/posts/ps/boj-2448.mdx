@@ -36,6 +36,7 @@ def solve(n, x, y):
 n = int(input().strip())
 paper = [[" " for _ in range(2*n-1)] for _ in range(n)]
 
+# ((2*n-1)/2, 0) = 전체 삼각형 첫 꼭짓점 위치
 solve(n, int((2*n-1)/2), 0)
 for l in paper:
     print("".join(l))
