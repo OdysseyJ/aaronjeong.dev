@@ -48,18 +48,18 @@ const Home = ({ posts }: any) => (
             <Heading fontSize={"2xl"} fontFamily={"body"}>
               Seongwoon Jeong
             </Heading>
-            <Text fontWeight={600} color={"gray.500"} mb={4}>
-              @Aaron
+            <Text
+                textAlign={"center"}
+                color={useColorModeValue("gray.700", "gray.400")}
+                mb={4}
+            >
+              who love sweet potato
             </Text>
             <Text fontWeight={600} color={"gray.500"} >
               ggogumalove@gmail.com
             </Text>
-            <Text
-              textAlign={"center"}
-              color={useColorModeValue("gray.700", "gray.400")}
-              px={3}
-            >
-              who love sweet potato
+            <Text fontWeight={600} color={"gray.500"}>
+              @Aaron
             </Text>
             <Stack align={"center"} justify={"center"} direction={"row"} mt={6}>
               <Badge
