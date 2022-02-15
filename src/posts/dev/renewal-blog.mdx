@@ -2,7 +2,7 @@
 title: 블로그 리뉴얼 - ReactJS(NextJS)를 사용해 직접 만들기
 date: '2022-02-15T21:05:49+09:00'
 description: blog renewal using nextjs and reactjs
-tags: [Dev, NextJS, ReactJS]
+tags: [Dev, NextJS, ReactJS, Blog]
 ---
 
 이전에 글을 작성하던 규칙을 뼈대로 삼아 블로그를 새로 만들었다.
@@ -34,23 +34,94 @@ NextJS + Nextra라는 좋은 블로그용 프레임워크 위에 마크다운(.m
 
 ### 그래서 뭐가 바뀌었는데?
 
-#### 최근에 올라온 글
-#### 페이지네이션
-#### 통계
-#### 코드 하이라이팅
-#### 레이아웃 변경
-#### 다크 모드
-#### 블로그 글 생성기
+- #### 최근에 올라온 글
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-02-15-recent-posts.png'
+    alt="Photo"
+    width={400}
+    height={250}
+    priority
+    className="next-image"
+/>
 
-### 코드로 살펴보기
+- #### 페이지네이션
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-02-15-pagination.png'
+    alt="Photo"
+    width={400}
+    height={250}
+    priority
+    className="next-image"
+/>
 
-#### Good-Bye Nextra
-#### NextJS + fs + next-mdx-remote를 사용해 mdx 렌더링 직접 하기
-#### 포스트 개수 세기
-#### 페이지네이션
-#### 최근에 올라온 글
-#### 포스트 개수 세기
-#### 통계 차트 구현하기
-#### Chakra UI
-#### 다크 모드
-#### 블로그 글 생성기
+- #### 통계
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-02-15-wordcloud.png'
+    alt="Photo"
+    width={400}
+    height={250}
+    priority
+    className="next-image"
+/>
+
+- #### 코드 하이라이팅
+    ```python
+    import sys
+    sys.setrecursionlimit(100000)
+    input = sys.stdin.readline
+
+    def w(a, b, c):
+        if dp[a][b][c] != 0:
+            return dp[a][b][c]
+        if a <= 0 or b <= 0 or c <= 0:
+            dp[a][b][c] = 1
+        elif a > 20 or b > 20 or c > 20:
+            dp[a][b][c] = w(20, 20, 20)
+        elif a < b < c:
+            dp[a][b][c] = w(a, b, c-1) + w(a, b-1, c-1) - w(a, b-1, c)
+        else:
+            dp[a][b][c] = w(a-1, b, c) + w(a-1, b-1, c) + w(a-1, b, c-1) - w(a-1, b-1, c-1)
+        return dp[a][b][c]
+
+    dp = [[[0 for _ in range(101)] for _ in range(101)] for _ in range(101)]
+
+    while True:
+        a, b, c = map(int, input().strip().split(" "))
+        if a == b == c == -1:
+            break
+        w(a, b, c)
+        print(f"w({a}, {b}, {c}) = {dp[a][b][c]}")
+    ```
+
+- #### 레이아웃 변경, 모바일 지원
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-02-15-layout.png'
+    alt="Photo"
+    width={350}
+    height={400}
+    priority
+    className="next-image"
+/>
+
+- #### 다크 모드
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-02-15-darkmode.png'
+    alt="Photo"
+    width={350}
+    height={400}
+    priority
+    className="next-image"
+/>
+
+- #### 블로그 글 생성기
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-02-15-postgenerator.png'
+    alt="Photo"
+    width={500}
+    height={200}
+    priority
+    layout={"responsive"}
+    className="next-image"
+/>
+
+블로그 구현에 대한 코드 포스팅은 다음 포스트로 미뤄야겠다.

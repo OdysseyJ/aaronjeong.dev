@@ -43,7 +43,7 @@ const PostList = ({ posts, page, total, title, urlPrefix }: any) => {
               <NextLink href={urlPrefix + `/${page - 1}`} passHref>
                   <Button variant="outline" colorScheme="blue">
                     <Link>
-                      <ChevronLeftIcon /> 이전 페이지 {page - 1}/ {allPageCount}
+                      <ChevronLeftIcon /> 이전 {page - 1}/{allPageCount}
                     </Link>
                   </Button>
               </NextLink>
@@ -55,7 +55,7 @@ const PostList = ({ posts, page, total, title, urlPrefix }: any) => {
               <NextLink href={urlPrefix + `/${page + 1}`} passHref>
                   <Button variant="outline" colorScheme="blue">
                     <Link>
-                      다음 페이지 {page + 1}/ {allPageCount} <ChevronRightIcon />
+                      다음 {page + 1}/{allPageCount} <ChevronRightIcon />
                     </Link>
                   </Button>
               </NextLink>
