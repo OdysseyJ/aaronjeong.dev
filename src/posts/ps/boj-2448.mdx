@@ -19,10 +19,12 @@ import sys
 sys.setrecursionlimit(100000)
 input = sys.stdin.readline
 
+star_locations = [(0, 0), (-1, 1), (1, 1), (-2, 2), (-1, 2), (0, 2), (1, 2), (2, 2)]
+
 
 def solve(n, x, y):
     if n == 3:
-        for i, j in [(0, 0), (-1, 1), (1, 1), (-2, 2), (-1, 2), (0, 2), (1, 2), (2, 2)]:
+        for i, j in star_locations:
             paper[y+j][x+i] = "*"
         return
     div = int(n/2)
