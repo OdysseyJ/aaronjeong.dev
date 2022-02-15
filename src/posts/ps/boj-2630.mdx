@@ -1,3 +1,15 @@
+---
+title: boj-2630 python
+date: 2022/2/15
+description: backjoon online judge 2630
+tags: [PS]
+---
+
+### 접근
+1. 재귀가 점점 익숙해지는지, 실버 문제는 가뿐히 풀 수 있다.
+물론 이전에 풀어봤던 문제랑 닮아 있어서 코드를 몇줄 고치지 않았다.
+> https://www.aaronjeong.dev/posts/ps/boj-1780
+```python
 import sys
 sys.setrecursionlimit(100000)
 input = sys.stdin.readline
@@ -30,3 +42,4 @@ for i in range(n):
 solve(n, 0, 0)
 for i in [0, 1]:
     print(counts[i])
+```
