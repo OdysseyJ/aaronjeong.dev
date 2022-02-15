@@ -4,7 +4,7 @@ import { Group } from "@visx/group";
 import { scaleOrdinal } from "@visx/scale";
 import { LegendOrdinal } from '@visx/legend';
 
-const colors = ['#688F4E', '#B1D182', '#2B463C']
+const colors = ['#26648E', '#4F8FC0', '#53D2DC']
 
 type DataType = {key: string, value: number}[]
 

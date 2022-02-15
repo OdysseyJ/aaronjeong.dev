@@ -28,7 +28,7 @@ const Statistics = ({ texts: {note: note_text}, counts: {ps, note, dev} }: HomeS
         <WordCloud allTexts={note_text}/>
         <PieChart data={[{key: 'ps', value: ps}, {key: "note", value: note}, {key: "dev", value: dev}]}/>
         <Box padding={"10px"}/>
-        <HeatMap width={500} height={200} data={[]}/>
+        {/*<HeatMap width={500} height={200} data={[]}/>*/}
     </>
 );
 
