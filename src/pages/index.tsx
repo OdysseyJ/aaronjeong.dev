@@ -53,7 +53,7 @@ const Home = ({ posts }: any) => (
                 color={useColorModeValue("gray.700", "gray.400")}
                 mb={4}
             >
-              who love sweet potato
+              loves sweet potato
             </Text>
             <Text fontWeight={600} color={"gray.500"} >
               ggogumalove@gmail.com
