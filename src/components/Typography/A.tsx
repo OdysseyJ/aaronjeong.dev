@@ -11,7 +11,7 @@ const A: ({
   [p: string]: any;
 }) => JSX.Element = ({ as, href, ...otherProps }) => (
   <NextLink as={as} href={href}>
-    <Link color={`teal`} {...otherProps} />
+    <Link href={href} color={`teal`} target={"_blank"} {...otherProps} />
   </NextLink>
 );
 export default A;
