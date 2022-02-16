@@ -1,3 +1,15 @@
+---
+title: boj-1914 python
+description: boj solve problem 1914
+date: '2022-02-16T20:34:36+09:00'
+tags: []
+---
+
+### 접근
+1. dp와 하노이 재귀를 섞어서 푼다.
+단지, 문제점은 2[n-1]+1이라는 점화식을 유도하는 과정과
+마지막에 20이상인 수는 출력을 하지 않는 문제를 주의깊게 봐야한다.
+```python
 import sys
 sys.setrecursionlimit(100000)
 input = sys.stdin.readline
@@ -22,3 +34,6 @@ for i in range(2, n+1):
 print(dp[i])
 if n <= 20:
     solve(n, '1', '3', '2')
+```
+
+
