@@ -1,7 +1,7 @@
 import {
     Box,
     Grid,
-    GridItem,
+    GridItem, Text,
 } from "@chakra-ui/react";
 import { NextSeo } from "next-seo";
 import WordCloud from "@src/components/Charts/WordCloud";
@@ -25,7 +25,13 @@ type HomeStaticProps = {
 const Statistics = ({ texts: {note: note_text}, counts: {ps, note, dev} }: HomeStaticProps) => (
     <>
         <NextSeo title={"Statistics"} />
+        <Text fontWeight={600} fontSize={"24px"} >
+            Note에서 많이 사용한 단어
+        </Text>
         <WordCloud allTexts={note_text}/>
+        <Text fontWeight={600} fontSize={"24px"} mt={10} >
+            게시판별 글의 개수
+        </Text>
         <PieChart data={[{key: 'ps', value: ps}, {key: "note", value: note}, {key: "dev", value: dev}]}/>
         <Box padding={"10px"}/>
         {/*<HeatMap width={500} height={200} data={[]}/>*/}
