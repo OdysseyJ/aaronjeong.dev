@@ -1,0 +1,68 @@
+---
+title: Deep dive 파이어베이스 클라우드 메세징 - 전송옵션
+description: deep dive firebase cloud messaging(fcm)
+date: '2022-02-19T21:45:56+09:00'
+tags: [Dev, Firebase, Fcm]
+---
+
+### 전송 옵션
+
+#### 비축소형 메세지 및 축소형 메세지
+
+- 축소형 메세지 : 개별 메세지가 압축된 형태로 보이는것 (모바일 앱에 서버의 데이터를 동기화할 것을 알리는데 사용)
+> 토큰당 최대 다른 축소키를 4개까지만 허용한다.
+
+  - Android : collapse_key
+  - Apple : apns-collapse-id
+  - Javascript/Web : Topic
+  - 기존 프로토콜(모든 플랫폼) : collapse_key
+
+- 비축소형 메세지 : 개별 메세지가 각각 기기로 전송됨 (채팅 메세지나 중요한 메세지)
+> 알림 메세지를 제외한 모든 메세지가 기본적으로 비축소형이다.
+
+  - Android : 최대 100개까지 저장 가능. 최대 한도 도달시 저장된 메세지 모두 삭제
+
+#### 메세지 우선순위 설정
+
+- 2가지의 전송 우선순위를 할당할 수 있다.
+
+  - 보통 우선순위 : 데이터 메세지의 기본 우선순위. 보통 우선순위 메세지는 앱이 `포그라운드 상태`이면 즉시 전송된다. 기기가 잠자기 상태이면
+배터리를 절약하기 위해 전송이 지연될 수 있다. 보통 `시간이 크게 중요하지 않은 메세지`의 경우에 사용한다.
+
+  - 높은 우선순위 : 즉시 전송하려고 시도하며, 필요한 경우 FCM에서 기기의 절전 모드를 해제하고 매우 제한된 네트워크 엑세르를 포함하여 제한된
+일부 처리 작업을 실행. 대개 사용자가 앱 또는 알림과 상호작용하게 해야 함.
+
+- 잡지 구독자에게 새 콘텐츠를 다운로드 할 수 있다고 알리기 위해 FCM HTTP v1 프로토콜을 통해 보내는 보통 우선순위 메세지의 예시
+    ```json
+    {
+      "message":{
+        "topic":"subscriber-updates",
+        "notification":{
+          "body" : "This week's edition is now available.",
+          "title" : "NewsMagazine.com",
+        },
+        "data" : {
+          "volume" : "3.21.15",
+          "contents" : "http://www.news-magazine.com/world-week/21659772"
+        },
+        "android":{
+          "priority":"normal"
+        },
+        "apns":{
+          "headers":{
+            "apns-priority":"5"
+          }
+        },
+        "webpush": {
+          "headers": {
+            "Urgency": "high"
+          }
+        }
+      }
+    }
+    ```
+
+- 메세지 우선순위 설정에 관한 플랫폼별 세부정보는 아래의 문서를 보자
+  - [APN 문서](https://developer.apple.com/library/prerelease/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingwithAPNs.html#//apple_ref/doc/uid/TP40008194-CH11-SW1)
+  - [잠자기 및 앱 대기 최적화 - Android](https://developer.android.com/training/monitoring-device-state/doze-standby.html?hl=ko)
+  - [웹 푸시 메세지 긴급성](https://datatracker.ietf.org/doc/html/rfc8030#section-5.3)

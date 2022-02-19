@@ -2,7 +2,7 @@
 title: Deep dive 파이어베이스 클라우드 메세징(FCM)
 description: deep dive firebase cloud messaging(fcm)
 date: '2022-02-17T13:44:56+09:00'
-tags: []
+tags: [Dev, Firebase, Fcm]
 ---
 
 ### 소개
@@ -81,6 +81,88 @@ FCM을 이용하면 이런 다른 인터페이스에 대해 하나의 인터페�
 
 #### 데이터 메세지
 
+- 데이터 메세지의 목적은 앱으로 데이터 페이로드를 보내기 위해 사용한다.
+
+> 주의! 이때 커스텀 키-값 쌍에 예약어를 사용하지 않도록 주의한다 (from, notification, message_type등)
+
+```json
+{
+  "message":{
+    "token":"bk3RNwTe3H0:CI2k_HHwgIpoDKCIZvvDMExUdFQ3P1...",
+    "data":{
+      "Nick" : "Mario",
+      "body" : "great match!",
+      "Room" : "PortugalVSDenmark"
+    }
+  }
+}
+```
+
+- Android에서는 필요에 따라 데이터 메세지에 엔드 투 엔드 암호화를 추가할 수 있다.
 
 #### 알림 메세지(데이터 페이로드 포함)
 
+- 알림 및 데이터 페이로드가 둘 다 포함된 메세지를 수신할 경우 앱 동작은 앱이 어떤 상태인지에 따라 다르다.
+    - `백그라운드 상태`인 경우, 알림 페이로드가 앱의 알림 목록에 수신되며, 사용자가 알림을 탭한 경우에만 앱이 페이로드를 처리한다.
+    - `포그라운드 상태`인 경우, 앱에서 페이로드가 둘 다 제공되는 메세지 객체를 수신한다.
+
+```json
+{
+  "message":{
+    "token":"bk3RNwTe3H0:CI2k_HHwgIpoDKCIZvvDMExUdFQ3P1...",
+    "notification":{
+      "title":"Portugal vs. Denmark",
+      "body":"great match!"
+    },
+    "data" : {
+      "Nick" : "Mario",
+      "Room" : "PortugalVSDenmark"
+    }
+  }
+}
+```
+
+### 여러 플랫폼의 메세지를 맞춤 설정하기
+
+#### 특정 플랫폼과 상관없이 모든 앱 인스턴스가 해석 할 수 있는 공통 필드들
+
+- message.notification.title
+- message.notification.body
+- message.data
+
+#### 특정 플랫폼에만 값을 보내려면 공통 필드를 사용하지 말고, 플랫폼별 필드를 사용해야 한다.
+
+- 다음 v1요청은 모든 플랫폼에 공통인 알림 제목과 콘텐츠를 보내지만, 일부 플랫폼별 재정의도 보낸다.
+    ```json
+    # Android와 웹의 경우는 TTL(수명)을 길게 설정, APN 메세지 우선순위는 낮게 설정.
+    {
+      "message":{
+         "token":"bk3RNwTe3H0:CI2k_HHwgIpoDKCIZvvDMExUdFQ3P1...",
+         "notification":{
+           "title":"Match update",
+           "body":"Arsenal goal in added time, score is now 3-0"
+         },
+         "android":{
+           "ttl":"86400s",
+           "notification"{
+             "click_action":"OPEN_ACTIVITY_1"
+           }
+         },
+         "apns": {
+           "headers": {
+             "apns-priority": "5",
+           },
+           "payload": {
+             "aps": {
+               "category": "NEW_MESSAGE_CATEGORY"
+             }
+           }
+         },
+         "webpush":{
+           "headers":{
+             "TTL":"86400"
+           }
+         }
+       }
+     }
+    ```
