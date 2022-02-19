@@ -1,0 +1,42 @@
+---
+title: boj-5639 python
+description: boj problem solve by python 5639
+date: '2022-02-18T19:56:10+09:00'
+tags: []
+---
+
+### 접근
+1. 프리 오더로 탐색한 리스트를 가지고 post_order를 구하는 문제다.
+pre_order 리스트의
+```python
+import sys
+sys.setrecursionlimit(100000)
+input = sys.stdin.readline
+
+
+def post_order(start, end):
+    if start > end:
+        return
+
+    root = pre_order[start]
+    idx = start + 1
+
+    while idx <= end:
+        if pre_order[idx] > root:
+            break
+        idx += 1
+
+    post_order(start+1, idx-1)
+    post_order(idx, end)
+    print(root)
+
+
+pre_order = []
+while True:
+    try:
+        pre_order.append(int(input()))
+    except:
+        break
+
+post_order(0, len(pre_order) - 1)
+```

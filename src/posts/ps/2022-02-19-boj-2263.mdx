@@ -1,0 +1,60 @@
+---
+title: boj 2263 python
+description: boj problem 2263 solved by python
+date: '2022-02-19T15:42:48+09:00'
+tags: []
+---
+
+### 접근
+1. in_order와 post_order 탐색 결과가 주어졌을 때, pre_order 를 구하면 되는 문제다.
+
+in_order와 post_order간의 상관관계에 주목했는데, post_order의 맨 끝번째 값이 트리의 루트가 되니까,
+해당 루트를 in_order에서 찾아 루트를 기준으로 좌/우를 분리해주면 새로운 서브트리 배열을 만들 수 있다.
+
+새로운 서브트리 배열을 만들었다면, 해당 서브트리 배열을 다시 재귀적으로 돌아서 새로운 서브트리의 루트를 찾는다.
+새로운 서브트리의 루트를 찾아 다시 트리를 구성해주면, 완전한 형태의 트리를 구성할 수 있다.
+
+이때, pre_order 형태로 출력을 하기만 하면 되니까, 트리의 루트를 찾아서 바로 출력해주면 된다.
+주의해야 할 점은 왼쪽 서브트리부터 recursion을 통해 구해야 정확한 pre_order형태의 트리를 출력할 수 있다.
+```python
+import sys
+sys.setrecursionlimit(100000)
+input = sys.stdin.readline
+
+
+class Node(object):
+left = None
+right = None
+value = None
+
+    def __init__(self, **kwargs):
+        self.value = kwargs.get("value", None)
+
+
+def pre_order(in_start, in_end, post_start, post_end):
+    if (in_start > in_end) or (post_start > post_end):
+    return
+
+    root = post_order[post_end]
+    print(root, end=" ")
+
+    left = positions[root] - in_start
+    right = in_end - positions[root]
+
+    # left
+    pre_order(in_start, in_start+left-1, post_start, post_start+left-1)
+    # right
+    pre_order(in_end-right+1, in_end, post_end-right, post_end-1)
+
+
+k = int(input())
+in_order = [int(i) for i in input().split(" ")]
+post_order = [int(i) for i in input().split(" ")]
+
+positions = [0] * (k+1)
+for i in range(k):
+positions[in_order[i]] = i
+
+pre_order(0, k-1, 0, k-1)
+print()
+```
