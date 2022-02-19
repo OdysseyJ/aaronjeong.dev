@@ -1,40 +1,17 @@
 import sys
-sys.setrecursionlimit(100000)
 input = sys.stdin.readline
 
 
-class Node(object):
-    left = None
-    right = None
-    value = None
+n = int(input())
+dp = [0 for _ in range(20)]
 
-    def __init__(self, **kwargs):
-        self.value = kwargs.get("value", None)
+for i in range(n):
+    t, p = map(int, input().split(" "))
+    # 오늘이 내일보다 큰 경우 내일 오늘까지 수익 채우기
+    if dp[i] > dp[i+1]:
+        dp[i+1] = dp[i]
+    # t일 후의 수익이 현재 수익+p보다 더 작을경우 업데이트
+    if dp[i+t] < dp[i]+p:
+        dp[i+t] = dp[i]+p
 
-
-def pre_order(in_start, in_end, post_start, post_end):
-    if(in_start > in_end) or (post_start > post_end):
-        return
-
-    root = post_order[post_end]
-    print(root, end=" ")
-
-    left = positions[root] - in_start
-    right = in_end - positions[root]
-
-    # left
-    pre_order(in_start, in_start+left-1, post_start, post_start+left-1)
-    # right
-    pre_order(in_end-right+1, in_end, post_end-right, post_end-1)
-
-
-k = int(input())
-in_order = [int(i) for i in input().split(" ")]
-post_order = [int(i) for i in input().split(" ")]
-
-positions = [0] * (k+1)
-for i in range(k):
-    positions[in_order[i]] = i
-
-pre_order(0, k-1, 0, k-1)
-print()
+print(dp[n])
