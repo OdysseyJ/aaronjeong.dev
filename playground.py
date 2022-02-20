@@ -3,19 +3,14 @@ sys.setrecursionlimit(100000)
 input = sys.stdin.readline
 
 
-def solve(n, start, end):
-    if n == k:
+def solve(num, n):
+    sum_ = sum([int(n) for n in num])
+    if len(num) == 1:
+        print(n)
+        print("YES" if sum_ % 3 == 0 else "NO")
         return
-    d = start + int((end-start)/2)
-    root = in_order[d]
-    results[n].append(root)
-    solve(n+1, start, d-1)
-    solve(n+1, d+1, end)
+    solve(str(sum_), n+1)
 
 
-k = int(input())
-in_order = input().split()
-results = [[] for _ in range(k)]
-solve(0, 0, 2**k-1-1)
-for result in results:
-    print(" ".join(result))
+num = input().strip()
+solve(num, 0)

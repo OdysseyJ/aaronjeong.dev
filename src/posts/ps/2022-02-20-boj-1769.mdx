@@ -1,0 +1,27 @@
+---
+title: boj 1769 3의배수 python
+description: boj problem 1769 solved by python
+date: '2022-02-20T21:19:08+09:00'
+tags: [PS, Recursion]
+---
+
+### 접근
+1. recursion으로 구하면 되는 굉장히 간단한 문제. recursion이 아니라 stack으로 dfs로 풀어도 될것같다.
+```python
+import sys
+sys.setrecursionlimit(100000)
+input = sys.stdin.readline
+
+
+def solve(num, n):
+    sum_ = sum([int(n) for n in num])
+    if len(num) == 1:
+        print(n)
+        print("YES" if sum_ % 3 == 0 else "NO")
+        return
+    solve(str(sum_), n+1)
+
+
+num = input().strip()
+solve(num, 0)
+```
