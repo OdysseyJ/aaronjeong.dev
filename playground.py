@@ -3,14 +3,24 @@ sys.setrecursionlimit(100000)
 input = sys.stdin.readline
 
 
-def solve(num, n):
-    sum_ = sum([int(n) for n in num])
-    if len(num) == 1:
-        print(n)
-        print("YES" if sum_ % 3 == 0 else "NO")
+def post_order(pre_start, pre_end, in_start, in_end):
+    if in_start > in_end or pre_start > pre_end:
         return
-    solve(str(sum_), n+1)
+
+    root = pre_order[pre_start]
+    root_inorder_idx = positions[root]
+
+    post_order(pre_start+1, pre_end, in_start, root_inorder_idx)
+    post_order(pre_start+1, pre_end, root_inorder_idx+1, in_end)
 
 
-num = input().strip()
-solve(num, 0)
+t = int(input().strip())
+for _ in range(t):
+    n = int(input().strip())
+    pre_order = [int(i) for i in input().strip().split()]
+    in_order = [int(i) for i in input().strip().split()]
+    positions = [0 for _ in range(n+1)]
+    for idx, order in enumerate(in_order):
+        positions[order] = idx
+    print(positions)
+    # post_order(0, n-1, 0, n-1)
