@@ -1,17 +1,21 @@
 import sys
+sys.setrecursionlimit(100000)
 input = sys.stdin.readline
 
 
-n = int(input())
-dp = [0 for _ in range(20)]
+def solve(n, start, end):
+    if n == k:
+        return
+    d = start + int((end-start)/2)
+    root = in_order[d]
+    results[n].append(root)
+    solve(n+1, start, d-1)
+    solve(n+1, d+1, end)
 
-for i in range(n):
-    t, p = map(int, input().split(" "))
-    # 오늘이 내일보다 큰 경우 내일 오늘까지 수익 채우기
-    if dp[i] > dp[i+1]:
-        dp[i+1] = dp[i]
-    # t일 후의 수익이 현재 수익+p보다 더 작을경우 업데이트
-    if dp[i+t] < dp[i]+p:
-        dp[i+t] = dp[i]+p
 
-print(dp[n])
+k = int(input())
+in_order = input().split()
+results = [[] for _ in range(k)]
+solve(0, 0, 2**k-1-1)
+for result in results:
+    print(" ".join(result))
