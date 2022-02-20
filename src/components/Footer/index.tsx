@@ -58,7 +58,7 @@ const Footer = () => (
           <FaGithub size={25}/>
         </SocialButton>
         <SocialButton label={"Backjoon"} href={"https://www.acmicpc.net/user/ggogumalove"}>
-          <img width={30} height={30} src="/images/backjoon.png"/>
+          <img width={30} height={30} src={useColorModeValue("/images/backjoon.png", "/images/backjoon-white.png")} />
         </SocialButton>
       </Stack>
     </Container>
