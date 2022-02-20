@@ -50,13 +50,6 @@ const Home = ({ posts, postsByDate }: any) => (
             <Heading fontSize={"2xl"} fontFamily={"body"}>
               Seongwoon Jeong
             </Heading>
-            <Text
-                textAlign={"center"}
-                color={useColorModeValue("gray.700", "gray.400")}
-                mb={4}
-            >
-              loves sweet potato
-            </Text>
             <Text fontWeight={600} color={"gray.500"} >
               ggogumalove@gmail.com
             </Text>
@@ -81,7 +74,7 @@ const Home = ({ posts, postsByDate }: any) => (
                 #DJANGO
               </Badge>
             </Stack>
-            <Stack align={"center"} justify={"center"} direction={"row"}>
+            <Stack align={"center"} justify={"center"} direction={"row"} mt={2}>
               <Badge
                   px={2}
                   py={1}
@@ -99,7 +92,7 @@ const Home = ({ posts, postsByDate }: any) => (
                 #NextJS
               </Badge>
             </Stack>
-            <Stack align={"center"} justify={"center"} direction={"row"}>
+            <Stack align={"center"} justify={"center"} direction={"row"} mt={2}>
               <Badge
                   px={2}
                   py={1}
