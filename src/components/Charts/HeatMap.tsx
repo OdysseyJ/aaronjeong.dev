@@ -5,8 +5,8 @@ import { HeatmapRect } from '@visx/heatmap';
 import { getSeededRandom } from '@visx/mock-data';
 import {PostType} from "@src/lib/posts";
 
-const cool1 = 'white';
-const cool2 = '#2B463C';
+const cool1 = '#ededed';
+const cool2 = '#08b101';
 
 
 function max<Datum>(data: Datum[], value: (d: Datum) => number): number {
@@ -65,7 +65,7 @@ const Example = ({
     // bounds
     const size =
         width > margin.left + margin.right ? width - margin.left - margin.right - separation : width;
-    const xMax = 200;
+    const xMax = 210;
     const yMax = 150;
 
     const binWidth = 15;

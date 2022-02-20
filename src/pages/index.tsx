@@ -29,9 +29,6 @@ const Home = ({ posts, postsByDate }: any) => (
       gap={12}
     >
       <GridItem colSpan={{ md: 4 }}>
-        <Box>
-          <HeatMap width={500} height={200} data={postsByDate}/>
-        </Box>
         <Center>
           <Box
             maxW={{ base: "320px", md: "100%" }}
@@ -42,6 +39,7 @@ const Home = ({ posts, postsByDate }: any) => (
             p={6}
             textAlign={"center"}
           >
+            <HeatMap width={500} height={200} data={postsByDate}/>
             <Avatar
               size={"2xl"}
               alt={"Aaron"}
