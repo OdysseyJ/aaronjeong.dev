@@ -3,8 +3,9 @@ import genBins, { Bin, Bins } from '@visx/mock-data/lib/generators/genBins';
 import { scaleLinear } from '@visx/scale';
 import { HeatmapRect } from '@visx/heatmap';
 import { getSeededRandom } from '@visx/mock-data';
+import {PostType} from "@src/lib/posts";
 
-const cool1 = '#E5F6DF';
+const cool1 = 'white';
 const cool2 = '#2B463C';
 
 
@@ -12,7 +13,7 @@ function max<Datum>(data: Datum[], value: (d: Datum) => number): number {
     return Math.max(...data.map(value));
 }
 
-export type HeatMapDataType = {bin: number, count: number}[]
+export type HeatMapDataType = PostType[][]
 
 export type HeatmapProps = {
     width: number;
@@ -36,16 +37,20 @@ const Example = ({
     const bins = (d: Bins) => d.bins;
     const count = (d: Bin) => d.count;
     const seededRandom = getSeededRandom(0.41);
+    let c = 0
     const binData = genBins(
-        /* length = */ 7,
-        /* height = */ 32,
-        /** binFunc */ (idx) => 150 * idx,
-        /** countFunc */ (i, number) => 25 * (number - i) * seededRandom(),
+        /* length = */ 16,
+        /* height = */ 7,
+        /** binFunc */ (i, number) => i,
+        /** countFunc */ (i, number) => {
+            c += 1
+            const before = 16*7-c
+            return data[before].length
+        },
     );
     const colorMax = max(binData, (d) => max(bins(d), count));
     const bucketSizeMax = max(binData, (d) => bins(d).length);
 
-// scales
     const xScale = scaleLinear<number>({
         domain: [0, 12],
     });
@@ -54,14 +59,14 @@ const Example = ({
     });
     const rectColorScale = scaleLinear<string>({
         range: [cool1, cool2],
-        domain: [0, colorMax],
+        domain: [0, 5],
     });
 
     // bounds
     const size =
         width > margin.left + margin.right ? width - margin.left - margin.right - separation : width;
     const xMax = 200;
-    const yMax = 500;
+    const yMax = 150;
 
     const binWidth = 15;
     const binHeight = 15;
@@ -77,7 +82,7 @@ const Example = ({
                     yScale={(d) => yScale(d) ?? 0}
                     colorScale={rectColorScale}
                     binWidth={binWidth}
-                    binHeight={binWidth}
+                    binHeight={binHeight}
                     gap={2}
                 >
                     {(heatmap) =>
@@ -88,11 +93,11 @@ const Example = ({
                                     className="visx-heatmap-rect"
                                     width={bin.width}
                                     height={bin.height}
-                                    x={bin.y}
-                                    y={bin.x}
+                                    x={bin.x}
+                                    y={bin.y}
                                     fill={bin.color}
                                     onClick={() => {
-                                        if (!events) return;
+                                        if (!events) return
                                         const { row, column } = bin;
                                         alert(JSON.stringify({ row, column, bin: bin.bin }));
                                     }}

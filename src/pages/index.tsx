@@ -15,10 +15,11 @@ import {
 } from "@chakra-ui/react";
 import PostItem from "@src/components/Posts/PostItem";
 import { H2 } from "@src/components/Typography/Headings";
-import { getAllPosts } from "@src/lib/posts";
+import {getAllPosts, getPostsByDate} from "@src/lib/posts";
 import { NextSeo } from "next-seo";
+import HeatMap from "@src/components/Charts/HeatMap";
 
-const Home = ({ posts }: any) => (
+const Home = ({ posts, postsByDate }: any) => (
   <>
     <NextSeo title={"Home"} />
     <Grid
@@ -28,6 +29,9 @@ const Home = ({ posts }: any) => (
       gap={12}
     >
       <GridItem colSpan={{ md: 4 }}>
+        <Box>
+          <HeatMap width={500} height={200} data={postsByDate}/>
+        </Box>
         <Center>
           <Box
             maxW={{ base: "320px", md: "100%" }}
@@ -140,10 +144,12 @@ export default Home;
 
 export const getStaticProps = async () => {
   const { posts, total } = await getAllPosts();
+  const { posts: postsByDate } = await getPostsByDate();
 
   return {
     props: {
-      posts: posts.slice(0, 5),
+      posts: posts.slice(0, 10),
+      postsByDate: postsByDate,
       total,
     },
   };

@@ -6,7 +6,7 @@ import {
 import { NextSeo } from "next-seo";
 import WordCloud from "@src/components/Charts/WordCloud";
 import PieChart from "@src/components/Charts/Pie";
-import {getAllPosts, getPathPosts, getPathSlugs} from "@src/lib/posts";
+import {getAllPosts, getPathPosts, getPathSlugs, getPostsByDate} from "@src/lib/posts";
 import HeatMap from "@src/components/Charts/HeatMap";
 
 type HomeStaticProps = {
@@ -34,7 +34,6 @@ const Statistics = ({ texts: {note: note_text}, counts: {ps, note, dev} }: HomeS
         </Text>
         <PieChart data={[{key: 'ps', value: ps}, {key: "note", value: note}, {key: "dev", value: dev}]}/>
         <Box padding={"10px"}/>
-        {/*<HeatMap width={500} height={200} data={[]}/>*/}
     </>
 );
 

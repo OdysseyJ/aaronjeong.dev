@@ -13,7 +13,7 @@ const paths = [DEV_PATH, NOTE_PATH, PS_PATH] as const
 
 type PATHS = typeof paths[number]
 
-type PostType = {
+export type PostType = {
   slug: string;
   mdxSource : MDXRemoteSerializeResult<Record<string, unknown>>;
   content: string;
@@ -23,6 +23,11 @@ type PostType = {
 
 type PostReturnType = {
   posts: PostType[],
+  total: number
+}
+
+type PostByDateReturnType = {
+  posts: PostType[][],
   total: number
 }
 
@@ -73,6 +78,27 @@ export const getAllPosts :()=> Promise<PostReturnType> = async () => {
     posts: allPosts.sort((a, b) =>
       dayjs(b.data.date).isAfter(a.data.date) ? 1 : -1
     ),
+    total: allPosts.length,
+  };
+};
+
+export const getPostsByDate :()=> Promise<PostByDateReturnType> = async () => {
+  const allPostsByPath: any[] = await Promise.all(
+      paths.map(async (path)=> await Promise.all(getPathSlugs(path).map(async ({slug})=> await getPostBySlug(path, slug)))))
+
+  const allPosts: PostType[] = [].concat(...allPostsByPath)
+
+  const postsByDates = Array.from({length: 365}, () => []) as PostType[][]
+
+  allPosts.forEach((p)=>{
+    const date = dayjs(p.data.date)
+    const today = dayjs()
+    const diff = today.diff(date, "day")
+    postsByDates[diff].push(p)
+  })
+
+  return {
+    posts: postsByDates,
     total: allPosts.length,
   };
 };
