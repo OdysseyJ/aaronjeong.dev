@@ -39,7 +39,7 @@ const Home = ({ posts, postsByDate }: any) => (
             p={6}
             textAlign={"center"}
           >
-            <HeatMap width={500} height={200} data={postsByDate}/>
+            <HeatMap width={300} height={200} data={postsByDate}/>
             <Avatar
               size={"2xl"}
               alt={"Aaron"}
