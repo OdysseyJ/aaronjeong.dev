@@ -1,0 +1,80 @@
+---
+title: python __future__ 모듈
+description: study python __future__ module
+date: '2022-02-21T19:20:44+09:00'
+tags: [Python]
+---
+
+### 어디에 쓰는걸까?
+> 다음 버전의 문법을 이전 버전에서 쓸수 있게 하기 위해 사용한다.
+
+#### python print에서 future의 사용
+- python 2에서 print는 statement이고, python 3에서 print는 함수이다. 해당 코드는 python 2, 3 모두 동작한다.
+    ```python
+    from __future__ import print_function
+    print("Hello World")
+    ```
+
+#### python typing에서 future의 사용
+- 파이썬 3.7에서 typing모듈이 가지고 있는 두가지 문제를 해결했다.
+  1. impor / generic class 생성 시간 문제
+      - typing모듈은 원래 import가 아주 오래 걸리는 모듈이었다.
+      - 특히 generic class생성에 시간이 오래 걸렸는데, 이유는 각 타입을 클래스로 표현하기 때문이었다. [관련 Github Issue](https://github.com/python/typing/issues/432)
+      - 파이썬 3.7부터 임포트 속도가 7배 개선되었고, generic class에 굉장히 큰 발전이 있었다. [PEP0560](https://www.python.org/dev/peps/pep-0560/)
+  2. forward reference가 가능해졌다.
+      - 원래는 아래에 정의한 클래스를 위에서 참조할 수 없었다.
+          ```python
+          # ERROR
+          class A:
+              def foo(self, source: B) -> int:
+                  pass
+
+          class B:
+              pass
+          ```
+      - `__future__` 를 이용하면 forward reference가 가능해졌다.
+          ```python
+            from __future__ import annotations
+
+            # NO ERROR
+            class A:
+                def foo(self, source: B) -> int:
+                    pass
+
+            class B:
+                pass
+          ```
+      - circular import를 막기 위해 해당 방식을 사용할 수 있다.
+          ```python
+            from __future__ import annotations
+            from typing import TYPE_CHECKING
+            if TYPE_CHECKING:
+                from main import Main
+
+            class MyObject(object):
+                # Hooray, cleaner annotations!
+                def func2(self, some_param: Main):
+                    ...
+          ```
+
+#### python unicode_literal에서 future의 사용
+- 원래 파이썬
+    ```python
+    type("h")
+    >>> <type 'str'>
+    ```
+
+- future와 함께 사용하기
+    ```python
+    from __future__ import unicode_literals
+    type("h")
+    >>> <type 'unicode'>
+    ```
+
+
+
+#### 참고
+- https://teknology.tistory.com/5
+- https://ryanking13.github.io/2018/07/12/python-37-whats-new.html
+- https://stackoverflow.com/questions/39740632/python-type-hinting-without-cyclic-imports
+- https://www.delftstack.com/ko/howto/python/__future__-python/#python%25EC%2597%2590%25EC%2584%259C%25EC%25A3%25BC%25EC%2584%259D%25EC%2597%2590__future__%25EC%2582%25AC%25EC%259A%25A9

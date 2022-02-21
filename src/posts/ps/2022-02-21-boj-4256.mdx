@@ -1,3 +1,17 @@
+---
+title: boj 4256 트리 python
+description: boj problem 4256 solved by python
+date: '2022-02-21T19:45:07+09:00'
+tags: [PS, Tree, Recursion]
+---
+
+2263번 문제와 유사한 문제다.
+https://www.aaronjeong.dev/posts/ps/2022-02-19-boj-2263
+
+### 접근
+1. 2263번과 달리 이번 문제는 pre_order와 in_order를 주고 post_order를 구해내는 문제다.
+pre_order의 첫번째는 항상 서브트리의 루트가 온다는 사실을 이용해 post_order를 recursion을 통해 구해내면 된다.
+```python
 import sys
 sys.setrecursionlimit(100000)
 input = sys.stdin.readline
@@ -25,3 +39,4 @@ for _ in range(t):
         positions[order] = idx
     post_order(0, n-1, 0, n-1)
     print()
+```
