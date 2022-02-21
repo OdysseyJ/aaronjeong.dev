@@ -1,0 +1,34 @@
+---
+title: Programmers sql problems - 중복 제거하기
+description: sql problem solved on programmers
+date: '2022-02-21T21:47:50+09:00'
+tags: [PS, SQL]
+---
+
+#### 테이블 구조
+
+[`ANIMAL_INS`]
+
+| **NAME** | **TYPE** | **NULLABLE** |
+| -------- | -------- | -------------|
+| ANIMAL_ID | VARCHAR(N) | FALSE |
+| ANIMAL_TYPE | VARCHAR(N) | FALSE |
+| DATETIME | DATETIME | FALSE |
+| INTAKE_CONDITION | VARCHAR(N) | FALSE |
+| NAME | VARCHAR(N) | TRUE |
+| SEX_UPON_INTAKE | VARCHAR(N) | FALSE |
+
+
+#### 문제
+동물 보호소에 들어온 동물의 이름은 몇 개인지 조회하는 SQL 문을 작성해주세요. 이때 이름이 NULL인 경우는 집계하지 않으며 중복되는 이름은 하나로 칩니다.
+
+#### 정답
+```sql
+SELECT COUNT(DISTINCT NAME)
+FROM ANIMAL_INS
+WHERE NAME IS NOT NULL
+```
+
+#### DISTINCT
+- distinct는 NULL인 경우 집계하지 않고, 중복되는 요소는 하나로 취급해 데이터를 가져와주는 예약어이다.
+
