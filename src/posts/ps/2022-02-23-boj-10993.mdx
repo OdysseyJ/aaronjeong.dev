@@ -1,3 +1,19 @@
+---
+title: boj 10993 별찍기-18 python
+description: boj problem 10993 solved by python
+date: '2022-02-23T21:08:31+09:00'
+tags: [PS, Recursion]
+---
+
+#### 접근
+1. 꽤나 피곤했던 문제. 홀짝의 규칙을 찾아서 recursion으로 풀었는데,
+
+x, y를 삼각형 바닥부분의 시작점으로 잡아서 해당 점부터 iteration을 돌았다.
+
+이때 최대 길이는 dp를 통해서 미리 구해놓았다.
+
+출력 형식도 맞춰줘야해서 솔직히 좀 귀찮은 문제였다. 괜히 디버깅도 오래걸렸음.
+```python
 import sys
 sys.setrecursionlimit(100000)
 input = sys.stdin.readline
@@ -53,3 +69,5 @@ else:
         for x in range(dp_w[n]-dp_h[n]+idx+1):
             print(printer[y][x], end="")
         print()
+```
+
