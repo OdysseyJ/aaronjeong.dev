@@ -1,0 +1,40 @@
+---
+title: Programmers sql Problems - 입양 시각 구하기
+description: sql problem solved on programmers
+date: '2022-02-23T21:44:20+09:00'
+tags: [PS, SQL]
+---
+
+#### 테이블 구조
+
+[`ANIMAL_OUTS`]
+
+| **NAME** | **TYPE** | **NULLABLE** |
+| -------- | -------- | -------------|
+| ANIMAL_ID | VARCHAR(N) | FALSE |
+| ANIMAL_TYPE | VARCHAR(N) | FALSE |
+| DATETIME | DATETIME | FALSE |
+| NAME | VARCHAR(N) | TRUE |
+| SEX_UPON_INTAKE | VARCHAR(N) | FALSE |
+
+
+#### 문제
+- 보호소에서는 몇 시에 입양이 가장 활발하게 일어나는지 알아보려 합니다. 0시부터 23시까지, 각 시간대별로 입양이 몇 건이나 발생했는지 조회하는 SQL문을 작성해주세요. 이때 결과는 시간대 순으로 정렬해야 합니다.
+
+#### 문제의 핵심 포인트
+- 처음에는 group by로 풀려고 했으나, count가 0이어도 출력해야하는게 어렵다.
+
+#### 정답
+```sql
+SET @HOUR := -1;
+SELECT (@HOUR := @HOUR +1) AS HOUR,
+(SELECT COUNT(*) FROM ANIMAL_OUTS WHERE HOUR(DATETIME) = @HOUR) AS COUNT
+FROM ANIMAL_OUTS
+WHERE @HOUR < 23
+```
+
+#### @(지역변수)
+- 지역변수를 정의한다, 해당 sql내부에서 살아있음
+- -1으로 정의한 이유는 HOUR(DATETIME)의 값이 0일수 있기 때문에
+
+

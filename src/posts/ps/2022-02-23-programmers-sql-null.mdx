@@ -1,0 +1,35 @@
+---
+title: Programmers sql Problems - NULL 처리하기
+description: sql problem solved on programmers
+date: '2022-02-23T22:01:58+09:00'
+tags: [PS, SQL]
+---
+
+#### 테이블 구조
+
+[`ANIMAL_OUTS`]
+
+| **NAME** | **TYPE** | **NULLABLE** |
+| -------- | -------- | -------------|
+| ANIMAL_ID | VARCHAR(N) | FALSE |
+| ANIMAL_TYPE | VARCHAR(N) | FALSE |
+| DATETIME | DATETIME | FALSE |
+| NAME | VARCHAR(N) | TRUE |
+| SEX_UPON_INTAKE | VARCHAR(N) | FALSE |
+
+
+#### 문제
+- 입양 게시판에 동물 정보를 게시하려 합니다. 동물의 생물 종, 이름, 성별 및 중성화 여부를 아이디 순으로 조회하는 SQL문을 작성해주세요. 이때 프로그래밍을 모르는 사람들은 NULL이라는 기호를 모르기 때문에, 이름이 없는 동물의 이름은 "No name"으로 표시해 주세요.
+
+#### 문제의 핵심 포인트
+- NULL일때 따로 핸들링을 할 수 있는가.
+
+#### 정답
+```sql
+SELECT ANIMAL_TYPE, IFNULL(NAME, "No name") AS 'NAME', SEX_UPON_INTAKE
+FROM ANIMAL_INS
+ORDER BY ANIMAL_ID
+```
+
+#### IFNULL
+- null이 아니면 원래 값을, null이면 우측 값을 반환한다.

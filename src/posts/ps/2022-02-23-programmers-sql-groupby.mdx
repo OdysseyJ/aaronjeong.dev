@@ -1,0 +1,37 @@
+---
+title: Programmers sql problems - 동명 동물 수 찾기
+description: sql problem solved on programmers
+date: '2022-02-23T21:37:51+09:00'
+tags: [PS, SQL]
+---
+
+#### 테이블 구조
+
+[`ANIMAL_INS`]
+
+| **NAME** | **TYPE** | **NULLABLE** |
+| -------- | -------- | -------------|
+| ANIMAL_ID | VARCHAR(N) | FALSE |
+| ANIMAL_TYPE | VARCHAR(N) | FALSE |
+| DATETIME | DATETIME | FALSE |
+| INTAKE_CONDITION | VARCHAR(N) | FALSE |
+| NAME | VARCHAR(N) | TRUE |
+| SEX_UPON_INTAKE | VARCHAR(N) | FALSE |
+
+
+#### 문제
+동물 보호소에 들어온 동물 이름 중 두 번 이상 쓰인 이름과 해당 이름이 쓰인 횟수를 조회하는 SQL문을 작성해주세요. 이때 결과는 이름이 없는 동물은 집계에서 제외하며, 결과는 이름 순으로 조회해주세요.
+
+#### 정답
+```sql
+SELECT NAME, COUNT(*) as 'COUNT'
+FROM ANIMAL_INS
+GROUP BY NAME
+HAVING COUNT(*) >= 2
+ORDER BY NAME
+```
+
+#### HAVING
+- group by의 조건문은 having에 적는다.
+
+
