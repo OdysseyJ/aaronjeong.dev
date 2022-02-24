@@ -1,0 +1,41 @@
+---
+title: boj 12919 A와B - 2 python
+description: boj problem 12919 solved by python
+date: '2022-02-24T21:30:43+09:00'
+tags: [PS, Recursion, BFS]
+---
+
+#### 접근
+1. 백트래킹으로 구하면 된다. 이때 포인트는 T를 S까지 줄여가면서 해야 시간초과가 안남.
+
+줄여 나갈 때 재귀를 이용해서 뒤집은 문자열에서 B를 빼서 한번, 그리고 A를 끝에서 빼서 한번 트래킹 하면 된다.
+```python
+S = input()
+T = input()
+found = False
+
+
+def solve(ss):
+    global found
+    if len(ss) < len(S):
+        return
+    if ss == S:
+        found = True
+        return
+
+    if ss[0] == 'B':
+        ss = ss[::-1]
+        ss = ss[:-1]
+        solve(ss)
+        ss = ss + 'B'
+        ss = ss[::-1]
+
+    if ss[-1] == 'A':
+        ss = ss[:-1]
+        solve(ss)
+
+
+solve(T)
+print(1 if found else 0)
+```
+
