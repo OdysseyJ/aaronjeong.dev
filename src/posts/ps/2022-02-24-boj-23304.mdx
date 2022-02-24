@@ -1,3 +1,13 @@
+---
+title: boj 23304 AKARAKA python
+description: boj problem 23304 solved by python
+date: '2022-02-24T22:12:20+09:00'
+tags: [PS, Recursion]
+---
+
+#### 접근
+1. 쉽다. 재귀로 풀면 되는데, 처음에는 ss의 길이가 짝수일때와 홀수일때를 나눠주지 않아서 많이 헤맸다.
+```python
 import sys
 sys.setrecursionlimit(100000)
 
@@ -31,3 +41,4 @@ s = input()
 akaraka_pelindrom = True
 solve(s)
 print("AKARAKA" if akaraka_pelindrom else "IPSELENTI")
+```
