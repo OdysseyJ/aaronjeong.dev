@@ -1,0 +1,23 @@
+---
+title: boj 11399 ATM python
+description: boj problem 11399 solved by python
+date: '2022-02-25T20:41:17+09:00'
+tags: [PS, DP]
+---
+
+### 접근
+1. dp로 풀면 간단하게 풀린다. 이때 기다리는 값이 최소가 되려면 빨리 끝나는 태스크를 먼저 처리하게만 해주면 된다.
+```python
+import sys
+input = sys.stdin.readline
+n = int(input().strip())
+nums = map(int, input().strip().split())
+sorted_nums = sorted(nums)
+dp = [0 for _ in range(n)]
+dp[0] = sorted_nums[0]
+
+for idx, num in enumerate(sorted_nums[1:]):
+  dp[idx+1] = dp[idx] + num
+
+print(sum(dp))
+```

@@ -1,0 +1,39 @@
+---
+title: boj 11725 트리의 부모찾기 python
+description: boj problem 11725 solved by python
+date: '2022-02-25T20:43:23+09:00'
+tags: [PS, BFS, Tree]
+---
+
+### 접근
+1. 전형적인 트리 + bfs문제다. 트리를 찾아서 1부터 순회하면서 먼저 나온 노드가 부모가 되고, 해당 노드와 연결되어있는 노드가 자식이 된다.
+
+그다지 어렵지 않은 문제
+```python
+import sys
+from collections import deque
+
+input = sys.stdin.readline
+n = int(input().strip())
+tree = [[] for _ in range(n+1)]
+visited = [False for _ in range(n+1)]
+results = [0 for _ in range(n+1)]
+
+for i in range(n-1):
+  n1, n2 = map(int, input().strip().split())
+  tree[n1].append(n2)
+  tree[n2].append(n1)
+
+queue = deque([1])
+while queue:
+  top = queue.popleft()
+  visited[top] = True
+
+  for node in tree[top]:
+    if not visited[node]:
+      results[node] = top
+      queue.append(node)
+
+for result in results[2:]:
+  print(result)
+```
