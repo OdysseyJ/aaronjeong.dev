@@ -1,0 +1,75 @@
+---
+title: Shell script 실행시 sh와 ./의 차이점
+description: different way of running shell scripts
+date: '2022-02-25T17:07:07+09:00'
+tags: [Dev, Shell, Bash]
+---
+
+### 쉘 스크립트 실행
+
+쉘 스크립트를 실행시키는 방법에는 크게 2가지가 있다.
+
+`[test.sh]`
+```shell
+#!/bin/bash
+echo "Hello world"
+```
+
+1. `sh`을 통해서 실행시키기
+
+    ```shell
+    sh test.sh
+    ```
+
+    > Hello world
+
+2. `./`를 통해서 실행시키기
+
+    ```shell
+    ./test.sh
+    ```
+
+    > Hello world
+
+
+### 차이점
+
+#### sh
+
+- `sh`은 현재 세션의 쉘 설정을 읽어서 바로 실행시킨다. 그렇기에 만약 sh파일안의 내용이 현재 사용하는 쉘에서 사용할수 없는 내용이 있다면 실행되지 않을 수 있다.
+
+- 현재 세션이 가지고있는 권한과, 실제 실행되는 쉘의 권한이 다를 수 있다.
+    ```shell
+    sh test.sh
+    >> Hello World
+    ```
+
+    ```shell
+    ./test.sh
+    >> zsh: permission denied: ./test.sh
+    ```
+
+- 현재 사용하는 기본 쉘 확인하기
+    ```shell
+    ❯ env | grep sh
+    PATH=/Users/turing-211231/.pyenv/shims:/Users/turing-211231/.pyenv/bin:/Users/turing-211231/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+    SHELL=/bin/zsh
+    PYENV_SHELL=zsh
+    ZSH=/Users/turing-211231/.oh-my-zsh
+    ```
+
+#### ./
+
+- `./`는 스크립트의 쉘 설정을 따른다.
+    `[test.sh]`
+    ```shell
+    #!/bin/bash << 해당 부분
+    echo "Hello world"
+    ```
+
+- 해당 쉘에서 정의된 쉘 옵션을 따르기 때문에, 기본 쉘에서는 동작하는 스크립트가 동작하지 않을 수 있다.
+
+
+### 무엇을 사용하는게 더 좋을까?
+
+> 개인 컴퓨터마다 쉘 설정이 다 다르므로, 스크립트 제일 위쪽에 항상 어떤 쉘에서 사용해야 할 지에 대해 명시하고, `./`를 사용하는것이 좋다.
