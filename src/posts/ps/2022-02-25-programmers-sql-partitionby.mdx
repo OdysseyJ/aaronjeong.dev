@@ -1,0 +1,49 @@
+---
+title: Programmers sql problems - 헤비 유저가 소유한 장소
+description: sql problem solved on programmers
+date: '2022-02-25T11:37:26+09:00'
+tags: [PS, SQL]
+---
+
+#### 테이블 구조
+
+[`ANIMAL_INS`]
+
+| **NAME** | **TYPE** |
+| -------- | -------- |
+| ID | INT |
+| NAME | VARCHAR |
+| HOST_ID | INT |
+
+
+#### 문제
+이 서비스에서는 공간을 둘 이상 등록한 사람을 "헤비 유저"라고 부릅니다. 헤비 유저가 등록한 공간의 정보를 아이디 순으로 조회하는 SQL문을 작성해주세요.
+
+#### 정답
+1. partition by 써서 풀기
+```sql
+SELECT t1.ID, t1.NAME, t1.HOST_ID
+FROM (SELECT ID, NAME, HOST_ID, COUNT(*) OVER(PARTITION BY HOST_ID) AS 'CNT'
+FROM PLACES) t1
+WHERE CNT >= 2
+ORDER BY ID
+```
+2. groupby + in으로 풀기
+```sql
+SELECT ID, NAME, HOST_ID
+FROM PLACES
+WHERE HOST_ID IN (
+	SELECT HOST_ID
+    FROM PLACES
+    GROUP BY HOST_ID
+    HAVING count(*) >= 2
+)
+```
+
+#### SQL의 실행순서
+- FROM -> WHERE -> SELECT -> ORDER BY
+
+#### PARTITION BY
+- 처음에 partition by와 where을 섞어서 쓰려다가 많이 헤맸다.
+- partition by를 통해 구해낸 값을 다시 테이블로 정의해 서브쿼리로 쓰면 where을 사용 가능.
+
