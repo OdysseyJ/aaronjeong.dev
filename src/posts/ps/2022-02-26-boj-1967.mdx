@@ -1,3 +1,16 @@
+---
+title: boj 1967 트리의지름 python
+description: boj problem 1967 solved by python
+date: '2022-02-26T19:06:23+09:00'
+tags: [PS, BFS, Tree]
+---
+
+### 접근
+1. 아이디어를 떠올리기 쉽지 않다. 구현 자체가 어려운건 아니다.
+
+루트 노드를 기준으로 제일 먼 노드를 한번 찾아내고, 해당 노드를 기준으로 제일 먼 노드를 다시한번 찾아본다.
+
+```python
 import sys
 from collections import deque
 input = sys.stdin.readline
@@ -30,3 +43,4 @@ for i in range(n-1):
 node, _ = bfs(1)
 node, dist = bfs(node)
 print(dist)
+```
