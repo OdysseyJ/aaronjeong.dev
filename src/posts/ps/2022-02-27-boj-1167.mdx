@@ -1,3 +1,19 @@
+---
+title: boj 1167 트리의지름 python
+description: boj problem 1167 solved by python
+date: '2022-02-27T15:47:32+09:00'
+tags: [PS, BFS, Tree]
+---
+
+https://www.acmicpc.net/problem/1167
+https://www.acmicpc.net/problem/1967
+
+### 접근
+1. 아이디어를 떠올리기 쉽지 않다. 구현 자체가 어려운건 아니다. 1967번과 매우 유사하다. 인풋만 다르다.
+
+루트 노드를 기준으로 제일 먼 노드를 한번 찾아내고, 해당 노드를 기준으로 제일 먼 노드를 다시한번 찾아본다.
+
+```python
 import sys
 from collections import deque
 input = sys.stdin.readline
@@ -31,3 +47,4 @@ for i in range(v):
 node, _ = bfs(1)
 node, dist = bfs(node)
 print(dist)
+```
