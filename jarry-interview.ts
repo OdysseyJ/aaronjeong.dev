@@ -35,33 +35,42 @@ class Airplane {
 }
 
 
-interface Validator {
+interface ValidatorInterface {
   validate(): string | undefined
 }
 
-class ValidationInput{
+class NormalizedValidationInput{
   prev = ""
   cur = ""
 
   constructor(prev: string, cur: string){
-    this.prev = prev
-    this.cur = cur
+    this.prev = this._normalize(prev)
+    this.cur = this._normalize(cur)
+  }
+
+  _normalize(text: string){
+    return text
   }
 }
 
-class AddOverMaximumValidator extends ValidationInput implements Validator{
+class Validatior extends NormalizedValidationInput implements ValidatorInterface{
+  validate(): string | undefined {
+    return
+  }
+}
+
+class AddOverMaximumValidator extends Validatior{
   validate(): string | undefined {
     if(this.cur.length > 13) return this.prev
   }
 }
 
-/*
- * This function is a transformer. Receive prev string to cur string
- * @param prev previous raw string for phone number
- * @param cur changed raw string for phone number
- * @return valid phone number formmated with hyphen pattern e.g.) 010-0000-0000
- * @author you
- * */
+class AddNoNeedChangeValidator extends Validatior {
+  validate(): string | undefined {
+    if (this.prev.length === 13) return this.prev
+  }
+}
+
 export function _______EDIT_________THIS_______ONLY__________(
     prev: string,
     cur: string,
@@ -71,22 +80,24 @@ export function _______EDIT_________THIS_______ONLY__________(
   const isCopying = cur.length > prev.length && cur.length - prev.length >= 2
   const isCutting = cur.length < prev.length && prev.length - cur.length >= 2
 
-  let validatorClasses : typeof AddOverMaximumValidator[] = []
+  let validatorClasses : typeof Validatior[] = []
   if (isAddition) {
+    validatorClasses.push(AddNoNeedChangeValidator)
     validatorClasses.push(AddOverMaximumValidator)
   }
   if (isDeletion) {
-    validatorClasses.push(AddOverMaximumValidator)
+    // ...
   }
   if (isCopying){
-    validatorClasses.push(AddOverMaximumValidator)
+    // ...
   }
   if (isCutting){
-    validatorClasses.push(AddOverMaximumValidator)
+    // ...
   }
   validatorClasses.forEach((validatorClass)=>{
     const result = new validatorClass(prev, cur).validate()
     if (result) return result
   })
-  return '';
+  return cur;
 }
+
