@@ -177,3 +177,13 @@ target = [6, -8, 1, 12, 8, 3, 7, -7]
 quick_sort_2(target, 0, len(target))
 print(target)
 ```
+
+#### 두 소트 비교 (Merge vs Quick)
+
+| **NAME** | **MergeSort** | **QuickSort** |
+| -------- | -------- | -------------|
+| 시간복잡도 | O(NlogN) | 평균 O(NlogN), 최악 O(N^2), 평균은 더 빠름 |
+| 추가적인 공간(오버헤드) | O(N) | O(1) |
+| Stable Sort 여부 | O | X |
+
+> 다시 한번 알고리즘 풀때는 머지소트가 더 좋음.
