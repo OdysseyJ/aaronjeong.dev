@@ -1,0 +1,41 @@
+---
+title: 소팅(sorting)의 여러가지 방법 python으로 구현하기 - Counting
+description: study sorting ways 2
+date: '2022-03-01T17:43:13+09:00'
+tags: [Dev, Sorting]
+---
+
+https://www.youtube.com/watch?v=dq5t1woLJMw&t=44s
+
+해당 영상을 보고 공부한 내용을 파이썬으로 정리한 글입니다.
+
+#### Counting Sort O(N+k) -> n: 리스트 개수, k: 정수의 최대값
+
+> frequency배열을 관리해야 하기 때문에, 메모리 사용량이 커질 수 있어 n이 너무 크지 않을때만 사용할 수 있다.
+
+구현이 굉장히 간단하고, 알고리즘이 쉽기 때문에 배열의 크기가 작고 메모리가 널널하다면 사용해 볼만하다.
+
+https://www.acmicpc.net/problem/15688
+
+```python
+def counting_sort(arr):
+    freq = [0 for _ in range(2000001)]
+
+    for num in arr:
+        freq[1000000+num] += 1
+
+    for idx, i in enumerate(freq):
+        if i != 0:
+            for j in range(i):
+                print(idx-1000000)
+```
+
+#### 기수정렬 - Radix Sort O(DN) -> 엄밀히 말하면 O(D(N+K)), k는 무시가 가능한 정도라, D = 자릿수
+
+1의 자리끼리 먼저 비교하고, 10의 자리끼리 비교하고, 100의 자리끼리 비교하는 식으로 정렬하는 방법
+
+즉, 상대적인 위치가 계속 유지되면서 더 큰 자릿수를 기준으로 정렬
+
+#### Comparsion Sort vs Non Comparison Sort
+
+Merge, Bubble, Quick / Radix Sort, Counting Sort
