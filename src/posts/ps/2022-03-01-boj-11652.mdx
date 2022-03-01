@@ -1,0 +1,42 @@
+---
+title: boj 11652 카드 python
+description: boj problem 11652 solved by python
+date: '2022-03-01T20:56:47+09:00'
+tags: [PS]
+---
+
+#### 접근
+1. 카운팅소트로 풀면 편할것같은데, 숫자가 -2^62~2^62라 너무 커서 그 방법으로는 안될 듯 하고,
+
+dictionary로 키-밸류로 저장한다음 밸류값 max찾으면 간단할것 같긴 한데,
+
+소팅으로 풀어보고 싶었다. 바킹독님의 강의를 참고해 cnt, max_cnt, max_value를 선언해 O(N)으로 풀었다
+
+특이점은 맥스보다 1 더큰 값을 끝에 넣어줘서 마지막 값에 대한 처리를 따로 하지 않게끔 했고,
+
+cnt를 1부터 시작해서 0에 대한 처리를 하지 않게끔 했다.
+```python
+import sys
+input = sys.stdin.readline
+
+n = int(input())
+cards = [int(input()) for _ in range(n)]
+MAX = 2**62
+
+sorted_cards = sorted(cards)
+sorted_cards = sorted_cards + [MAX+1]
+
+cnt = 1
+max_cnt = 0
+max_val = -MAX-1
+for prev, next in zip(sorted_cards, sorted_cards[1:]):
+    if prev == next:
+        cnt += 1
+    else:
+        if cnt > max_cnt:
+            max_cnt = cnt
+            max_val = prev
+        cnt = 1
+
+print(max_val)
+```

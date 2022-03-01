@@ -2,15 +2,22 @@ import sys
 input = sys.stdin.readline
 
 n = int(input())
-nums = [int(input()) for _ in range(n)]
+cards = [int(input()) for _ in range(n)]
+MAX = 2**62
 
-def counting_sort(arr):
-    freq = [0 for _ in range(2000001)]
+sorted_cards = sorted(cards)
+sorted_cards = sorted_cards + [MAX+1]
 
-    for num in nums:
-        freq[1000000+num] += 1
+cnt = 1
+max_cnt = 0
+max_val = -MAX-1
+for prev, next in zip(sorted_cards, sorted_cards[1:]):
+    if prev == next:
+        cnt += 1
+    else:
+        if cnt > max_cnt:
+            max_cnt = cnt
+            max_val = prev
+        cnt = 1
 
-    for idx, i in enumerate(freq):
-        if i != 0:
-            for j in range(i):
-                print(idx-1000000)
+print(max_val)
