@@ -1,0 +1,179 @@
+---
+title: 소팅(sorting)의 여러가지 방법 python으로 구현하기.
+description: study sorting ways
+date: '2022-03-01T15:26:50+09:00'
+tags: [Dev, Sorting]
+---
+
+https://www.youtube.com/watch?v=59fZkZO0Bo4
+
+해당 영상을 보고 공부한 내용을 파이썬으로 정리한 글입니다.
+
+#### 기초소트 O(N^2)
+
+기초 정렬은 간단하게, O(N^2)으로 구현할 수 있다.
+
+N개의 배열중에서, 가장 작은 원소를 찾아 0번째 인덱스 원소와 바꾼다.
+
+그리고 다음으로 N-1개의 배열 중에서 가장 작은 원소를 찾아 1 인덱스 원소와 바꾼다.
+
+다음으로는 N-2개의 배열 원소들 중에서 가장 작은 원소를 2 인덱스 원소와 바꾼다.
+
+> 중복되는 원소가 있는 경우 사용할 수 없다.
+
+```python
+def basic_sort(array):
+    for i in range(len(array)):
+        # 가장 작은 원소 인덱스 찾기
+        min_idx = array.index(min(array[i:]))
+        # SWAP
+        array[min_idx], array[i] = array[i], array[min_idx]
+    return array
+```
+
+#### 버블소트 O(N^2)
+
+현재 원소와, 그 다음 원소를 비교해 더 큰수를 오른쪽으로 계속해서 밀어준다.
+
+가장 큰 원소는 계속해서 자리를 바꾸다가 결국 끝에 도달하게 될 것이고,
+
+그 다음 원소들 또한 차례대로 끝에 도달하게 되서 정렬이 완료되는 방법이다.
+
+```python
+def bubble_sort(array):
+    n = len(array)
+    for i in range(n):
+        for j in range(n-i-1):
+            if array[j] >= array[j+1]:
+                array[j], array[j+1] = array[j+1], array[j]
+    return array
+```
+
+#### 머지소트 O(NlogN)
+
+재귀로 짠다. 8개 배열을 정렬하려면 4개배열에 대한 정렬이 필요하고, 4개 배열은 2개, 2개는 1개 배열에 대한 정렬이 필요하다.
+
+쪼개는 단계에서는 O(N), 합치는 단계에서는 O(NlogN)의 연산이 필요하다.
+
+1. 배열을 2개로 쪼갠다
+
+2. 각 배열을 정렬한다
+
+3. 각 배열을 다시 1개의 배열로 합친다. 이때 선형시간으로 합치는 알고리즘을 선택해야한다.
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/merge_sort.png'
+    alt="Photo"
+    width={300}
+    height={100}
+    priority
+    layout={"responsive"}
+    className="next-image"
+/>
+
+```python
+import sys
+sys.setrecursionlimit(100000)
+
+def merge_sort(array):
+    if len(array) == 1:
+        return array
+    mid = len(array)//2
+    left, right = array[:mid], array[mid:]
+    a, b = merge_sort(left), merge_sort(right)
+    return merge_arrays(a, b)
+
+# O(N)
+def merge_arrays(a, b):
+    n, m = len(a), len(b)
+    a_idx, b_idx = 0, 0
+    result = []
+    for i in range(n+m):
+        if a_idx == n:
+            result.append(b[b_idx])
+            b_idx += 1
+        elif b_idx == m:
+            result.append(a[a_idx])
+            a_idx += 1
+        elif a[a_idx] <= b[b_idx]:
+            result.append(a[a_idx])
+            a_idx += 1
+        else:
+            result.append(b[b_idx])
+            b_idx += 1
+    return result
+```
+
+> stable sort = 우선 순위가 같은 요소들끼리 정렬할때는 원래의 순서를 따르는 정렬
+
+아래의 코드 조각에 등호가 들어가게 되면 stable sort가 되고, 등호가 빠지면 stable sort가 아님.
+(우선순위가 같을 때 더 빠른 a를 먼저 보내준다.)
+
+```python
+def merge_array(a, b):
+    ...
+    elif a[a_idx] <= b[b_idx]:
+        result.append(a[a_idx])
+        a_idx += 1
+    ...
+```
+
+#### 퀵소트 O(NlogN)
+
+> 내장 라이브러리를 사용할 수 없으면 퀵소트를 쓰지 말자. 왠만하면 머지소트를 쓰자.
+
+최악의 경우 O(N^2)이기 때문. 라이브러리에서는 다양한 최적화가 되어 있음.
+
+> Quick sort는 대표적인 In place sort (추가 메모리를 사용하지 않는 소팅 기법중 하나)
+
+
+```python
+def quick_sort(array):
+    if len(array) == 1:
+        return array
+    pivot = 0
+    l, r = 1, len(array)-1
+    while l <= r:
+        print(l, r)
+        if array[l] < array[pivot]:
+            l += 1
+            continue
+        if array[r] > array[pivot]:
+            r -= 1
+            continue
+        array[l], array[r] = array[r], array[l]
+    array[pivot], array[r] = array[r], array[pivot]
+
+    left = quick_sort(array[:r+1])
+    right = quick_sort(array[r+1:])
+
+    return left+right
+```
+
+처음에 내가 구현한 방식이다. 해당 방식은 새롭게 메모리를 많이 사용한다. 해당 방식은 원래 배열을 정렬하는 방식
+
+```python
+def quick_sort_2(target, st, en):
+    if en <= st+1:
+        return
+    pivot = st
+    l, r = st+1, en-1
+    while l <= r:
+        print(l, r)
+        if target[l] < target[pivot]:
+            l += 1
+            continue
+        if target[r] > target[pivot]:
+            r -= 1
+            continue
+        target[l], target[r] = target[r], target[l]
+    target[pivot], target[r] = target[r], target[pivot]
+
+    quick_sort_2(target, st, r)
+    quick_sort_2(target, r+1, en)
+
+
+target = [6, -8, 1, 12, 8, 3, 7, -7]
+quick_sort_2(target, 0, len(target))
+print(target)
+```

@@ -1,37 +1,47 @@
-import sys
-input = sys.stdin.readline
+target = [6, -8, 1, 12, 8, 3, 7, -7]
 
 
-def lower_index(target):
-    start = 0
-    end = n
+def quick_sort(array):
+    if len(array) == 1:
+        return array
+    pivot = 0
+    l, r = 1, len(array)-1
+    while l <= r:
+        print(l, r)
+        if array[l] < array[pivot]:
+            l += 1
+            continue
+        if array[r] > array[pivot]:
+            r -= 1
+            continue
+        array[l], array[r] = array[r], array[l]
+    array[pivot], array[r] = array[r], array[pivot]
 
-    while start < end:
-        mid = int((start+end)/2)
-        if a_array[mid] >= target:
-            end = mid
-        else:
-            start = mid + 1
-    return start
+    left = quick_sort(array[:r+1])
+    right = quick_sort(array[r+1:])
 
-
-def upper_index(target):
-    start = 0
-    end = n
-
-    while start < end:
-        mid = int((start+end)/2)
-        if a_array[mid] > target:
-            end = mid
-        else:
-            start = mid + 1
-    return start
+    return left+right
 
 
-n = int(input())
-a_array = sorted([int(i) for i in input().strip().split()])
-m = int(input())
-candidates = [int(i) for i in input().strip().split()]
+def quick_sort_2(target, st, en):
+    if en <= st+1:
+        return
+    pivot = st
+    l, r = st+1, en-1
+    while l <= r:
+        print(l, r)
+        if target[l] < target[pivot]:
+            l += 1
+            continue
+        if target[r] > target[pivot]:
+            r -= 1
+            continue
+        target[l], target[r] = target[r], target[l]
+    target[pivot], target[r] = target[r], target[pivot]
 
-for candidate in candidates:
-    print(upper_index(candidate) - lower_index(candidate))
+    quick_sort_2(target, st, r)
+    quick_sort_2(target, r+1, en)
+
+
+quick_sort_2(target, 0, len(target))
+print(target)
