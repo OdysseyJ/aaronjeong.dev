@@ -1,37 +1,37 @@
 import sys
-from collections import deque
 input = sys.stdin.readline
 
 
-def solve(start):
-    queue = deque([start])
-    while queue:
-        top, step = queue.popleft()
-        if 100-top <= 6:
-            return step + 1
-        if top > 100:
-            continue
-        if top in ladders:
-            queue.append((ladders[top], step))
-            continue
-        if top in snakes:
-            queue.append((snakes[top], step))
+def lower_index(target):
+    start = 0
+    end = n
 
-        possibles = [top + dice for dice in range(1, 7)]
-        for possible in possibles:
-            queue.append((possible, step+1))
+    while start < end:
+        mid = int((start+end)/2)
+        if a_array[mid] >= target:
+            end = mid
+        else:
+            start = mid + 1
+    return start
 
 
-n, m = map(int, input().strip().split())
-ladders = {}
-snakes = {}
+def upper_index(target):
+    start = 0
+    end = n
 
-for _ in range(n):
-    x, y = map(int, input().strip().split())
-    ladders[x] = y
+    while start < end:
+        mid = int((start+end)/2)
+        if a_array[mid] > target:
+            end = mid
+        else:
+            start = mid + 1
+    return start
 
-for _ in range(m):
-    u, v = map(int, input().strip().split())
-    snakes[u] = v
 
-print(solve((1, 0)))
+n = int(input())
+a_array = sorted([int(i) for i in input().strip().split()])
+m = int(input())
+candidates = [int(i) for i in input().strip().split()]
+
+for candidate in candidates:
+    print(upper_index(candidate) - lower_index(candidate))

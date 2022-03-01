@@ -1,0 +1,58 @@
+---
+title: boj 10816 숫자카드2 python
+description: boj problem 10816 solved by python
+date: '2022-03-01T14:25:17+09:00'
+tags: [PS, BinarySearch]
+---
+
+https://www.acmicpc.net/problem/10816
+
+### 접근
+1. 이분 탐색 기본 문제이다. O(N*M)으로 풀면 시간초과가 나기 때문에 꼭 이분탐색으로 찾아내야 하는데
+이때 같은 원소의 개수는 같은 원소가 시작하는 인덱스부터, 같은 원소가 끝나고 더 큰 원소가 나오기 시작하는 시점의
+인덱스를 빼 주면 된다.
+
+target 원소가 시작하는 인덱스 = lower_index
+
+target 원소보다 큰 다른 원소가 나오기 시작하는 시점 = upper_index
+
+lower_index와 upper_index는 a_array[mid]와 target의 동치 여부 조건만 다르고, 같은 함수이다.
+```python
+import sys
+input = sys.stdin.readline
+
+
+def lower_index(target):
+    start = 0
+    end = n
+
+    while start < end:
+        mid = int((start+end)/2)
+        if a_array[mid] >= target:
+            end = mid
+        else:
+            start = mid + 1
+    return start
+
+
+def upper_index(target):
+    start = 0
+    end = n
+
+    while start < end:
+        mid = int((start+end)/2)
+        if a_array[mid] > target:
+            end = mid
+        else:
+            start = mid + 1
+    return start
+
+
+n = int(input())
+a_array = sorted([int(i) for i in input().strip().split()])
+m = int(input())
+candidates = [int(i) for i in input().strip().split()]
+
+for candidate in candidates:
+    print(upper_index(candidate) - lower_index(candidate))
+```
