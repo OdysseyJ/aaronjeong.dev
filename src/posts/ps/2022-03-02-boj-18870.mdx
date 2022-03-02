@@ -1,0 +1,51 @@
+---
+title: boj 18870 좌표압축 python
+description: boj problem 18870 solved by python
+date: '2022-03-02T20:07:39+09:00'
+tags: [PS, BinarySearch]
+---
+
+https://www.acmicpc.net/problem/18870
+
+### 접근
+1. 이분 탐색 기본 문제이다. 정렬된 배열에서 중복 요소를 O(N)으로 제거한 뒤에,
+
+각 원소에 대해서 이분탐색을 돌려주면 된다. 해당 이분탐색 방법은 lower_index를 구해내는 방법으로
+
+본인보다 작은 인덱스의 개수만 세면 되기 때문에 `array[mid] >= target`의 조건으로 탐색을 해준다.
+
+중복 제거는 잘 짰는데, 이분탐색 함수를 짜는데 익숙하지 않아서, 이전에 짰던 함수를 참고했다. 아직 부족한 듯 하다. 더 풀어봐야지.
+
+```python
+import sys
+input = sys.stdin.readline
+
+
+def remove_dup(array):
+    array = array + [10**9+1]
+    result = []
+    for prev, next in zip(array, array[1:]):
+        if prev != next:
+            result.append(prev)
+    return result
+
+
+def binary_search(array, target):
+    start, end = 0, len(array)
+    while start < end:
+        mid = (start+end) // 2
+        if array[mid] >= target:
+            end = mid
+        else:
+            start = mid + 1
+    return start
+
+
+n = int(input())
+x = [int(i) for i in input().strip().split()]
+
+
+non_duplicated_sorted = remove_dup(sorted(x))
+for el in x:
+    print(binary_search(non_duplicated_sorted, el), end=" ")
+```
