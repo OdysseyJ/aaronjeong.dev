@@ -1,31 +1,26 @@
 import sys
+import math
 input = sys.stdin.readline
 
 
-def remove_dup(array):
-    array = array + [10**9+1]
-    result = []
-    for prev, next in zip(array, array[1:]):
-        if prev != next:
-            result.append(prev)
-    return result
+def lower_bound(target):
+    st, en = 0, n
 
-
-def binary_search(array, target):
-    start, end = 0, len(array)
-    while start < end:
-        mid = (start+end) // 2
-        if array[mid] >= target:
-            end = mid
+    while st < en:
+        mid = (st+en)//2
+        if a[mid] >= target:
+            en = mid
         else:
-            start = mid + 1
-    return start
+            st = mid + 1
+    return st
 
 
-n = int(input())
-x = [int(i) for i in input().strip().split()]
+n, m = map(int, input().split())
+a = sorted([int(input()) for _ in range(n)])
+ans = math.inf
+for i in a:
+    idx = lower_bound(i+m)
+    if idx != n:
+        ans = min(ans, abs(i-a[idx]))
 
-
-non_duplicated_sorted = remove_dup(sorted(x))
-for el in x:
-    print(binary_search(non_duplicated_sorted, el), end=" ")
+print(ans)

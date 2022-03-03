@@ -1,0 +1,71 @@
+---
+title: boj 2230 수 고르기 python
+description: boj problem 2230 solved by python
+date: '2022-03-03T20:55:48+09:00'
+tags: []
+---
+
+https://www.acmicpc.net/problem/2230
+
+### 접근
+1. 투 포인터 기본 문제. 원래는 O(N^2)으로 풀수 있는 풀이를 2개의 포인터를 이용해 간단하게 O(N)으로 풀어내는 문제다.
+
+```python
+import sys
+import math
+input = sys.stdin.readline
+
+def two_pointer(a, m):
+    _min = math.inf
+    st, en = 0, 0
+    while st <= en < len(a):
+        diff = a[en] - a[st]
+        if diff >= m:
+            if diff < _min:
+                _min = diff
+            st += 1
+        else:
+            en += 1
+    return _min
+
+n, m = map(int, input().split())
+a = sorted([int(input()) for _ in range(n)])
+print(two_pointer(a, m))
+```
+
+투포인터 문제는 대부분 이분탐색으로도 풀 수 있다고 배웠기에, 이분탐색으로도 풀어봤다.
+
+현재 a안의 수 k를 보고 있다고 하면, k+m의 lower_bound를 돌리기만 하면 되는데
+
+lower_bound를 찾았을 경우 현재 값과 lower_bound의 값을 빼준값을 보면 된다.
+
+막상 풀면 어렵지는 않은데, 생각보다 풀이를 떠올리는건 쉽지 않다.
+
+```python
+import sys
+import math
+input = sys.stdin.readline
+
+
+def lower_bound(target):
+    st, en = 0, n
+
+    while st < en:
+        mid = (st+en)//2
+        if a[mid] >= target:
+            en = mid
+        else:
+            st = mid + 1
+    return st
+
+
+n, m = map(int, input().split())
+a = sorted([int(input()) for _ in range(n)])
+ans = math.inf
+for i in a:
+    idx = lower_bound(i+m)
+    if idx != n:
+        ans = min(ans, abs(i-a[idx]))
+
+print(ans)
+```
