@@ -1,0 +1,37 @@
+---
+title: boj 1806 부분합 python
+description: boj problem 1806 solved by python
+date: '2022-03-04T20:56:31+09:00'
+tags: []
+---
+
+https://www.acmicpc.net/problem/1806
+
+### 접근
+1. 투 포인터 문제라서 처음에 쉽다고 생각했는데 자꾸 한개의 테스트케이스에서 통과하지 못했다.
+
+`en == n` 일때 바로 종료하는것이 아니라, `sum_ >= s`일때 계속해서 st를 빼보면서 최소 길이를 구해야하는데
+
+나는 `while st <= en < n:` 으로 놓고 풀어서 자꾸 에러가 났다.
+```python
+import sys
+input = sys.stdin.readline
+
+n, s = map(int, input().split())
+nums = [int(i) for i in input().strip().split()]
+min_, sum_ = 1000001, 0
+st, en = 0, 0
+while st <= en:
+    if sum_ >= s:
+        min_ = min(min_, en-st)
+        sum_ -= nums[st]
+        st += 1
+    else:
+        if en == n:
+            break
+        sum_ += nums[en]
+        en += 1
+
+print(0 if min_ == 1000001 else min_)
+```
+

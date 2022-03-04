@@ -1,26 +1,19 @@
 import sys
-import math
 input = sys.stdin.readline
 
+n, s = map(int, input().split())
+nums = [int(i) for i in input().strip().split()]
+min_, sum_ = 1000001, 0
+st, en = 0, 0
+while st <= en:
+    if sum_ >= s:
+        min_ = min(min_, en-st)
+        sum_ -= nums[st]
+        st += 1
+    else:
+        if en == n:
+            break
+        sum_ += nums[en]
+        en += 1
 
-def lower_bound(target):
-    st, en = 0, n
-
-    while st < en:
-        mid = (st+en)//2
-        if a[mid] >= target:
-            en = mid
-        else:
-            st = mid + 1
-    return st
-
-
-n, m = map(int, input().split())
-a = sorted([int(input()) for _ in range(n)])
-ans = math.inf
-for i in a:
-    idx = lower_bound(i+m)
-    if idx != n:
-        ans = min(ans, abs(i-a[idx]))
-
-print(ans)
+print(0 if min_ == 1000001 else min_)
