@@ -1,0 +1,47 @@
+---
+title: boj 16401 과자 나눠주기 python
+description: boj problem 16401 solved by python
+date: '2022-03-05T16:56:01+09:00'
+tags: [PS, BinarySearch]
+---
+
+#### 접근
+1. 이분 탐색 문제. 생각보다 아이디어가 잘 안떠올랐다. 아직 부족한가보다.
+
+막대 과자의 길이가 t일때 m조각 이상이 나오는지를 O(2N)으로 확인한다.
+
+이때 막대과자의 길이를 찾아 내야 하니 막대과자의 길이를 두고 이분탐색을 한다.
+
+막대과자의 길이를 이분탐색하면 O(logN)이므로 O(NlogN)에 풀 수 있다.
+
+이때 이분탐색을 하면서 st/en을 잘 조절해 주지 않으면 시간초과가 나므로 주의해야 한다.
+```python
+import sys
+input = sys.stdin.readline
+
+
+# 막대 과자 길이가 t일때 m조각 이상 나오나
+def solve(t):
+    if t == 0:
+        return True
+    return sum([i//t for i in l]) >= m
+
+
+def binary_search():
+    st, en = 1, max(l)
+
+    res = 0
+    while st <= en:
+        mid = (st+en)//2
+        if solve(mid):
+            res = mid
+            st = mid+1
+        else:
+            en = mid-1
+    print(res)
+
+
+m, n = [int(i) for i in input().split()]
+l = [int(i) for i in input().split()]
+binary_search()
+```

@@ -2,25 +2,27 @@ import sys
 input = sys.stdin.readline
 
 
-def binary_search(target):
-    st, en = 0, nb
-    while st < en:
+# 막대 과자 길이가 t일때 m조각 이상 나오나
+def solve(t):
+    if t == 0:
+        return True
+    return sum([i//t for i in l]) >= m
+
+
+def binary_search():
+    st, en = 1, max(l)
+
+    res = 0
+    while st <= en:
         mid = (st+en)//2
-        if b[mid] >= target:
-            en = mid
+        if solve(mid):
+            res = mid
+            st = mid+1
         else:
-            st = mid + 1
-    if st >= nb or b[st] != target:
-        result.append(target)
+            en = mid-1
+    print(res)
 
 
-na, nb = [int(i) for i in input().split()]
-a = sorted([int(i) for i in input().split()])
-b = sorted([int(i) for i in input().split()])
-result = []
-for el in a:
-    binary_search(el)
-
-print(len(result))
-for i in result:
-    print(i, end=" ")
+m, n = [int(i) for i in input().split()]
+l = [int(i) for i in input().split()]
+binary_search()
