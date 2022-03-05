@@ -1,0 +1,31 @@
+---
+title: '[AWS] 리전 및 AZ'
+description: prepare aws certified solutions architect associate
+date: '2022-03-05T18:14:59+09:00'
+tags: [Dev, AWS]
+---
+
+## AWS Regions
+
+### Region
+- AWS는 전 세계에 Region을 가지고 있다.
+- US East, US West, US West, Africa, South America....
+- 대부분의 AWS 서비스는 Region에 의존적이다.
+
+### Region을 고르는 방법
+- `Compliance` 데이터를 특정 리전에 보관해야 하는 경우 고려
+- `Proximity` 사용하는 유저가 많은곳 근처에 배포하는게 대기시간이 짧아 좋다.
+- `Available services` 원하는 서비스가 리전에서 사용이 가능한지 고려
+- `Pricing` 리전마다 가격이 다르므로 리전의 가격을 고려해서
+
+## AWS Availability Zones
+
+### Availability Zones
+- 각각의 리전마다 여러개의 availability zone을 가지고 있다.
+- ex) ap-southeast-2 -> ap-southeast-2a, ap-southeast-2b, ap-southeast-2c
+- 모든 availability zone은 연결되어 있고, 독립적이다.
+
+### Points of Presence (Edge Locations)
+- 아마존은 205개의 Edge Locations와 Regional 캐시를 가지고 있고, 42개국 84개의 도시에 존재한다.
+- 콘텐츠는 유저에게 매우 낮은 레이턴시를 통해 전달된다.
+
