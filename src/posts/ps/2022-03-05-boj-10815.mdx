@@ -1,3 +1,18 @@
+---
+title: boj 10815 숫자카드 python
+description: boj problem 10815 solved by python
+date: '2022-03-05T15:31:01+09:00'
+tags: [PS, BinarySearch]
+---
+
+https://www.acmicpc.net/problem/10815
+
+### 접근
+1. 이분 탐색 기본 문제이다. O(N*M)으로 풀면 시간초과가 나기 때문에 꼭 이분탐색으로 찾아내야 한다.
+
+이분 탐색이 좀 부족한것 같아서, 연습문제를 다시 복기한다.
+
+```python
 import sys
 input = sys.stdin.readline
 
@@ -23,3 +38,4 @@ targets = [int(i) for i in input().split()]
 
 for target in targets:
     print(binary_search(target), end=" ")
+```
