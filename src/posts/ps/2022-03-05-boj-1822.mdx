@@ -1,0 +1,53 @@
+---
+title: boj 1822 차집합 python
+description: boj problem 1822 solved by python
+date: '2022-03-05T15:42:52+09:00'
+tags: [PS, Set, BinarySearch]
+---
+
+https://www.acmicpc.net/problem/1822
+### 접근
+1. python 기본 set으로 푼다. 이건 솔직히 언어의 특성을 이용한거라, binary-search로 다시 풀었다.
+```python
+import sys
+input = sys.stdin.readline
+
+na, nb = [int(i) for i in input().split()]
+a = [int(i) for i in input().split()]
+b = [int(i) for i in input().split()]
+
+diff = set(a)-set(b)
+print(len(diff))
+for i in sorted(diff):
+    print(i, end=" ")
+```
+
+2. binary search 풀이 (출력도 증가순인걸 인지하지 못해서 한번 틀렸다;)
+```python
+import sys
+input = sys.stdin.readline
+
+
+def binary_search(target):
+    st, en = 0, nb
+    while st < en:
+        mid = (st+en)//2
+        if b[mid] >= target:
+            en = mid
+        else:
+            st = mid + 1
+    if st >= nb or b[st] != target:
+        result.append(target)
+
+
+na, nb = [int(i) for i in input().split()]
+a = sorted([int(i) for i in input().split()])
+b = sorted([int(i) for i in input().split()])
+result = []
+for el in a:
+    binary_search(el)
+
+print(len(result))
+for i in result:
+    print(i, end=" ")
+```
