@@ -1,0 +1,78 @@
+---
+title: '[AWS] IAM - 사용자, 그룹, 정책'
+description: prepare aws certified solutions architect associate
+date: '2022-03-05T18:25:30+09:00'
+tags: [Dev, AWS]
+---
+
+## AWS IAM (Identity and Access Management)
+- IAM은 리전에 의존적이지 않은 `Global` 서비스이다.
+
+### Users & Groups
+- Root account는 기본적으로 만들어지며, 공유되지 않아야 한다
+- Users는 당신의 조직의 사람들이며, grouping 될 수 있다.
+- Groups는 유저만을 포함할 수 있으며, 다른 그룹을 포함할 수는 없다.
+- 유저는 group에 속하지 않을 수 있고, multiple groups에 속할 수도 있다.
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/3_5_iam.png'
+    alt="Photo"
+    width={400}
+    height={100}
+    priority
+    layout={"responsive"}
+    className="next-image"
+/>
+
+### Permissions
+- User나 Group에게 특정 정책을 부여할 수 있다.
+- 정책은 JSON documents로 구성되어 있다.
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/3_5_policy_json.png'
+    alt="Photo"
+    width={300}
+    height={300}
+    priority
+    className="next-image"
+/>
+
+- 유저가 가진 퍼미션을 조정하는데 도움을 준다.
+
+
+### IAM Policy inheritance
+- policy는 다중 상속 될 수 있다.
+- 그룹에 속하지 않은 유저에게도 inline-policy가 적용될 수 있다.
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/3_5_policy_inheritance.png'
+    alt="Photo"
+    width={400}
+    height={200}
+    priority
+    layout={"responsive"}
+    className="next-image"
+/>
+
+### IAM Policy Structure
+- Consist of
+    - Version : 정책의 언어 버전이다. 항상 `2012-10-17`을 포함한다.
+    - Id(Optional) : 정책의 identifier
+    - Statetment(Required) : 개별 정책 구성이다.
+- Statements consists of
+    - Sid(Optional): statement의 identifier이다.
+    - Effect(Allow/Deny): 허용 / 제한 여부
+    - Principal: 해당 정책이 적용 될 account/user/role
+    - Action: 해당 정책이 허용하거나 거부할 액션들
+    - Resource: 리소스 종류
+    - Condition(Optional): 언제 적용되어야 하는지의 여부
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/3_5_policy_structure.png'
+    alt="Photo"
+    width={100}
+    height={100}
+    priority
+    layout={"responsive"}
+    className="next-image"
+/>
