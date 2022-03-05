@@ -1,0 +1,11 @@
+---
+title: '[HackerRank] Weather Observation Station 18'
+description: sql problem
+date: '2022-03-05T20:25:48+09:00'
+tags: [SQL]
+---
+
+```sql
+SELECT ROUND( ABS(MIN(LAT_N)-MAX(LAT_N)) + ABS(MIN(LONG_W)-MAX(LONG_W)), 4)
+FROM STATION
+```
