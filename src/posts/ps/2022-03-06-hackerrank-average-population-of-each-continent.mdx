@@ -1,0 +1,14 @@
+---
+title: '[HackerRank] Average Population of Each Contient'
+description: sql problem
+date: '2022-03-06T11:24:39+09:00'
+tags: [SQL]
+---
+
+```sql
+SELECT COUNTRY.CONTINENT, FLOOR(AVG(CITY.POPULATION))
+FROM CITY
+JOIN COUNTRY
+ON CITY.COUNTRYCODE = COUNTRY.CODE
+GROUP BY COUNTRY.CONTINENT
+```
