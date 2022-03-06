@@ -1,5 +1,5 @@
 import { Grid, GridItem, Link, useColorModeValue } from "@chakra-ui/react";
-import { H5 } from "@src/components/Typography/Headings";
+import {H5, H6} from "@src/components/Typography/Headings";
 import dayjs from "dayjs";
 import NextLink from "next/link";
 
@@ -22,8 +22,8 @@ const PostItem = ({ post }: any) => (
           color: useColorModeValue("blackAlpha.600", "whiteAlpha.600"),
         }}
       >
-        <GridItem colSpan={{ base: 1, md: 2 }}>
-          <H5>{dayjs(post.data.date).format("YYYY MMM D")} </H5>
+        <GridItem colSpan={{ base: 1, md: 2 }} color={"gray"}>
+          <H6>{dayjs(post.data.date).format("YYYY MMM D")} </H6>
         </GridItem>
         <GridItem colSpan={{ base: 1, md: 10 }} order={{ base: -1, md: 0 }}>
           <H5>

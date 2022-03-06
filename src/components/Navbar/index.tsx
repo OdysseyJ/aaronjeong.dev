@@ -11,9 +11,8 @@ import {
 import { DesktopNav } from "@src/components/Navbar/DesktopNav";
 import { MobileNav } from "@src/components/Navbar/MobileNav";
 import { useNavbarContext } from "@src/context/useNavbarContext";
-import Image from "next/image";
 import NextLink from "next/link";
-import { IoMoon, IoSunny, IoHome } from "react-icons/io5";
+import { IoMoon, IoSunny, IoSearch, IoSearchOutline } from "react-icons/io5";
 
 const Navbar = () => {
   const { colorMode, toggleColorMode } = useColorMode();
@@ -87,19 +86,30 @@ const Navbar = () => {
             justify={"flex-end"}
           >
             <DesktopNav display={{ base: "none", md: "flex" }} />
-            <IconButton
-              size={"sm"}
-              variant={"ghost"}
-              aria-label={"Toggle Color Mode"}
-              onClick={toggleColorMode}
-              icon={
-                colorMode == "light" ? (
-                  <IoMoon size={18} />
-                ) : (
-                  <IoSunny size={18} />
-                )
-              }
-            />
+
+            <Stack direction={"row"} spacing={6}>
+                <NextLink href={"/search"} passHref>
+                    <IconButton
+                        size={"sm"}
+                        variant={"ghost"}
+                        aria-label={"Toggle Color Mode"}
+                        icon={<IoSearch size={18} />}
+                    />
+                </NextLink>
+                <IconButton
+                    size={"sm"}
+                    variant={"ghost"}
+                    aria-label={"Toggle Color Mode"}
+                    onClick={toggleColorMode}
+                    icon={
+                        colorMode == "light" ? (
+                            <IoMoon size={18} />
+                        ) : (
+                            <IoSunny size={18} />
+                        )
+                    }
+                />
+            </Stack>
           </Stack>
         </Container>
       </Flex>

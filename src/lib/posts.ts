@@ -21,7 +21,7 @@ export type PostType = {
   path: PATHS;
 }
 
-type PostReturnType = {
+export type PostReturnType = {
   posts: PostType[],
   total: number
 }
