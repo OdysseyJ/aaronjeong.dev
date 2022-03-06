@@ -1,3 +1,19 @@
+---
+title: boj 2805 나무 자르기 python
+description: boj problem 2805 solved by python
+date: '2022-03-06T14:25:38+09:00'
+tags: [PS, BinarySearch]
+---
+
+### 접근
+1. n, m, h(나무의 높이)은 각각 최대 범위가 100만, 20억, 10억이므로 linear 풀이로는 해결할 수 없다.
+
+높이가 h일때 적어도 m이상의 나무를 가져갈 수 있는지 여부를 조사하고, 나무의 높이를 가지고 이분탐색을 돈다.
+
+이때의 big O 는 NlogH 이다. (solve = N, 이분탐색 logH)
+
+```python
+import sys
 input = sys.stdin.readline
 
 
@@ -26,3 +42,4 @@ def binary_search():
 n, m = map(int, input().split())
 trees = [int(i) for i in input().split()]
 binary_search()
+```
