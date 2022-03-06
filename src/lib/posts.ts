@@ -91,10 +91,10 @@ export const getPostsByDate :()=> Promise<PostByDateReturnType> = async () => {
   const postsByDates = Array.from({length: 365}, () => []) as PostType[][]
 
   allPosts.forEach((p)=>{
-    const date = dayjs(p.data.date)
-    const today = dayjs()
+    const date = dayjs(p.data.date).startOf("day")
+    const today = dayjs().startOf("day")
     const diff = today.diff(date, "day")
-    postsByDates[diff].push(p)
+    postsByDates[diff].push(p.data.date)
   })
 
   return {
