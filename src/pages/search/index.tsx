@@ -8,10 +8,15 @@ import {Button} from "@chakra-ui/react";
 const Search: NextPage<PostReturnType> = ({ posts, total }) => {
     const [matchingPosts, setMatchingPosts] = useState<PostType[]>([])
     const ref = useRef<HTMLInputElement>(null)
-    const handleSearch = ()=>{
+    const handleSubmit = ()=>{
         if (ref.current && ref.current.value){
             // @ts-ignore
             setMatchingPosts(posts.filter((p)=>p.data.title.toLowerCase().includes(ref.current.value)))
+        }
+    }
+    const handleInputKeyUp = (event: React.KeyboardEvent<HTMLInputElement>)=>{
+        if (event.code == "Enter"){
+            handleSubmit()
         }
     }
     return (<>
@@ -22,9 +27,10 @@ const Search: NextPage<PostReturnType> = ({ posts, total }) => {
         size={"md"}
         variant={"filled"}
         ref={ref}
+        onKeyUp={handleInputKeyUp}
       />
       <InputRightElement width='4.5rem'>
-        <Button h='1.75rem' size='sm' onClick={handleSearch}>
+        <Button h='1.75rem' size='sm' onClick={handleSubmit}>
           {"검색"}
         </Button>
       </InputRightElement>
