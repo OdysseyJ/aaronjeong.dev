@@ -1,0 +1,17 @@
+---
+title: '[HackerRank] Occupations'
+description: sql problem
+date: '2022-03-06T13:43:10+09:00'
+tags: [SQL]
+---
+
+```sql
+SELECT
+    MAX(CASE WHEN OCCUPATION = 'Doctor' THEN NAME END) AS 'Doctor',
+    MAX(CASE WHEN OCCUPATION = 'Professor' THEN NAME END) AS 'Professor',
+    MAX(CASE WHEN OCCUPATION = 'Singer' THEN NAME END) AS 'Singer',
+    MAX(CASE WHEN OCCUPATION = 'Actor' THEN NAME END) AS 'Actor'
+FROM (SELECT *, ROW_NUMBER() OVER (PARTITION BY OCCUPATION ORDER BY NAME) ROW_NUM
+      FROM OCCUPATIONS) t0
+GROUP BY ROW_NUM
+```
