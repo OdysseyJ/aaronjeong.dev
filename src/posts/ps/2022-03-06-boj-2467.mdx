@@ -1,3 +1,43 @@
+---
+title: boj 2467 용액 python
+description: boj problem 2467 solved by python
+date: '2022-03-06T15:19:02+09:00'
+tags: [PS, TwoPointer]
+---
+
+### 접근
+1. 전체 용액의 수는 10만으로, 전체 용액 조합을 다 만들어보려면 O(N^2)은 1초안에 풀 수 없다.
+따라서 이분탐색 혹은 투포인터를 사용해서 풀어야 N^2이하로 풀 수 있다.
+
+`투포인터(TwoPointer)` 풀이 : 용액의 크기를 비교해가며 st와 en의 범위 조정하기 -> O(N)
+```python
+import sys
+import math
+input = sys.stdin.readline
+
+
+def two_pointer():
+    st, en = 0, n-1
+    rst, ren = math.inf, math.inf
+
+    while st < en:
+        if abs(rst + ren) > abs(waters[st] + waters[en]):
+            rst = waters[st]
+            ren = waters[en]
+        if abs(waters[st] + waters[en-1]) <= abs(waters[st+1] + waters[en]):
+            en = en-1
+        else:
+            st = st+1
+    print(rst, ren)
+
+
+n = int(input())
+waters = sorted([int(i) for i in input().split()])
+two_pointer()
+```
+
+`이분탐색(BinarySearch)` 풀이 : O(NlogN) - 더 어렵다.
+```python
 import sys
 import math
 input = sys.stdin.readline
@@ -35,3 +75,4 @@ def binary_search():
 n = int(input())
 waters = sorted([int(i) for i in input().split()])
 binary_search()
+```
