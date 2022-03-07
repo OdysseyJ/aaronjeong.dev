@@ -9,9 +9,16 @@ const Search: NextPage<PostReturnType> = ({ posts, total }) => {
     const [matchingPosts, setMatchingPosts] = useState<PostType[]>([])
     const ref = useRef<HTMLInputElement>(null)
     const handleSubmit = ()=>{
-        if (ref.current && ref.current.value){
-            // @ts-ignore
-            setMatchingPosts(posts.filter((p)=>p.data.title.toLowerCase().includes(ref.current.value)))
+        if (ref.current){
+            if (!ref.current.value)
+                setMatchingPosts([])
+            else
+                setMatchingPosts(posts.filter((p)=>{
+                    const lowerTitle = p.data.title.toLowerCase()
+                    // @ts-ignore
+                    const lowerSearchValues = ref.current.value.toLowerCase().split(" ")
+                    return lowerSearchValues.filter((s)=>lowerTitle.includes(s)).length == lowerSearchValues.length
+                }))
         }
     }
     const handleInputKeyUp = (event: React.KeyboardEvent<HTMLInputElement>)=>{
