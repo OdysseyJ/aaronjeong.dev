@@ -1,3 +1,16 @@
+---
+title: boj 16948 데스나이트 python
+description: boj problem 16948 solved by python
+date: '2022-03-09T17:29:48+09:00'
+tags: [PS, BFS]
+---
+
+### 접근
+1. 이제 bfs문제는 너무 웰노운이 되어버려서 그냥 가볍게 풀고싶을때 푼다.
+
+이동할 수 없는 경우에 -1을 출력하는 출력 조건을 못봐서 한번 틀렸는데, 풀이가 어렵지는 않았다.
+
+```python
 import sys
 from collections import deque
 input = sys.stdin.readline
@@ -28,3 +41,5 @@ n = int(input())
 r1, c1, r2, c2 = map(int, input().split())
 visited = [[0 for _ in range(n)] for _ in range(n)]
 print(bfs((r1, c1)))
+```
+
