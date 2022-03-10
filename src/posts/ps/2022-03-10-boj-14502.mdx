@@ -1,3 +1,12 @@
+---
+title: boj 14502 연구소 python
+description: boj problem 14502 solved by python
+date: '2022-03-10T20:52:08+09:00'
+tags: [PS, BFS, BackTracking]
+---
+
+### 접근
+```python
 import sys
 from collections import deque
 input = sys.stdin.readline
@@ -62,3 +71,4 @@ for i in range(n):
             viruses.append((j, i))
 build_wall(0)
 print(max_)
+```
