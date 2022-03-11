@@ -1,3 +1,14 @@
+---
+title: boj 15656 N과M(7) python
+description: boj problem 15656 solved by python
+date: '2022-03-11T20:18:40+09:00'
+tags: [PS, BackTracking]
+---
+
+### 접근
+1. 전형적인 백트래킹 문제다. 중복을 허용해서 크게 어렵지 않다.
+
+```python
 import sys
 sys.setrecursionlimit(100000)
 input = sys.stdin.readline
@@ -19,3 +30,4 @@ def back_tracking(arr):
 n, m = map(int, input().split())
 nums = sorted([int(i) for i in input().split()])
 back_tracking([])
+```
