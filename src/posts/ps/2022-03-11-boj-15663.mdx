@@ -1,3 +1,17 @@
+---
+title: boj 15663 N과M(9) python
+description: boj problem 15663 solved by python
+date: '2022-03-11T20:56:55+09:00'
+tags: [PS, BackTracking]
+---
+
+### 접근
+1. 전형적인 백트래킹 문제다. 백트래킹에서 2가지 작업을 더 해줬는데,
+
+- 중복된 인덱스인지 체크해줬다.
+- 이미 출력한적이 있는지 체크해줬다.
+
+```python
 import sys
 sys.setrecursionlimit(100000)
 input = sys.stdin.readline
@@ -28,3 +42,4 @@ nums = sorted([int(i) for i in input().split()])
 visited = [False for _ in range(n)]
 duplicated = {}
 back_tracking([])
+```
