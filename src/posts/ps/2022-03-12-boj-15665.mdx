@@ -1,0 +1,57 @@
+---
+title: boj 15665 N과M(11) python
+description: boj problem 15665 solved by python
+date: '2022-03-12T16:52:46+09:00'
+tags: [PS, BackTracking]
+---
+
+### 접근
+1. 왜 이전문제보다 쉬운지는 모르겠으나, 중복을 허용하므로 중복 허용 후 중복체크만 해주면 된다.
+
+```python
+import sys
+sys.setrecursionlimit(100000)
+input = sys.stdin.readline
+
+
+def back_tracking(arr):
+    if len(arr) == m:
+        if m == 1 and arr[0] not in duplicated:
+            duplicated[arr[0]] = True
+            print(arr[0])
+        elif " ".join(arr) not in duplicated:
+            result = " ".join(arr)
+            duplicated[result] = True
+            print(result)
+        return
+
+    for idx, num in enumerate(nums):
+        arr.append(str(num))
+        back_tracking(arr)
+        arr.pop()
+
+
+n, m = map(int, input().split())
+nums = sorted([int(i) for i in input().split()])
+duplicated = {}
+back_tracking([])
+```
+
+- 다른 사람의 풀이중에서, 좀 괜찮은 풀이를 발견해 가져왔다. set으로 만들고 sort를 해준뒤에 백트래킹을 해준다.
+```
+N, M = map(int, input().split())
+numbers = list(set(list(map(int, input().split()))))
+numbers.sort()
+N = len(numbers)
+
+def dfs(d, seq):
+    if d == M:
+        print(seq.rstrip())
+        return
+
+    for i in range(N):
+        dfs(d+1, seq+str(numbers[i])+' ')
+
+dfs(0, '')
+```
+
