@@ -1,0 +1,21 @@
+---
+title: '[AWS] EC2'
+description: prepare aws certified solutions architect associate
+date: '2022-03-13T20:53:31+09:00'
+tags: [Dev, AWS, EC2]
+---
+
+### Private vs Public IP (IPv4)
+- IPv4 : 1.160.10.240
+- IPv6 : 3ffe:1900:4545:3:200:f8ff:fe21:67cf
+- IPv4의 공간이 모자라 나온 개념이 IPv6이다
+- IP는 네트워크 내부에서 unique해야 한다.
+- PrivateIP : 내부 네트워크끼리의 통신만 가능하다.
+    - www에 연결하려면 internet gateway를 사용해 proxy로 연결할 수 있다.
+- PublicIP : 인터넷에서 접근이 가능하다.
+
+### Elastic IP
+- EC2 인스턴스를 시작할 때, public ip를 변경한다.
+- 고정된 public IP가 필요할때는, Elastic IP를 설정해야 한다.
+- 전반적으로 ElasticIP를 사용하지 않는 것이 좋다.
+- DNS를 사용하자.
