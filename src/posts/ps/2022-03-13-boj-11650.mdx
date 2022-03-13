@@ -1,0 +1,18 @@
+---
+title: boj 11650 좌표 정렬하기 python
+description: boj problem 11650 solved by python
+date: '2022-03-13T19:02:34+09:00'
+tags: [PS]
+---
+
+### 접근
+```python
+import sys
+input = sys.stdin.readline
+
+n = int(input())
+dots = sorted([int(i) for i in [input().split() for _ in range(n)]], key=lambda d: (d[0], d[1]))
+
+for (x, y) in dots:
+print(f"{x} {y}")
+```
