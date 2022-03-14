@@ -19,3 +19,40 @@ tags: [Dev, AWS, EC2]
 - 고정된 public IP가 필요할때는, Elastic IP를 설정해야 한다.
 - 전반적으로 ElasticIP를 사용하지 않는 것이 좋다.
 - DNS를 사용하자.
+
+### 배치 그룹
+#### Cluster
+- 장점
+    - 완전 저 지연을 위해 사용
+    - EC2 인스턴스가 같은 랙에 들어있기를 원한다
+    - 빠른 반응성의 어플리케이션에 사용
+- 단점
+    - 랙이 실패하고, 하드웨어가 실패하면 모든 인스턴스가 실패할 수 있다.
+
+#### Spread
+- 장점
+    - EC2 인스턴스들이 전부 다른 하드웨어에서 구동된다
+    - 여러 AZ에 걸쳐있을 수 있고, 동시 실패 가능성이 낮아진다.
+- 단점
+    - 배치 그룹당 7개로 제한된다.
+- 사용
+    - 인스턴스가 다른 인스턴스로부터 고립될 수 있을 때
+
+#### Partition
+- 장점
+    - 하나의 랙(partition)에 여러가지 인스턴스를 함께 구동할 수 있다
+    - 각각의 파티션별로 실패에 안전하다.
+    - 수백개의 인스턴스를 동시에 파티셔닝 할 수 있다.
+- 리전별로 7개의 파티션을 가질 수 있다.
+- 어플리케이션을 구획을 나눠서 이용하는 HBase, Casandra등등에 쓰인다.
+
+### ENI (Elastic Network Interfaces)
+- VPC의 논리적 컴포넌트이다.
+- ENI가 가질 수 있는 attributes
+    - Primary private IPv4, secondary IPv4
+    - Elastic IPv4 per private IPv4
+    - Public IP
+    - One or more security groups
+    - MAC address
+- AZ에 묶여있다.
+- 왜 사용하나 ? : 인스턴스에 부착이 쉽기 때문에 두 인스턴스간 빠르고 쉬운 네트워크 장애 조치 가능
