@@ -1,0 +1,36 @@
+---
+title: '[AWS] EC2 Advanced'
+description: ''
+date: '2022-03-16T19:26:21+09:00'
+tags: []
+---
+
+### EC2 Hybernate
+#### What is Hybernate
+- 인스턴스 Stop : 다음 가동을 위해서 데이터 유지됨
+- 인스턴스 Terminate : 어떠한 EBS Volume이라도 인스턴스와 함께 데이터가 없어진다
+- EC2 Hybernate를 사용하면 `메모리에 있는 정보`는 그대로 유지한다.
+- 메모리 정보는 root EBS volume에 통째로 덤프된다.
+
+#### 사용례
+- 장기 러닝 프로세스
+- 램 상태 저장
+- 시작에 오래걸리는 서비스
+
+### EC2 Nitro
+- New virtualization technology
+#### 왜 쓸까?
+- 더 나은 퍼포먼스 제공
+    - 향상된 네트워크, HPC, IPV6
+    - 더 빠른 EBS (need 64000 IOPS - max 32,000 on non-Nitro)
+    - 더 나은 보안
+
+### EC2 vCPU
+- 하나의 CPU에서 여러개의 thread가 동작할 수 있다.
+- Each thread가 vCPU를 대표한다
+- 4 CPU, 2 thread per CPU => 8 vCPU in total
+
+#### CPU option 옵티마이즈하기
+- 인스턴스는 RAM과 vCPU의 조합으로 구성되어 있다.
+- 코어당 thread개수를 줄일수 있다.
+- CPU 코어 개수를 줄일 수 있다.
