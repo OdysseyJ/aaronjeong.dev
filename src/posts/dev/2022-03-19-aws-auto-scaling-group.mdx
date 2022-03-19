@@ -1,0 +1,41 @@
+---
+title: '[AWS] Auto Scaling Group'
+description: ''
+date: '2022-03-19T15:08:43+09:00'
+tags: []
+---
+
+### Auto Scaling Group이 뭘까?
+- Scale out(add), Scale in(remove)을 통해 인스턴스의 개수를 조절하며 트래픽을 처리하는 기능
+- minimum size
+- actual size / Desired Capacity
+- maximum size
+- Auto Scaling Group에 의해 인스턴스가 Scale out되면 로드밸런서가 해당 인스턴스에 적절히 트래픽을 분산해줌.
+
+#### ASG가 가지는 특성
+- launch configuration
+    - AMI + instance type
+    - ec2 user data
+    - ebs volume
+    - sequrity group
+    - ssh key pari
+- Min Size / Max Size / Initial Capacity
+- Network + Subnet
+- Load Balancer Info
+- Scaling 정책
+- Auto Scaling Alarm : CloudWatch알람을 통해서 ASG를 트리거 할 수 있다.
+- Auto Scaling New Rules : 스케일링 정책을 직접 설정할 수 있다.
+
+#### Auto Scaling Custom Metric
+- 커스텀 메트릭에 기반해 오토스케일링을 할 수 있음 (예를들어, 커넥트된 유저 수)
+- EC2에서 Cloudwatch를 통해 custom metric을 보내기
+- Cloudwatch 알람을 만들기
+- 해당 알람을 통해 ASG 트리거하기
+
+#### ASG Brain Dump
+- 스케일링 정책은 뭐든지 될 수 있다. (CPU, Network, custom metrics...)
+- ASG는 런칭 구성과 런칭 템플릿을 사용할 수 있다.
+- 업데이트를 하러면 새로운 런치구성과 런치 템플릿을 제공한다.
+- EC2 인스턴스에 IAM롤이 자동으로 할당된다.
+- ASG는 무료이다. 사용한 리소스에 대해서만 비용을 지불한다.
+- ASG는 이상이 있는 인스턴스를 중지하고 새롭게 만든다.
