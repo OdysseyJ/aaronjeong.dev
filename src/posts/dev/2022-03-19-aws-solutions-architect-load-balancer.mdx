@@ -1,0 +1,118 @@
+---
+title: '[AWS] Sticky Sessions, Cross Zone, SSL'
+description: ''
+date: '2022-03-19T13:56:25+09:00'
+tags: []
+---
+
+### Sticky Sessions (Session Affinity)
+- 같은 클라이언트가 항상 같은 인스턴스로 redirect되게끔 하는 기술
+- CLB / ALB에서 사용 가능
+- stickiness를 위해서는 쿠키를 사용하는데, expiration date를 설정할 수 있다.
+- 유저가 세션 데이터를 잃어버리지 않게 할 수 있음
+- stickiness를 사용가능하게 하면 ec2 instance의 로드밸런싱이 불균형해질 수 있음.
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-03-19-sticky-session.png'
+    alt="Photo"
+    width={300}
+    height={400}
+    priority
+    className="next-image"
+/>
+
+#### Sticky Session - Cookie Names
+- 어플리케이션 기반 쿠키
+    - 커스텀 쿠키
+        - 어플리케이션에 의해 만들어짐
+        - 앱을 위해 필요한 어떤 어트리뷰트도 포함할 수 있음
+        - 각각의 타겟 그룹마다 개별적으로 정의되어야 함
+        - AWSALB, AWSALBAPP, AWSALBTG 같은 AWS특정 키워드는 사용하면 안된다.
+    - 어플리케이션 쿠키
+        - 로드 밸런서에 의해 생성
+        - 쿠키 이름은 AWSALBAPP
+- Duration 기반 쿠키
+    - 로드 밸런서에 의해 만들어지는 쿠키
+    - 쿠키 이름은 AWSALB for ALB, AWSELB for CLB
+
+### Cross-Zone Load Balancing
+- AZ별로 인스턴스의 가용량이 달라도, 모든 zone에 있는 인스턴스에 트래픽이 똑같이 분산되는 기능
+
+#### ALB
+- ALB에서는 항상 켜져있고, disable 시킬 수 없음.
+- inter AZ data 전달에 대해 비용을 지불하지 않는다.
+
+#### CLB
+- default로 꺼져있다
+- inter AZ data 전달에 대해 비용을 지불하지 않는다.
+
+### NLB
+- default로 꺼져있다.
+- inter AZ간 데이터 전달에 대해 비용을 `지불 해야한다`.
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-03-19-cross-zone-loadbalancing.png'
+    alt="Photo"
+    width={300}
+    height={300}
+    priority
+    className="next-image"
+/>
+
+### SSL/TLS - Basics
+- SSL은 클라이언트와 로드밸런서 사이에 일어나는 통신 내용을 암호화하는 것이다.
+- Secure Sockets Layer(SSL)은 connection에 encryption을 사용한다.
+- Transport Layer Security(TLS)는 새로운 버전이다.
+- 요즘에는 TLS가 주로 사용되지만, 사람들이 주로 SSL이라고 부른다.
+- 퍼블릭 SSL은 Certificate Authorities(CA)에 의해 발급된다.
+- SSL 인증은 만료 날짜가 있고, 갱신을 해줘야 한다.
+
+#### 로드 밸런서 입장에서 SSL 살펴보기
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-03-19-lb-and-ssl.png'
+    alt="Photo"
+    width={300}
+    height={50}
+    layout={"responsive"}
+    priority
+    className="next-image"
+/>
+
+- 로드 밸런서는 X.509 인증(SSL/TLS 서버 인증)을 사용한다.
+- ACM을 통해서 https 인증서를 발급 받을 수 있다.
+- HTTPS 리스너를 위해서
+    - 기본 인증서를 반드시 설정해야 함
+    - 여러 도메인을 지원하기 위해서 multiple 인증서를 설정할 수 있다.
+    - 클라이언트는 SNI(Server Name Indication)을 사용해 그들이 도달할 호스트명을 지정할 수 있다.
+
+#### SSL - Server Name Indication(SNI)
+- SNI는 하나의 웹 서버가 여러개의 SSL인증을 보유하고 있는 경우에 사용한다.
+- 새로운 프로토콜이며 유저가 첫 SSL handshaking을 하는 과정에서 어떤 인증서를 사용할지를 판단하기 위해 hostname을
+지정하는 방식이다.
+- 서버는 적절한 certificate를 찾을것이고, 혹은 default를 반환하게 된다.
+- ALB, NLB, CloudFront에서만 사용 가능하다
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-03-19-sni.png'
+    alt="Photo"
+    width={300}
+    height={300}
+    priority
+    className="next-image"
+/>
+
+### Connection Draining (Deregistration Delay)
+- CLB : Connection Draning
+- ALB, NLB : Deregistration Delay
+- 인스턴스가 등록 취소되거나, 비정상인 동안 기존에 연결된 커넥션이 끝날때까지 시간을 준다.
+- 1-3600초로 지정할 수 있으며, 기본은 300초다.
+- value를 0으로 설정해 disable 시킬 수 있다.
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-03-19-draining.png'
+    alt="Photo"
+    width={300}
+    height={300}
+    priority
+    className="next-image"
+/>
