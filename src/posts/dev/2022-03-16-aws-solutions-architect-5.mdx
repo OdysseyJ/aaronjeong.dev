@@ -1,0 +1,113 @@
+---
+title: '[AWS] EBS, AMI, EFS'
+description: ''
+date: '2022-03-16T19:55:08+09:00'
+tags: []
+---
+
+### EBS(Elastic Block Store)
+- 인스턴스에 연결할 수 있는 네트워크 드라이버다.
+- 인스턴스 데이터를 저장하는 네트워크 저장소이다.
+- 다른 인스턴스에 detach와 attach가 쉽다.
+- AZ에 귀속된다.
+    - 옮기기를 원하면 스냅샷을 떠야함.
+    - 스냅샷은 EBS 볼륨의 상태를 저장했다가 나중에 복원할때 사용한다.
+- GB, IOPS와 같은 용량이 있다.
+    - 용량을 추가적으로 늘릴 수 있다.
+- Delete on Termination
+    - EC2가 Terminate됨에 따라서 EBS볼륨을 지울지 아닐지 선택하는 옵션
+
+#### EBS 볼륨 유형
+- gp2 / gp3 (SSD) : 범용 목적의 SSD 볼륨으로 성능과 비용에 밸런스가 좋음.
+- io1 / io2 (SSD) : 빠른 퍼포먼스의 SSD로 low-latency나 high-throughput 워크로드에 사용
+- st1 (HDD) : 저비용 HDD로, 자주 엑세스되는 녀석들에 주로 사용
+- sc1 (HDD) : 가장 낮은 코스트의 HDD로, 적게 접근되는 워크로드에 사용
+
+#### GP2
+- 효율적 비용과, 낮은 지연을 제공한다
+- 루트 볼륨, 가장 환경, 개발 등에 사용 가능
+- 1GB ~ 16TB까지 제공
+- IOPS / throughput이 묶여 함께 제공된다.
+
+#### GP3
+- IOPS와 throughput을 커스터마이징 할 수 있다
+
+#### IO1/IO2
+- IOPS 퍼포먼스가 크리티컬한 비즈니스에서 사용
+- 16000IOPS 이상 필요할때
+- IO2 Block Express (4GB - 64TB)
+    - 가장 저 지연 반응으로 가장 성능이 좋음.
+
+#### ST1/SC1
+- boot 볼륨이 될수는 없다.
+- 125MB ~ 16TB까지 제공한다
+- ST1 => warm data, SC1 => cold data
+
+### EBS multi attach
+- 하나의 EBS 볼륨을 여러개의 인스턴스에 연결할 수 있다.
+- io1/io2인 경우에만 가능하다.
+
+### EBS Encryption
+- 암호화된 EBS를 생성하면 인스턴스와 EBS간의 데이터, 스냅샷 등이 전부 암호화된다.
+- 지연에 관여하는 임팩트는 거의 없다.
+- 암호화되지 않은 기존 EBS를 암호화하기 위해서는
+    - EBS 스냅샷을 통해 스냅샷을 생성한다.(암호화되지 않은 스냅샷 생성)
+    - 스냅샷을 복사하고, 복사하는 동시에 encryption 옵션을 선택해 암호화한다.
+    - 스냅샷을 통해 EBS 볼륨을 생성한다. (암호화된 스냅샷을 통해 생성했으므로 암호화 됨)
+    - 암호화되지 않은 스냅샷을 통해 EBS를 생성할때도 암호화를 할수 있음
+
+### AMI(Amazon Machine Image)
+- AMI는 EC2 인스턴스의 Customization이다.
+    - 본인만의 software, config, os, mornitoring...
+    - 원하는 소프트웨어가 미리 설치되어 있기 때문에 빠르게 boot/config 할 수 있다.
+- AMI는 특정 리전을 위해 빌드된다. (리전간 복사도 가능.)
+- 다양한 AMI를 통해 EC2를 구동시킬수 있다.
+    - public AMI
+    - own AMI
+    - aws marketplace AMI
+
+### EC2 Instance Store
+- EBS는 네트워크 드라이브 형태라 좋긴 하지만, 성능상 제약이 있었다.
+- 좋은 성능의 하드웨어 디스크 그 자체가 필요할때 EC2 Instance Store를 사용한다.
+- 특정 타입의 인스턴스만 사용 가능하며, I/O performance가 훨씬 좋아진다.
+- EC2 Instance Store는 멈추면 storage 데이터를 잃어버린다.
+- buffer / cache 같은 임시 저장소로 활용하는것이 좋다.
+- 백업을 하는것은 전적으로 이용자의 책임이다.
+
+### EFS(Elastic File System)
+- 많은 EC2에서 마운트 될 수 있는 관리형 네트워크 파일 시스템이다.
+- 다양한 AZ에 있는 인스턴스와 함께 사용할 수 있다 (EBS와 가장 큰 차이 - EBS는 AZ에 한정)
+- 엄청 유용하고, 확장가능하지만 비싸다. 사용한 만큼 비용을 낸다.
+
+#### 특징
+- NFSv4 프로토콜을 사용한다.
+- security group이 필요하다.
+- 리눅스를 사용하는 AMI에서만 사용가능하다.
+- KMS를 사용해 암호화한다.
+- 사용량에 따라 과금한다.
+- EFS Scale
+    - 1000번의 concurrent client, 10GB의 throughput
+    - petabyte scale까지 증가 가능.
+- Performance mode
+    - 일반 사용 목적(default) : 지연에 민감한 유즈케이스 (웹서버, CMS..)
+    - MAX I/O : 높은 latency, throughput (큰 데이터 처리)
+- Throughput mode
+    - Bursting (1 TB = 50mb + bust of 100mb/s)
+    - Provisioned : 처리량이 storage 사이즈와 관계없이 throughput을 설정할 수 있음.
+- Storage Tier (라이프사이클 관리)
+    - Standard : 자주 접근하는 파일
+    - Infrequent access(EFS-IA) : 복구하는데 비용이 들고, 적은 비용에 저장할 수 있다.
+
+### EBS vs EFS
+- EBS
+    - EBS는 하나의 인스턴스에만 연결될 수 있다
+    - AZ에 독립적이지 않다.
+    - gp/io같은 종류가 있다.
+    - 다른 AZ에서 사용하려면 EBS 볼륨을 스냅샷 떠야함.
+    - 루트 EBS볼륨은 EC2 인스턴스가 종료될 때 함께 종료된다.
+- EFS
+    - AZ에 독립적이다
+    - Multiple EC2에 연결될 수 있다.
+    - 리눅스에서만 작동함 (POSIX 파일 시스템이기 때문에)
+    - 3배정도 비쌈.
+    - 사용한 만큼만 돈을 낸다. (EBS는 미리 용량을 할당받아야 함)

@@ -1,0 +1,62 @@
+---
+title: '[AWS] ELB, ALB, NLB, GWLB'
+description: ''
+date: '2022-03-18T19:25:11+09:00'
+tags: []
+---
+
+### Load Balancer를 왜 쓰는가
+- 여러 인스턴스에게 로드를 분산하는 경우
+- 단일 엔드포인트를 제공하고 싶은 경우
+- 실패를 파악하기 쉽다
+- 주기적 헬스 체크를 진행한다
+- HTTPS 제공
+- 쿠키를 통해 stickiness를 Enforce할수 있다.
+- 여러 AZ를 동시에 사용할 수 있다.
+- public traffic / private traffic을 분리 가능하다.
+
+#### ALB
+- AWS에서 관리하는 로드밸런서
+- 확장성이 좋고
+- 다양한 AWS서비스와의 연동이 쉽다.
+- HealthCheck: Protocol, Port, Endpoint를 주기적으로 체크해서 밸런싱이 일어나면 안되는지 파악함.
+
+### ALB의 종류
+- Classic Load Balancer(CLB): HTTP, HTTPS, TCP, SSL
+- Application Load Balancer(ALB): HTTP, HTTPS, WebSocket
+- Network Load Balancer(NLB): TCP, TLS, UDP
+- Gateway Load Balancer(GWLB): Operates at Network layer 3 - IP Protocol
+
+### Application Load Balancer(ALB)
+- Application load balancer 는 7번 레이어에 존재한다.
+- 여러개의 HTTP 어플리케이션을 로드 밸런싱한다
+- HTTP/2와 WebSocket도 라우팅한다.
+- 다른 타겟 그룹에 대해서도 지원한다.
+    - example.com/users , example.com/posts
+    - one.example.com, other.example.com
+    - example.com/users?id=123&order=false
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-03-18-alb.png'
+    alt="Photo"
+    width={400}
+    height={100}
+    priority
+    layout={"responsive"}
+    className="next-image"
+/>
+
+#### ALB Target Group
+- EC2 instance
+- ECS tasks
+- Lambda function
+- IP Addresses
+- ALB는 여러개의 타겟 그룹에 라우팅을 할 수 있다
+- Health Check는 타겟 그룹 레벨에서 이루어진다.
+
+#### ALB를 사용하며 알아두면 좋은 것들
+- Fixed hostname을 앱 로드 밸런서와 함께 가져야 한다.
+- 어플리케이션 서버는 client의 IP를 직접적으로 볼 수 없다. 헤더에서 아래의 값들을 통해 얻을 수 있다.
+    - X-Forwareded-For
+    - X-Forwarded-Port
+    - X-Forwarded-Proto
