@@ -39,10 +39,9 @@ tags: []
 <Image
     src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-03-18-alb.png'
     alt="Photo"
-    width={400}
-    height={100}
+    width={350}
+    height={200}
     priority
-    layout={"responsive"}
     className="next-image"
 />
 
@@ -57,6 +56,40 @@ tags: []
 #### ALB를 사용하며 알아두면 좋은 것들
 - Fixed hostname을 앱 로드 밸런서와 함께 가져야 한다.
 - 어플리케이션 서버는 client의 IP를 직접적으로 볼 수 없다. 헤더에서 아래의 값들을 통해 얻을 수 있다.
-    - X-Forwareded-For
+    - X-Forwarded-For
     - X-Forwarded-Port
     - X-Forwarded-Proto
+
+### NLB
+- 네트워크 로드밸런서는 레이어 4이다.
+    - TCP & UDP 트래픽을 인스턴스로 포워딩한다.
+    - 초당 수천만개의 리퀘스르틀 핸들링한다.
+    - latency가 ALB에 비해 엄청 낮다.
+- ALB는 AZ별로 하나의 고정 IP를 가지고, Elastic IP 부여를 지원한다.
+
+#### NLB Target Group
+- EC2 instance
+- IP Addresses
+- Application Load Balancer
+
+### Gateway Load Balacner(GWLB)
+- 네트워크 트래픽 분석, 서드파티 네트워크 라우팅 등에 쓴다.
+- 네트워크 레이어 3에서 작동한다 (IP Packets)
+- 방화벽, 바이러스 감지, Deep Packet 분석 등에서 흔히 사용된다.
+- 2가지 기능
+    - Transparent Network Gateway : 모든 트래픽에 대해 하나의 출입구
+    - Load Balancer : 트래픽의 분산 기능
+- GENEVE 프로토콜을 사용하며, 포트는 6081을 사용한다.
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-03-19-nwlb.png'
+    alt="Photo"
+    width={300}
+    height={400}
+    priority
+    className="next-image"
+/>
+
+#### GWLB Target Group
+- EC2 instance
+- IP Addresses
