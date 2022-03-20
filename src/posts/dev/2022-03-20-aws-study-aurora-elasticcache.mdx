@@ -1,0 +1,71 @@
+---
+title: '[AWS] Aurora, ElasticCache'
+description: ''
+date: '2022-03-20T16:55:43+09:00'
+tags: [AWS, Aurora, ElasticCache]
+---
+
+### Amazon Aurora
+- Aurora는 AWS가 만든 기술로, 오픈소스가 아님
+- Postgres, Mysql 두 데이터베이스를 모두 서포트한다.
+- 오로라는 AWS 클라우드 optimized된 데이터베이스로, RDS에 postgres, mysql을 직접 사용하는것보다 몇배는 빠르다.
+- 오로라의 스토리지는 10GB부터 128TB까지 `알아서` 커진다.
+- Aurora는 15개의 replica를 가질 수 있으며, 복제 또한 더 빠르다.
+- Aurora의 Failover는 더 빠르다.
+- Aurora 는 RDS보다 20퍼센트 비싸지만, 효율적이다.
+
+#### Aurora의 높은 가용성과 리드 스케일링
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-03-20-aurora.png'
+    alt="Photo"
+    width={300}
+    height={300}
+    priority
+    className="next-image"
+/>
+
+- 3개의 AZ에 걸쳐 데이터가 6개의 카피로 보관된다.
+    - 4/6 은 write를 위해 필요 -> 1개의 AZ가 다운되어도 괜찮다.
+    - 3/6 은 read를 위해 필요
+    - 데이터가 망가진 경우 peer-to-peer 복제를 통해 자가 복구
+    - 볼륨 하나만이 아니라 여러개의 볼륨으로 운영된다.
+- 하나의 오로라 인스턴스(마스터)가 write를 담당한다
+- 자동 failover는 30초 미만이다.
+- 15개의 리드 레플리카를 지원한다.
+- Cross Region 복제를 지원한다.
+
+#### Aurora에서 기억해야 하는 것
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-03-20-aurora-remember.png'
+    alt="Photo"
+    width={300}
+    height={200}
+    priority
+    className="next-image"
+/>
+
+1. Shared Storage
+2. Automatically Expanding Storage Size
+3. Writer Endpoint
+4. Reader Endpoint
+5. Reader Auto Scaling
+
+#### 이외 오로라의 기능들
+1. 자동 Failover
+2. Backup과 Recovery
+3. Isolation과 Security
+4. Industry Compliance
+5. 버튼을 통한 스케일링
+6. 다운타임이 없는 자동 업데이트
+7. 향상된 모니터링
+8. 루틴 관리
+9. 백트랙 : 백업 없이 데이터를 어떤 시점으로든 복구할 수 있음.
+
+#### Aurora Security
+- RDS와 유사
+- KMS를 통한 암호화
+- 자동화된 백업, 스냅샷
+- SSL을 이용한 암호화
+- SSH 불가능
