@@ -77,3 +77,42 @@ tags: []
 - failover시 standby가 마스터가 된다.
 - AZ에 전체적으로 장애가 생겼을 경우에 유용함.
 - 옵션을 켜도 데이터베이스 재부팅 할 필요 없음
+
+#### RDS Security - Encryption
+- 고정 암호화
+    - 마스터, read replica를 AWS KMS을 활용해 암호화한다.
+    - 암호화는 RDS를 시작할 때 정의된다.
+    - 마스터가 암호화 되지 않았다면, read replica도 암호화 될 수 없다.
+    - 오라클과 SQL 서버에서는 투명한 데이터 암호화(TDE-다른 종류의 암호화)를 적용할 수 있음.
+
+- in-flight 암호화
+    - 클라이언트로부터 RDS로 데이터를 전송할 때 하는 SSL 인증을 뜻함.
+    - 데이터베이스에 연결할 때 SSL옵션과 함께 신뢰받는 certificate를 제공해야 함.
+    - SSL을 모든 클라이언트에서 강요하고 싶을 경우 각 데이터베이스별 설정을 해야함.
+
+#### RDS 암호화 기능
+- RDS 백업을 암호화하는 방법
+    - 암호화되지 않은 데이터베이스의 스냅샷 -> 암호화되지 않음
+    - 암호화된 데이터베이스의 스냅샷 -> 암호화 됨
+    - 스냅샷 -> 암호화 가능
+- 암호화되지 않은 RDS 데이터베이스를 암호화하는 방법
+    - 암호화되지 않은 데이터베이스에서 스냅샷 만들기
+    - 스냅샷을 복사해 암호화된 스냅샷 만들기
+    - 암호화된 스냅샷을 통해 데이터베이스 복구하기
+    - old database에서 new database로 마이그레이션
+    - old database 지우기
+
+#### RDS Security - Network & IAM
+- 네트워크 보안
+    - RDS 데이터베이스들은 보통 public subnet보다 private subnet에서 배포된다.
+    - RDS 보안은 security group을 활용하여 일어난다. (inbound, outbound)
+- 접근 보안
+    - IAM 정책은 AWS RDS에 누가 접근할 수 있는지를 조절하도록 돕는다.
+    - Database에 로그인하기 위해 전통적 Username / Password를 사용할 수 있다.
+    - 혹은 Mysql, Postgresql에서는 IAM-기반의 인증도 할 수 있음.
+
+#### RDS - IAM Authentication
+- IAM을 통한 데이터베이스 인증은 Mysql, Postgresql에서만 작동한다.
+- 비밀번호는 필요 없고, 인증 토큰은 RDS API call에 의해 얻을 수 있다.
+- 토큰은 15분의 수명을 가진다.
+- 토큰을 통해 EC2 instance와 RDS가 통신할 수 있다.
