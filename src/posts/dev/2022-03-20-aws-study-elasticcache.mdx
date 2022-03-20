@@ -54,3 +54,24 @@ tags: [AWS, Aurora]
     - 영속성 없음
     - 백업과 restore 없음
     - 멀티 쓰레드 구조
+
+### Cache Security
+- ElasticCache의 모든 캐시
+    - IAM 인증을 지원하지 않음 (캐시 내의 모든 작업)
+    - ElasticCache의 IAM 정책은 AWS API레벨의 보안에만 쓰인다.
+- Redis AUTH
+    - Redis cluster를 생성할 때 password/token을 설정할 수 있음
+    - 이것은 캐시를 위한 다른 레벨의 보안이다. (security group의 위)
+    - SSL in-flight 암호화 서포트
+- Memcached
+    - SASL 기반의 인증을 지원함
+
+### ElasticCache의 패턴들
+- Lazy Loading : 모든 종류의 리드 데이터가 캐싱되어 있고, 오랫동안 남아있을 수 있는 경우
+- Write Through : 데이터베이스로 Write될때마다 캐시를 업데이트함
+- Session Store : Stateless Application을 만들기 위해 사용함
+- 캐싱을 잘 하기는 매우 어렵다.
+
+### Redis Use Case
+- 게임 리더보드 생성
+- sorted set을 사용하기
