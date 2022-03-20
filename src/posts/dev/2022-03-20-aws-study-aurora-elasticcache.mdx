@@ -1,8 +1,8 @@
 ---
-title: '[AWS] Aurora, ElasticCache'
+title: '[AWS] Aurora'
 description: ''
 date: '2022-03-20T16:55:43+09:00'
-tags: [AWS, Aurora, ElasticCache]
+tags: [AWS, Aurora]
 ---
 
 ### Amazon Aurora
@@ -16,8 +16,7 @@ tags: [AWS, Aurora, ElasticCache]
 
 #### Aurora의 높은 가용성과 리드 스케일링
 
-<Image
-    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-03-20-aurora.png'
+<Image src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-03-20-aurora.png'
     alt="Photo"
     width={300}
     height={300}
@@ -69,3 +68,74 @@ tags: [AWS, Aurora, ElasticCache]
 - 자동화된 백업, 스냅샷
 - SSL을 이용한 암호화
 - SSH 불가능
+
+### Aurora Advanced
+#### Aurora Auto Scaling
+
+<Image src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-03-20-aurora-autoscaling.png'
+       alt="Photo"
+       width={300}
+       height={200}
+       layout={"responsive"}
+       priority
+       className="next-image"
+/>
+
+#### Aurora Custom Endpoint
+<Image src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-03-20-aurora-custom-endpoint.png'
+       alt="Photo"
+       width={300}
+       height={150}
+       layout={"responsive"}
+       priority
+       className="next-image"
+/>
+
+#### Aurora Serverless
+
+<Image src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-03-20-aurora-serverless.png'
+       alt="Photo"
+       width={300}
+       height={300}
+       priority
+       className="next-image"
+/>
+
+- 실제 사용량에 따라 자동으로 스케일링되는 서버리스 형태의 디비
+- 예측이 불가능한 워크로드 어플리케이션에서 사용하면 좋다.
+- 용량 계획이 필요없다
+- 초단위로 과금하며, 더 비용에 효율적일 수 있다.
+
+#### Aurora Multi-Master
+- write node에 대해서 즉각적인 failover 필요할 때,
+- write node에 대해서 High Ability가 필요할 때,
+- Aurora write인스턴스가 실패할 경우 즉각 failover를 제공받을 수 있다.
+
+#### Global Aurora
+- 크로스 리전 리드 레플리카
+    - 재해 복구에 유용함
+    - 사용하기 쉽다.
+- 오로라 글로벌 데이터베이스 (추천)
+    - 하나의 primary 리전 (read/ write)
+    - 복제 지연이 1초보다 작은 5개의 읽기 전용 리전을 만듬.
+    - 각 읽기 전용 리전 당 최대 16개의 리드 레플리카를 가짐.
+    - 지연율을 줄이는데 도움을 준다
+    - 하나의 구역에서 데이터베이스 중단이 일어날 경우, 다른 구역으로의 전환은 1분 미만에 일어난다.
+
+#### Aurora Machine Learning
+
+<Image src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-03-20-aurora-machine-learning.png'
+       alt="Photo"
+       width={300}
+       height={300}
+       priority
+       className="next-image"
+/>
+
+- SQL을 통해 ML 기반의 예측 모델을 어플리케이션에 적용할 수 있게 해준다
+- Aurora와 AWS ML 서비스와의 간단하고, 안정성 높은 호환성을 보여준다.
+- 호환되는 서비스
+    - Amazon SageMaker
+    - Amazon Comprehend
+- ML 경험이 없어도 됨.
+- 이상 거래 감지, 광고 타게팅, 감성 분석, 제품 추천 등의 기술을 적용할 수 있다.
