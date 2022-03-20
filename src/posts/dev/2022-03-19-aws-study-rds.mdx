@@ -1,0 +1,79 @@
+---
+title: '[AWS] RDS, Aurora, ElasticCache'
+description: ''
+date: '2022-03-19T17:14:13+09:00'
+tags: []
+---
+
+### RDS
+- 자동 provisioning, os patch
+- 지속적 백업과 restore
+- 모니터링 대시보드
+- 리드 성능을 위한 Read replicas
+- 재난 복구를 위한 멀티 AZ
+- 업그레이드를 위한 유지보수 윈도우
+- 용량 스케일링이 쉽다.
+- SSH를 통해 인스턴스에 직접 접근 안됨(X)
+
+#### 지원하는 데이터베이스
+- MySQL
+- PostgreSQL
+- mariaDB
+- Oracle
+- Microsoft SQL Server
+
+#### RDS Backups
+- 자동으로 켜져 있음
+- 자동으로 일어난다
+    - 하루마다 데이터베이스를 풀 백업함
+    - 트랜잭션 로그가 5분마다 로깅됨
+    - 어떤 포인트로든 복구가 가능함
+    - 7일간 보관 (35일까지 올릴 수 있음)
+- DB Snapshots
+    - 유저에 의해 트리거된다.
+    - 기간은 무제한이다.
+
+#### RDS Storage Auto Scaling
+- 필요하면 스토리지를 알아서 스케일링해줌
+- 스토리지 확장 최대치를 설정해야함
+- 오토스케일링이 일어나기 위한 조건
+    - 10퍼센트보다 적은 free storage
+    - 5분 이상 low storage가 지속될 때
+    - 지난 수정으로부터 6시간 후
+- 예측 불가능한 워크로드를 가진 어플리케이션에 유리하다.
+
+#### RDS 읽기 성능 스케일을 위한 Read Replicas
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-03-20-readreplica.png'
+    alt="Photo"
+    width={300}
+    height={200}
+    priority
+    className="next-image"
+/>
+
+- 리드 스케일링을 돕는다.
+- 복제 작업은 ASYNC라서 read작업은 궁극적으로 일관성을 유지할 수 있다.
+- read replica를 사용하고 싶은 경우 read replica의 엔드포인트에 요청하면 된다.
+
+#### RDS Read Replicas - Network Cost
+- 같은 리전, 다른 AZ라면 Replica에 대한 복제 비용은 무료이다.
+- 다른 리전, 다른 AZ라면 Replica에 대한 복제 네트워크 비용이 청구된다.
+
+#### RDS Multi AZ(Disaster Recovery)
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-03-20-multiaz.png'
+    alt="Photo"
+    width={300}
+    height={300}
+    priority
+    className="next-image"
+/>
+
+- SYNC replication(동기식 복제)
+- One DNS name을 사용하며 Master에 문제가 생길 경우 자동으로 standby로 failover된다.
+- failover시 standby가 마스터가 된다.
+- AZ에 전체적으로 장애가 생겼을 경우에 유용함.
+- 옵션을 켜도 데이터베이스 재부팅 할 필요 없음
