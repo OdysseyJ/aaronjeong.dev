@@ -1,0 +1,80 @@
+---
+title: '[AWS] Route53'
+description: ''
+date: '2022-03-22T21:29:25+09:00'
+tags: []
+---
+
+### DNS - Domain Name System
+- DNS는 hostname을 머신의 IP주소로 바꾸는 서비스이다.
+- 인터넷의 중추적 역할을 한다
+- DNS는 계층적 이름 구조를 사용한다
+    - .com
+    - example.com
+    - www.example.com
+    - api.example.com
+
+#### DNS 용어
+- Domain Registrar: Amazon Route53, Godaddy,,,
+- DNS Records: A, AAAA, CNAME. NS
+- Zone File: DNS 레코드를 포함하고 있음. 이름과 IP또는 주소 일치시키기
+- Name Server: DNS 쿼리를 해결하는곳
+- TOP Level Domain(TLD): .com, .us, .in, .gov...
+- Second Level Domain(SLD): amazon.com, google.com
+
+http://api.www.example.com
+Protocol/Domain/SubDomain/SLD/TLD
+
+#### DNS가 작동하는 방법
+- 웹 브라우저에서 DNS를 타이핑한다 (example.com)
+- 로컬 DNS 서버가 해당 쿼리를 본적이 없다면
+- ICANN에 의해 관리되는 DNS서버에 물어본다. (.com 서버 주소를 알려줌)
+- IANA에에 의해 관리되는 TLD DNS 서버에 물어본다. (Amazon 서버 주소 알려줌)
+- Amazon, Godaddy등에 의해 관리되는 SLD DNS 서버에 물어봐 최종 결과를 얻는다. (최종 IP 제공)
+
+### Amazon Route 53
+- DNS 레코드를 완전히 제어할 수 있는 서비스.
+- Route53는 또한 도메인 Registrar이다.
+- 사용자의 AWS 리소스 health를 체크할수 있는 기능이 있음
+- 100% SLA 가용성을 제공하는 유일한 AWS 서비스
+- 왜 route53인가? -> 전통적인 DNS 탐색에서 쓰이는 포트가 53번이라서.
+
+#### Route 53 - Records
+- 특정 도메인에 대해 트래픽을 어떻게 라우팅 하고 싶은지
+- 각각의 레코드가 포함하는 값
+    - 도메인 / 서브도메인 이름이 있다. -> example.com
+    - 레코드 타입 -> A or AAAA
+    - 값 -> 123.456.789.123
+    - 라우팅 정책 -> 쿼리에 대해 route53가 어떻게 응답하는가
+    - TTL -> DNS Resolver에 저장된 응답 시간
+- Route53은 아래와 같은 레코트 형식을 지원한다
+    - 꼭 알아야 하는 것 : A / AAAA / CNAME / NS
+    - 심화 : CAA / DS / MX / NAPTR / PTR / SOA / TXT / SPF / SRV
+
+#### Route 53 - 레코드 형식
+- A : 호스트 이름을 IPv4에 매핑하는 것
+- AAAA : 호스트 이름을 IPv6에 매핑하는 것
+- CNAME : 호스트 이름을 다른 호스트 이름에 매핑하는 것
+    - 타겟은 도메인 이름으로, A나 AAAA 레코드여야 한다
+    - CNAME 레코드를 DNS 네임스페이스의 탑 노드로 생성할 수 없음.
+    - 예를들어, example.com에는 만들수 없고, www.example.com에는 만들 수 있다.
+- NS : Name Server of Hosted Zones
+    - 트래픽이 어떻게 라우팅되는지 관리한다.
+
+#### Route 53 - Hosted Zones
+- 해당 도메인/서브도메인에 대한 트래픽을 어떻게 라우팅할지 정의한 레코드들에 대한 컨테이너
+- Public Hosted Zones : 인터넷 트래픽을 어떻게 라우팅 할지 정의하는 레코드들을 포함하고 있다.
+    - application1.mypublicdomain.com
+- Private Hosted Zones : 공개되지 않은 트래픽을 어떻게 라우팅할지 정의하는 레코드들을 포함한다.
+    - application1.company.internal
+- Hosted Zone 하나당 한달에 $0.5를 지불해야 한다.
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-3-23-hosted-zones.png'
+    alt="Photo"
+    width={400}
+    height={200}
+    layout={"responsive"}
+    priority
+    className="next-image"
+/>
