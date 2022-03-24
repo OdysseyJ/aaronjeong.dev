@@ -1,0 +1,124 @@
+---
+title: '[AWS] 솔루션 아키텍쳐 토론 - WhatsTheTime.com'
+description: ''
+date: '2022-03-24T20:52:41+09:00'
+tags: []
+---
+
+### Stateless Web App : WhatIsTheTime.com
+- 사람들에게 지금 현재 시간이 몇시인지를 알게 해주는 어플리케이션
+- 데이터베이스 필요없음 (서버가 몇시인지 암)
+- 작고, 다운타임을 허용할수 있음
+- 우리는 다운 타임이 없게 하기 위해 수평/수직 확장을 하고 싶음
+- 이 앱에 대한 솔루션즈 아키텍트
+
+#### 쉽게 시작
+- 처음에 T2 Micro에 탄력적 IP를 부여해 고정 Public ip를 가지도록 설계
+- 탄력적 IP는 인스턴스가 중지후 다시 실행될때 IP가 변경되는 것을 막는다.
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-3-24-step1.png'
+    alt="Photo"
+    width={300}
+    height={150}
+    layout={"responsive"}
+    priority
+    className="next-image"
+/>
+
+#### Scaling Vertically
+- 유저들이 늘어나며, 수직적 확장(어플리케이션 서버 사이즈를 키움)을 할 것.
+- 서버 사이즈를 늘리면서, 서버의 다운타임이 생겼음
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-3-24-step2.png'
+    alt="Photo"
+    width={300}
+    height={150}
+    layout={"responsive"}
+    priority
+    className="next-image"
+/>
+
+#### Scaling horizontally
+- 앱이 인기가 더욱 많아지면서, 인스턴스를 3개로 늘림
+- 각 인스턴스별로 탄력적 IP를 가짐
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-3-24-step3.png'
+    alt="Photo"
+    width={300}
+    height={150}
+    layout={"responsive"}
+    priority
+    className="next-image"
+/>
+
+- 탄력적 IP 제거 (리전마다 겨우 5개의 탄력적 IP)
+- Route53 부착, api.whatisthetime.com
+- A Record, TTL : 1hour
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-3-24-step4.png'
+    alt="Photo"
+    width={300}
+    height={150}
+    layout={"responsive"}
+    priority
+    className="next-image"
+/>
+
+
+#### Scaling horizontally with a load balancer
+- 만약 인스턴스 하나가 사라진다면? 이런 케이스에 대비해 로드밸런서를 이용한다.
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-3-24-step5.png'
+    alt="Photo"
+    width={300}
+    height={150}
+    layout={"responsive"}
+    priority
+    className="next-image"
+/>
+
+#### Auto scaling group
+- 인스턴스를 손으로 늘리고 줄이기 귀찮다(힘들다)
+- auto scaling group을 적용함
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-3-24-step6.png'
+    alt="Photo"
+    width={300}
+    height={150}
+    layout={"responsive"}
+    priority
+    className="next-image"
+/>
+
+#### Multi-AZ App
+- 지진이 나서 AZ가 마비되면 앱이 죽을 수 있음
+- Multi AZ ELB + Multi AZ Auto Scaling Group + Multi AZ Instances
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-3-24-step7.png'
+    alt="Photo"
+    width={300}
+    height={150}
+    layout={"responsive"}
+    priority
+    className="next-image"
+/>
+
+#### 비용 절감
+- 예약 인스턴스를 통해 최소 2개의 인스턴스 예약
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-3-24-step8.png'
+    alt="Photo"
+    width={300}
+    height={150}
+    layout={"responsive"}
+    priority
+    className="next-image"
+/>

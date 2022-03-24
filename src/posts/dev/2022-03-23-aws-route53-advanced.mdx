@@ -129,3 +129,48 @@ tags: [AWS, Route53]
 - Route53의 헬스 체커들은 VPC 밖에 있다.
 - private endpoint에 접근할 수 없음.
 - CloudWatch Metric을 만들고 CloudWatch Alarm과 연결한 다음, 알람 그 자체를 체크하는 HealthCheck를 만들어야 함.
+
+#### Routing Policies - Failover (Active-Passive)
+- 헬스 체크를 하고 있던 Primary 리소스의 헬스 체크가 실패하면, 다른 보조 리소스로 연결함
+- Primary와 Secondary를 각각 하나씩 설정할 수 있음
+
+#### Routing Policies - Geolocation
+- Latency based와 다르다
+- 유저의 위치에 따라 라우팅된다
+- 대륙, 도시, 혹은 주 별로 특정할 수 있다.
+- "Default" 레코드를 만들어야 한다.
+- 웹사이트 국제화, 컨텐츠 분산 제한, 로드밸런싱 등에 쓰인다.
+- 헬스 체크와 함께 사용될 수 있다.
+
+#### Routing Policies - Geoproximity Routing
+- 리소스와 유저의 지리학적 위치에 기반해서 트래픽을 라우팅하는 방식
+- 특정 위치를 기반으로 리소스에 더 많은 트래픽을 이동시키는것
+- 지리적 위치를 변경하려면, 편향값을 지정해야 함.
+    - 특정 리소스에 더 많은 트래픽을 보내려면, 편향값을 증가시켜 확장
+    - 리소스에 트래픽을 적게 보내려면, 편향값을 감소
+- 리소스들은
+    - AWS 리소스(특정 리전에 속한 리소스)
+    - 특정 위도 경도를 기반으로
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-3-24-geoproximity.png'
+    alt="Photo"
+    width={300}
+    height={150}
+    layout={"responsive"}
+    priority
+    className="next-image"
+/>
+
+#### Routing Policies - Multi Value
+- 트래픽을 여러개의 리소스로 라우팅 하고 싶을 때 사용
+- Route 53은 여러개의 값 혹은 리소스를 반환
+- 헬스 체크 로직과 함께 사용할 수 있다. (건강한 리소스의 값들만 반환한다.)
+- Multi-Value query에 의해 healthy는 8개까지 반환될 수 있다.
+- 클라이언트 사이드에서의 로드 밸런서
+
+#### Routing 53 - Traffic flow
+- 비주얼 에디터로 복잡한 라우팅 의사 결정 트리를 결정하는 것
+- Route53의 과정을 시각적으로 나타낼 수 있음
+    - 다른 Route53 Hosted Zones에 적용될 수 있음.
+    - 버저닝 지원
