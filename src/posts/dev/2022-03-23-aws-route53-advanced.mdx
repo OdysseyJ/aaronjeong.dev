@@ -1,0 +1,46 @@
+---
+title: '[AWS] Route53 advanced'
+description: 'aws route53'
+date: '2022-03-23T20:35:46+09:00'
+tags: [AWS, Route53]
+---
+
+### DNS 작동 트래킹 하기
+
+> dig [URL]
+
+> nslookup [URL]
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-3-23-dig.png'
+    alt="Photo"
+    width={400}
+    height={250}
+    layout={"responsive"}
+    priority
+    className="next-image"
+/>
+
+#### Route53 - Records TTL (Time To Live)
+- 높은 TTL(예, 24시간)
+    - Route53에 트래픽은 줄어듬
+    - outdated된 레코드를 조회할 가능성이 큼
+- 낮은 TTL(예, 60초)
+    - Route53에 트래픽이 더 많이나옴 (비용 증가)
+    - 레코드가 정말 짧은 시간만 outdate됨
+    - 레코드를 변경하기 쉬움
+- 보통 도메인 변경 전 TTL을 낮춰놓고 다시 TTL을 높이는 식으로 관리함
+- 각각의 DNS 레코드마다 TTL은 필수적이다 (Alias Record 제외)
+
+#### Route53 - CNAME vs Alias
+-
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-3-23-ttl.png'
+    alt="Photo"
+    width={300}
+    height={200}
+    layout={"responsive"}
+    priority
+    className="next-image"
+/>
