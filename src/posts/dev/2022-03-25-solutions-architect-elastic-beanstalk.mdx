@@ -1,0 +1,53 @@
+---
+title: '[AWS] Elastic Beanstalk'
+description: ''
+date: '2022-03-25T12:03:43+09:00'
+tags: []
+---
+
+### Elastic Beanstalk
+- 많은 어플리케이션이 같은 아키텍쳐를 따른다.
+- 개발자들에게 매번 설정을 하는 일은 귀찮은 일이다.
+- AWS에서 개발을 하는 모든 개발자들이 쉽게 사용할 수 있도록 만들어놓은 기본 틀.
+- beanstalk 서비스 그 자체는 무료지만, 여러가지 구성 요소들은 돈을 내야한다.
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-3-25-elastic-beanstalk.png'
+    alt="Photo"
+    width={300}
+    height={150}
+    layout={"responsive"}
+    priority
+    className="next-image"
+/>
+
+#### Components
+- Application : 작동시키고싶은 어플리케이션
+- Application Version : 버전
+- Environment
+    - 어플리케이션 버전에서 구동되는 AWS 리소스 콜렉션
+    - Web Server Env Tier & Work Environment Tier
+    - 여러개의 environment를 구성할 수 있다.
+
+#### Supported Platforms
+- Go
+- Javs SE
+- Java with Tomcat
+- .Net
+- Node
+- Python
+...
+
+#### Web Server Tier vs Worker Tier
+- Web Server Tier : ELB가 트래픽을 각 instance에 전달하는 방식
+- Worker Tier : SQS에 메세지를 쌓아두고, Worker가 Consuming하는 방식
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-3-25-elastic-beanstalk-tiers.png'
+    alt="Photo"
+    width={300}
+    height={150}
+    layout={"responsive"}
+    priority
+    className="next-image"
+/>

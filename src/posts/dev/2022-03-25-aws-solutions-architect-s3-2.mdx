@@ -1,0 +1,71 @@
+---
+title: '[AWS] S3 Security, Websites, CORS'
+description: ''
+date: '2022-03-25T15:07:56+09:00'
+tags: []
+---
+
+### S3 Security
+- User based
+    - IAM Policies : 어떤 API call이 allow되어야 하는지
+- Resource based
+    - Bucket Policies
+    - Object Access Control List (ACL)
+    - Bucket Access Control List (ACL)
+
+- Note : IAM 정책은 s3 object에 access 할 수 있다
+    - 유저가 퍼미션이 있거나, 리소스 폴리시가 ALLOW인 경우
+    - 명시적 DENY가 없는 경우
+
+#### S3 Bucket Policies
+- Json based
+    - json을 통해 정책을 정의하는 방식
+    - 버킷과 오브젝트 전체 정의 가능
+    - Allow / Deny
+
+#### Security - Other
+- Networking
+- Logging and Audit
+    - S3 Access Log는 다른 버킷에 저장된다
+    - AWS CloudTrail에 API call도 저자오딤
+- User Security
+    - MFA Delete : 지울때 MFA 사용
+    - Pre-Signed URLs : 제한된 시간 동안만 유효한 URL
+
+### S3 Websites
+- s3는 정적 웹사이트를 호스트할 수 있고, www에서 접근 가능하게 만들 수 있음
+- website url은
+    - <bucket-name>.s3-website-<AWS-region>.amazonaws.com
+- 만약 403이 뜰 경우, 버킷 policy를 public read에 대해 allow하면 된다
+
+### S3 CORS
+- Cross Origin Resource Sharing
+- 웹 브라우저는 기본적으로 같은 오리진에 대해서만 허용을 해주고, 다른 오리진의 hostname에 요청을 보내는 경우 막음
+- 같은 Origin
+    - http://example.com/app1
+    - http://example.com/app2
+- 다른 Origin (Cross Origin)
+    - http://www.example.com
+    - http://other.example.com
+- 올바른 CORS헤더가 없는 경우 웹 브라우저가 해당 요청 차단
+- CORS Header (ex: Access-Control-Allow-Origin)를 설정해야 함.
+- 클라이언트가 cross-origin request를 우리 s3버켓에 날리면, 우리는 올바른 CORS 헤더를 enable해줘야 함.
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-3-25-cors.png'
+    alt="Photo"
+    width={300}
+    height={150}
+    layout={"responsive"}
+    priority
+    className="next-image"
+/>
+
+### S3 Consistency Model
+- 2020/12 부터
+- 해당 작업 후에
+    - 새로운 오브젝트 만들기
+    - 기존 오브젝트를 지우거나 오버라이딩 했을 때
+- Consistency 유지 (바로 보임)
+    - read/write consistency
+    - list consistency

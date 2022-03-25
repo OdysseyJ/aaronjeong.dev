@@ -1,0 +1,76 @@
+---
+title: '[AWS] S3 Bucket, Object, Encryption'
+description: ''
+date: '2022-03-25T12:27:43+09:00'
+tags: []
+---
+
+### S3
+- 무한정 scaling이 가능한 스토리지
+- 많은 웹사이트들이 s3를 사용하고 있음.
+
+
+#### Bucket
+- 파일 보관소
+- globally unique 한 이름을 가져야 한다.
+- Region 레벨에서 정의된다
+- 네이밍 컨벤션이 있다
+    - 대문자 안됨
+    - underscore안됨
+    - 3-63 캐릭터
+    - IP 안됨
+    - lower_case_letter or number로 시작해야함
+
+#### Object
+- Object는 키를 가진다.
+- `key`는 Full path를 의미한다
+    - s3://my-bucket/`my_file.txt`
+    - s3://my-bucket/`my_folder1/another_folder/my_file.txt`
+- key는 prefix + object name으로 구성됨
+- 디렉토리라는 컨셉이 없음. (UI는 사실 키를 디렉토리처럼 만든거임)
+- Object value는 컨텐츠의 body이다.
+    - Max Object Size : 5TB(5000GB)
+    - 만약 5GB이상의 오브젝트를 업로드 할 경우, `multi-part upload`를 사용해야함
+- Metadata (시스템 메타 데이터)
+- Tags
+- Version ID (버전)
+
+#### Versioning
+- S3내부의 파일에 대해 버저닝을 할 수 있음
+- 버킷 레벨에서 가능
+- same key에 대해 overwrite를 하면 버전을 증가시킴.
+- 노트
+    - 의도하지 않은 삭제로부터 보호
+    - 롤백하기 쉽다
+    - 버저닝이 꺼진 상태에서 업로드된 파일은 버전 null
+    - 버킷에서 버저닝을 없애면 이전 버전이 없어지는게 아니라 새로운 파일에 대한 버저닝이 없어짐
+    - 버저닝이 켜진 상태에서 파일을 지우면 Delete Marker가 붙을 뿐임. (이전 버전은 그대로 남아있음)
+
+#### Object 암호화
+- 4가지 암호화 방법이 있음
+    - SSE-S3 : AWS가 처리 관리하는 키를 사용해 객체 암호화
+    - SSE-KMS : AWS Key Management Service 사용
+    - SSE-C : 고유한 암호화 키
+    - Client Side Encryption : 클라이언트가 암호화
+
+#### SSE-S3
+- Server side encryption
+- 암호화는 아마존 s3에 의해 관리된다.
+- AES-256 암호화 방식을 사용
+- 헤더에 `"x-amz-server-side-encryption": "AES256"`을 꼭 설정 해야 함
+
+#### SSE-KMS
+- Server side encryption
+- KMS에서 암호화 키를 핸들링함
+- KMS의 장점 : 유저 컨트롤 + 추적
+- 헤더에 `"x-amz-server-side-encryption": "aws:kms"`를 꼭 설정 해야 함.
+
+#### SSE-C
+- Customer에 의해 관리되는 키를 가지고 암호화
+- S3는 encryption키를 저장하고 있지 않음
+- `HTTPS`가 무조건 사용되어야 함.
+
+#### Client side encryption
+- 클라이언트가 암호화를 진행
+- S3에 보내기 전에 암호화를 진행해서 보내야함
+- 해독할 책임도 Client Side에 있다.
