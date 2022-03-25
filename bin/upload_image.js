@@ -11,14 +11,13 @@ const AWS = require('aws-sdk');
 const multer = require("multer");
 const multerS3 = require("multer-s3");
 
-const { AWS_REGION, AWS_IDENTITYPOOLID, AWS_BUCKET, SCREENSHOT_PATH  } = process.env
+const { AWS_REGION, AWS_BUCKET, SCREENSHOT_PATH  } = process.env
 
+const credentials = new AWS.SharedIniFileCredentials({profile: 'odysseyj'});
+AWS.config.credentials = credentials;
 AWS.config.update({
-  region : AWS_REGION,
-  credentials : new AWS.CognitoIdentityCredentials({
-    IdentityPoolId: AWS_IDENTITYPOOLID
-})
-})
+    region: AWS_REGION,
+});
 
 const s3 = new AWS.S3({
   apiVersion: "2006-03-01",

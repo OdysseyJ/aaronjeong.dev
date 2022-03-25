@@ -1,0 +1,131 @@
+---
+title: '[AWS] S3 Advanced 2'
+description: ''
+date: '2022-03-25T18:53:40+09:00'
+tags: []
+---
+
+### S3 저장소 클래스
+- Amazon S3 Standard - 범용
+- Amazon S3 Standard-Infrequent Access(IA)
+- Amazon S3 One Zone-Infrequent Access
+- Amazon S3 Intelligent Tiering
+- Amazon Glacier
+- Amazon Glacier Deep Archive
+- Amazon S3 Reduced Redundancy Storage (deprecated)
+
+#### S3 Standard - General Purpose
+- 내구성, 객체 손실이 없고, 가용성 : 99.9999999%
+- 기능 장애를 동시에 2개 버틸 수 있음
+- 굉장히 범용적으로 많이 쓰임
+
+#### S3 Standard - Infrequent Access(IA)
+- 자주 엑세스 하지 않지만 빠르게 엑세스해야하는 데이터
+- 가용성
+- S3 Standard보다 비용이 적게 듬
+- 재해 복구, 백업, 잘 안쓰이는 데이터 저장용
+
+#### S3 One Zone - Infrequent Access(IA)
+- IA기능은 같고, 하나의 AZ에만 저장됨
+- 가용성은 조금 낮지만, 레이턴시가 낮고 높은 throughput을 기대할 수 있다.
+- AZ가 폭파되면 데이터를 잃는다
+- 암호화를 지원함.
+- IA 대비 비용 20% 저렴
+- 백업 파일 저장, 이미지 썸네일 저장 등에 쓰임
+
+#### S3 Intelligent Tiering
+- 낮은 지연, 높은 성능은 S3 standard랑 같다
+- 월마다 작은 모니터링비용과 함께 티어링 비용이 발생한다
+- 티어링이란, 활용도에 따라 고성능 / 저성능에 나눠서 보관하는것
+- 범용 S3, S3 IA 사이에 데이터 이동이 자동으로 일어남
+
+### AWS Glacier
+- 저비용의 object storage
+- 백업 / 아카이빙용
+- 엄청 오랜 기간동안 보관하는 용도 (10년)
+- 마그네틱 테이프 저장소를 대체할 수 있는 용도
+- 1GB당 0.004$로 매우 저렴하지만, retrieval 비용이 든다.
+- 각각의 아이템은 `Archive`라고 불리며 최대 40TB까지 저장이 가능하다.
+- 아카이브는 버킷이 아닌 `Vaults`라는 금고에 저장된다.
+
+#### AWS Glacier & Glacier Deep Archive
+- 3개의 복구 옵션
+    - Expedited (1~5분)
+    - Standard (3~5시간)
+    - Bulk (5~12시간)
+    - 최소 저장 기간 : 90일
+- Deep Archive : 더 긴 기간 보관하는 스토리지
+    - Standard (12시간)
+    - Bulk (48시간)
+    - 최소 저장 기간 : 180일
+
+### S3 수명 주기 규칙
+- object를 storage 클래스 사이에서 옮길 수 있음
+- 자주 엑세스되는 오브젝트는 STANDARD_IA
+- 리얼 타임이 필요없는 오브젝트는 GLACIER 혹은 DEEP_ARCHIVE
+- 직접 옮기는 것도 가능하지만, 수명 주기 구성을 사용해 자동으로 옮기는것이 가능
+
+#### 수명 주기 규칙
+- Transition actions : 오브젝트가 언제 다른 스토리지 클래스로 이동할지 정의
+    - Standard IA클래스로 60일뒤 이동
+    - Glacier 클래스로 6달후 이동
+- Expiration actions : 얼마간의 주기가 지난 뒤 object를 지우는것
+    - 엑세스 로그는 365일 후에 지워지게 설정할 수 있음
+    - old version의 파일을 지우는데 사용될 수 있음
+    - 미완료된 multi-part upload를 지우는데 사용될 수 있음
+- 특정 접두어를 포함해서 룰을 만들 수 있음
+- 특정 태그에 규칙을 정의할 수 있음
+
+#### S3 Lifecycle Rule 시나리오 1
+- 어플리케이션이 유저 프로필을 만들면 s3에 업로드한다.
+- 이러한 썸네일들은 쉽게 재생성될 수 있고, 45일간 보관될 필요가 있다.
+- 원본 이미지들은 즉시 45일간 복원이 가능해야 하고, 45일 이후에는 6시간까지 기다릴 수 있음.
+
+=> S3 원본은 standard에 두고, 45일후 GLACIER로 보내면 된다.
+=> 썸네일은 ONEZONE_IA에 두고, 45일후 지운다 (재생성이 가능하기 때문에)
+
+#### S3 Lifecycle Rule 시나리오 2
+- 15일동안은 삭제된 s3를 바로 복구할 수 있음
+- 1년까지는 삭제한 객체를 48시간내 복구 가능
+
+=> S3 버저닝
+=> current version이 아니면, S3_IA로 이동시킨다 (바로 복구)
+=> 15일이 지나면, DEEP_ARCHIVE로 이동시킨다 (48시간내 복구 가능)
+
+### S3 분석 - 스토리지 클래스 분석
+- 언제 오브젝트를 standard에서 standard_ia로 보내면 좋을지 결정하기 위해 s3 analytics를 셋업할 수 있다.
+- 오직 standard -> standard_ia로만 작동
+- 처음 활성화때는 24~48시간 걸림
+- lifecycle 룰을 개선시킬때 좋음
+
+### S3 - Baseline Performance
+- 아마존 S3는 아주 많은 수의 요청을 처리 하도록 자동적으로 스케일링된다.
+- 지연 시간이 매우 짧다.
+- (초, 접두어)당 3500개의 put/copy/post/delete, 5500개의 get
+- object path => prefix
+    - bucket/folder1/sub1/file => /folder1/sub1/
+    - bucket/folder1/sub2/file => /folder1/sub2/
+    - bucket/1/file => /1/
+    - bucket/2/file => /2/
+
+### S3 - KMS 제한
+- SSE-KMS를 사용하는 경우, KMS limit에 영향을 받음
+- 업로드시, GenerateDataKey라는 KMS API를 부른다
+- 다운로드시, Decrypt라는 KMS API 부른다.
+- KMS는 초당 quota제한을 가지고 있음
+- 서비스 할당량 콘솔을 통해 할당량 증가를 요청할 수 있음.
+
+### S3 - 성능
+- Multipart 업로드
+    - 파일당 100MB 이상
+    - 5GB이상의 파일에 사용
+    - 동시에 업로드가 가능함
+- S3 전송 가속
+    - 근처 엣지 로케이션으로 파일을 이동시킴
+    - 엣지 로케이션부터 버킷까지는 사설망으로 더 빠르게 전송
+    - 분할 업로드와 호환됨
+
+#### S3 성능 - S3 Byte-Range Fetches
+- GET 요청시 특정 오브젝트를 byte range로 작은 바이트단위로 나누어 요청
+- 병렬적으로 요청
+- 실패에 대해 더 나은 복구를 제공 (오직 partial data만 요청)

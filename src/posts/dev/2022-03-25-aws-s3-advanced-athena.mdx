@@ -1,0 +1,52 @@
+---
+title: '[AWS] S3 Advanced 1'
+description: ''
+date: '2022-03-25T16:52:48+09:00'
+tags: []
+---
+
+### S3 MFA Delete
+- MFA(Multi Factor Authentication)을 사용해 행동 규제
+- 버저닝을 enable해야 사용할 수 있다.
+- MFA가 필요한 경우
+    - 오브젝트 영구 삭제
+    - 버킷 버저닝 suspending
+- MFA 필요 없는 경우
+    - 버저닝 enable
+    - 삭제된 버전 listing
+- 버킷 오너만 설정 가능
+- 콘솔에서 불가능, CLI만 가능, 루트 계정만 가능
+
+#### S3 Default 암호화 vs Bucket policy
+- 암호화를 강제하고 싶으면 bucket policy를 설정해서 encryption 헤더가 없는 경우 막을 수 있음
+- 다른 방법으로는 s3 기본 암호화 옵션을 사용하는 방법이 있음.
+- 버킷 정책이 default encryption보다 먼저 계산됨
+
+#### S3 엑세스 로그
+- 감사 목적으로 버킷에 엑세스하는 모든 요청의 로깅하는 경우
+- 다른 버킷에 저장됨
+- 아테나나 다른 분석 툴을 사용해 분석될 수 있음.
+- 모니터링 버킷과 로깅 버킷을 동일하게 사용하면 안된다. (로깅 루프 - 용량이 엄청 커짐)
+
+### S3 복제
+- 다른 리전의 버킷으로 버킷을 복사하고 싶을 때
+- source랑 destination의 versioning을 enable해야함
+- Cross Region Replication (CRR)
+- Same Region Replication (SRR)
+- 버킷들은 다른 어카운트에 있을 수 있다.
+- 복제는 비동기적이다
+- 적절한 IAM 권한을 s3에 부여해야 한다
+
+- CRR : 규정 준수, 데이터 엑세스 시간 단축
+- SRR : 로그 집계, 프로덕션_테스트 데이터 복제
+
+- Activate된 이후의 새로운 오브젝트들만 복제된다
+- DELETE케이스의 경우
+    - delete marker도 복제 가능함
+    - 버전 삭제는 복제되지 않음
+- 연쇄 복제는 없음
+    - 버켓1이 버켓2로 복제되고, 버켓2가 버켓3으로 복제되는 경우
+    - 버켓1이 버켓3으로 복제되지 않음
+
+### S3 Presigned URLs
+- s3에 업로드를 일시 승인하는 방법

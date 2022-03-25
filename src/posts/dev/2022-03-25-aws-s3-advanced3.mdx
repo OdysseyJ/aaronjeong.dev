@@ -1,0 +1,50 @@
+---
+title: '[AWS] S3 Advanced 3, Athena'
+description: ''
+date: '2022-03-25T21:49:03+09:00'
+tags: []
+---
+
+### S3 Select & Glacier Select
+- SQL을 이용해 적은 양의 데이터를 검색하는 기술
+- row랑 column을 이용해서 필터링 할 수 있음 (집계 기능 안됨, 간단한것만)
+- client입장에서 적은 네트워크 전송, 낮은 cpu를 사용해 사용할 수 있다.
+
+### S3 Event Notifications
+- 일부 이벤트는 S3 버킷 내에서 발생함
+- 새로운 객체가 생성됨, 객체가 제거됨 등등
+- object name으로 필터링이 가능함
+- 유즈케이스 : 썸네일 이미지 자동 생성
+- Event Notification Targets : `SNS`, `SQS`, `Lambda Function`
+- S3 이벤트 알림은 보통 몇초안에 전달되지만, 가끔 더 길어지기도 한다
+- 만약 2개의 write가 동시에 버전이 없는 오브젝트를 만들면, 하나의 event만 전송될 가능성이 있음
+
+### S3 요청자 지불
+- 보통은 요청자가 아닌 버킷 오너가 비용을 지불한다.
+- 요청자 지불 버킷은, 버킷 주인 대신 요청자가 비용을 지불하는 것
+- 엄청 큰 데이터셋을 다른 계정과 공유하고자 할 때 유용
+- 요청자들 또한 AWS에 인증받아야 한다, anonymous일 수 없다
+
+### Amazon Athena
+- 아마존 아테나는 s3 object 분석에 사용되는 서버리스 쿼리다
+- SQL 언어를 통해 파일을 조회한다
+- CSV, JSON, ORC, Avro, Parquet드을 지원한다
+- 1TB 데이터 스캔당 5달러
+- 압축되거나 컬럼 데이터를 사용해 스캔량을 줄여 비용 절약이 가능
+- 유즈케이스 : 비즈니스 인텔리전스, 분석, 보고, 로그 분석 등등
+
+### Glacier Vault Lock
+- 한번 쓰고 여러번 읽는 WORM 모델에 관련된 것
+- 미래의 편집에 방지해, 더이상 변경될 수 없게 함
+- 규정 준수와 데이터 보존을 위해 이러한 정책을 사용함 (누군가 감사할 때 유용함)
+
+### S3 Object Lock (versioning must be enabled)
+- WORM(Write Once Read Many) Model
+- 특정 오브젝트 버전이 특정 기간동안 삭제되는것을 막는다
+- 오브젝트 리텐션
+    - 리텐션 기간: 고정된 기간 명시
+    - Legal Hold: 같은 보호지만, 만료 기간이 없는 것
+- 모드
+    - Governance mode: 유저는 특정 종류의 퍼미션이 없는 이상 오버라이팅, 삭제, lock setting에 대한 수정이 불가능
+    - Compliance mode: 보호되는 오브젝트 버전은 누구에게도 삭제되거나 수정될 수 없음(루트 계정 포함), 오브젝트가 compliance mode로 잠기면
+리텐션 모드도 변경될 수 없고, 리텐션 기간도 조정할 수 없음
