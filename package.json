@@ -11,9 +11,11 @@
     "lint": "next lint"
   },
   "bin": {
-    "create-post": "bin/create_post.js"
+    "create-post": "bin/create_post.js",
+    "upload": "bin/upload_image.js"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.56.0",
     "@chakra-ui/icons": "1.0.16",
     "@chakra-ui/react": "1.6.10",
     "@emotion/react": "^11",
@@ -30,10 +32,14 @@
     "@visx/shape": "^2.4.0",
     "@visx/text": "^2.3.0",
     "@visx/wordcloud": "^2.1.0",
+    "aws-sdk": "^2.1100.0",
     "dayjs": "1.10.7",
     "disqus-react": "1.1.2",
+    "dotenv": "^16.0.0",
     "framer-motion": "^4",
     "gray-matter": "4.0.3",
+    "multer": "^1.4.4",
+    "multer-s3": "^2.10.0",
     "next": "12.0.1",
     "next-mdx-remote": "3.0.7",
     "nprogress": "0.2.0",
