@@ -1,0 +1,61 @@
+---
+title: '[AWS] 솔루션 아키텍쳐 토론 - MyWordPress.com'
+description: ''
+date: '2022-03-25T10:13:49+09:00'
+tags: []
+---
+
+### MywordPress.com
+- 완전 확장 가능한 웹 사이트를 만들려고 함
+- 웹사이트에 접속해 그림 업로드한 그림이 바르게 나타나길 원함
+
+#### 기본 Aurora App
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-3-25-wordpress-step1.png'
+    alt="Photo"
+    width={300}
+    height={150}
+    layout={"responsive"}
+    priority
+    className="next-image"
+/>
+
+#### EBS 볼륨 사용해 이미지 저장하기
+- 많은 트래픽에 취약함.
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-3-25-wordpress-step2.png'
+    alt="Photo"
+    width={300}
+    height={150}
+    layout={"responsive"}
+    priority
+    className="next-image"
+/>
+
+#### 인스턴스 스케일링시 EBS 볼륨은 문제가 있다.
+- 특정 인스턴스에서는 이미지에 접근이 불가능할 수 있음.
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-3-25-wordpress-step3.png'
+    alt="Photo"
+    width={300}
+    height={150}
+    layout={"responsive"}
+    priority
+    className="next-image"
+/>
+
+#### EFS를 사용해 공유 이미지 보관함 사용
+- 비용이 더 많이 나옴.
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-3-25-wordpress-step4.png'
+    alt="Photo"
+    width={300}
+    height={150}
+    layout={"responsive"}
+    priority
+    className="next-image"
+/>
