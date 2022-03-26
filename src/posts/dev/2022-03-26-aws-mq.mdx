@@ -1,0 +1,15 @@
+---
+title: '[AWS] MQ'
+description: ''
+date: '2022-03-26T20:17:38+09:00'
+tags: []
+---
+
+### AWS MQ
+- AWS가 생기기 전 표준 프로토콜 : MQTT, AMQP, STOMP< Openwire, WSS 등등
+- SQS, SNS는 Amazon의 기능임
+- 온프로미스 큐를 그냥 그대로 옮기고 싶을 때
+- SQS/SNS만큼 스케일할 수 없음
+- 전용 머신에서 실행, 고가용성
+- 대기열 기능, topic같은 기능도 있음
+- Failover : EFS 사용
