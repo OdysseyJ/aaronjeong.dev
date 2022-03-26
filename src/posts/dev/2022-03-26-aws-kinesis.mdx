@@ -6,4 +6,55 @@ tags: []
 ---
 
 ### Kinesis
+- 스트리밍 데이터의 수집, 프로세싱, 분석을 쉽게 만들어주는 서비스
+- 어플리케이션 로그, Iot, Website 클릭 스트림 등등
+- Kinesis Data Stream : 캡쳐, 프로세싱, 데이터 스트림 저장
+- Kinesis Data Firehose : 데이터 스트림을 AWS data store로 로드한다
+- Kinesis Data Analytics : 데이터 스트림을 SQL이나 Apache Flink를 통해 분석
+- Kinesis Video Streams : 비디오 스트림을 캡쳐, 분석
 
+
+#### Kinesis Data Streams
+- 스트림 안에 샤드로 구성됨
+- 다양한 Producer들이 데이터를 실시간 스트림으로 전송 가능
+- 레코드들은 키 / blob를 가지고 최대 1MB임
+- 각 샤드는 1MB/s, 1000msg/s를 제공함
+- Consumer는 Kinesis 분석 툴과, 람다 등이 될 수 있다.
+- 샤드별로 청구
+- 리텐션은 1~365일
+- 데이터를 다시 프로세싱 할 수 있는 능력이 있음
+- Kinesis에 들어간 데이터는 절대 지울 수 없다.
+
+#### Kinesis Data Firehose
+- 다양한 Producer들을 가진다.
+- 레코드를 하나씩 읽어 데이터 배치를 만든 뒤 Batch Write를 시도한다.
+- Base Destination : S3, Redshift, ElasticSearch
+- 3rd party : Datadog, Mongodb ....
+- Custom Destination : Http Endpoint
+- 백업 S3 버켓을 가질 수 있다.
+- 완전 관리형 서비스
+- 얼마나 데이터가 지나가느냐에 따라 pay
+- 준 실시간 시스템
+- 많은 데이터 포맷을 서포팅 함
+
+#### Data Stream vs Firehose
+- DataStream
+    - 규모에 맞게 수집하는 스트리밍 서비스
+    - 커스텀 코드 작성
+    - 실시간
+    - 스케일링을 직접 매니징함
+    - 1~365일 저장
+- Data Firehose
+    - Fully Managed
+    - 거의 실시간
+    - 자동 스케일링
+    - 스토리지 없음
+    - 스트리밍 데이터를 S3 / Redshift / ES / 3rd party / custom https로 로드함
+
+#### Kinesis Data Analytics
+- SQL을 이용한 Kinesis Stream 분석
+- Fully Managed
+- 오토스케일링
+- 리얼타임 분석
+- 시계열 데이터 분석
+- 리얼타임 대시보드 등에 쓰임
