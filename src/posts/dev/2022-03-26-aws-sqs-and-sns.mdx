@@ -1,0 +1,39 @@
+---
+title: '[AWS] SNS+SQS : Fan Out'
+description: ''
+date: '2022-03-26T19:26:16+09:00'
+tags: []
+---
+
+### SNS + SQS : Fan Out 패턴
+- SNS에 한번 보내고, 여러 큐들이 해당 토픽을 구독하게 하는 방식
+- SQS는 데이터 영속성과, 지연 처리 및 업무의 retry를 담당
+- 해당 토픽에 대한 SQS 구독자를 늘려 서비스를 더 키울 수 있음
+- SQS 큐에 SNS가 쓸수 있는 권한을 지정해줘야 한다.
+
+Service -> TOPIC -> Queue -> Service
+                          -> Service
+                          -> Service
+                          -> Service
+
+
+#### 여러개의 큐를 위한 S3 Event
+- S3 이벤트 규칙에는 제한이 있음 : (이벤트 타입, prefix)의 형태로만 만들 수 있음
+- S3의 이벤트를 많은 SQS 큐로 보내고 싶으면, Fan Out 패턴 사용
+
+#### SNS - FIFO Topic
+- 팬아웃 패턴은 FIFO 토픽에서도 사용될 수 있다.
+- SQS FIFO와 유사한 기능
+    - Message Group ID에 의해 정렬
+    - 중복 제거
+- SQS FIFO Queue들이 FIFO SNS의 구독자가 될 수 있음
+
+#### SNS FIFO + SQS FIFO : Fan Out
+- Fan out + ordering + 중복 제거가 필요할 때
+
+#### SNS - Message Filtering
+- 구독할 때 해당 토픽의 모든 메세지가 아닌, 특정 상태의 메세지만 구독하고 싶을 때
+- 주문 -> 취소된 오더
+      -> 성공한 오더
+      -> 모든 오더
+      -> 거절된 오더

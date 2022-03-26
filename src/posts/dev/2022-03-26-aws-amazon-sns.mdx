@@ -5,3 +5,46 @@ date: '2022-03-26T19:18:09+09:00'
 tags: []
 ---
 
+### Amazon SNS
+- 많은 수신자에게 메세지를 보내고 싶은 경우
+- Direct Integration : 직접 메세지를 여러개 보내 Trigger하는것
+- Pub / Sub : 특정 메세지를 구독해 해당 메세지가 발생하는것을 추적
+- 이벤트 생성자가 특정 SNS토픽 메세지를 보내면
+- 많은 수신자(혹은 구독자)가 메세지를 받아볼 수 있음
+- 해당 토픽에 대한 구독자들은 메세지를 받아본다 (필터링하는 기능이 최근에 추가됨)
+- 토픽당 1000만 구독자를 가질 수 있다.
+- 10만개의 토픽을 가질 수 있다
+- 구독자들은
+    - SQS
+    - HTTP / HTTPS
+    - Lambda
+    - Emails
+    - SMS messages
+    - Mobile Notification
+
+#### SNS는 많은 AWS 서비스랑 연동된다
+- 많은 AWS 서비스들은 SNS 알림을 위해 데이터를 보낼 수 있음
+- CloudWatch
+- Auto Scaling Group Notification
+- S3 버킷 이벤트
+- CloudFormation (특정 상태의 변화에 따라 => 빌드 실패... 등등)
+- 기타 등등
+
+#### SNS - 어떻게 구독하는가
+- Topic Publish (SDK를 통해)
+    - create topic
+    - create subscription
+    - Publish to the topic
+- Direct Publish (모바일 App SDK)
+    - create platform application
+    - create platform endpoint
+    - publish to the platform endpoint
+    - works with google gcm, apple acns
+
+#### SNS - Security
+- 암호화
+    - HTTPS를 통한 in-flight
+    - KMS
+    - 클라이언트 사이드 암호화
+- 접근 제어 : IAM
+- SNS 접근 Policies
