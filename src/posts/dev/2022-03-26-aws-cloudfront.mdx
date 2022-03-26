@@ -1,0 +1,166 @@
+---
+title: '[AWS] CloudFront'
+description: ''
+date: '2022-03-26T14:22:03+09:00'
+tags: []
+---
+
+### CloudFront
+- Content Delivery Network (CDN)
+- 리드 퍼포먼스를 증가시키고, 컨텐츠는 edge에 캐시되어 있다.
+- 전 세계적으로 216개의 포인트가 존재한다 (edge locations)
+- DDos 보호, 방화벽 연동 등을 제공함
+- 외부 HTTPS 노출과, HTTPS 백엔드와의 통신도 가능함
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-3-26-cloudfront.png'
+    alt="Photo"
+    width={300}
+    height={300}
+    priority
+    className="next-image"
+/>
+
+#### CloudFront - origins
+- S3 Bucket
+    - 파일을 분산하고, 엣지에 캐싱할때
+    - CloudFront Origin Access Identity(OAI)를 이용해 보안 높이기 (CloudFront-Bucket간의 보안)
+    - 클라우드 프론트를 S3에 업로드 할 입구 처럼 사용할 수 있다.
+- Custom Origin (HTTP)
+    - Application Load Balancer
+    - EC2 instance
+    - S3 website (bucket을 먼저 static s3 website로 enable해야 함)
+    - 어떤 HTTP 백엔드던 가능
+
+#### CloudFront at a high level
+- 특정 요청과 헤더를 CloudFront Edge Location에 보낸다.
+- 해당 Edge Location에서 Request를 Origin으로 포워딩해준다. (쿼리 스트링과 Request헤더 포함)
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-3-26-cloudfront2.png'
+    alt="Photo"
+    width={300}
+    height={150}
+    layout={"responsive"}
+    priority
+    className="next-image"
+/>
+
+#### CloudFront - S3 as an Origin
+- CloudFront는 CDN으로서 굉장히 유용하게 활용된다
+- CloudFront가 버킷에 엑세스하려면 클라우드 프론트에 대한 IAM역할인 OAI 신분을 사용해야 함
+- 버킷 정책에 해당 신분(OAI)의 엑세스를 허용하게 되면, CDN역할을 할 수 있게 된다.
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-3-26-cloudfront3.png'
+    alt="Photo"
+    width={300}
+    height={150}
+    layout={"responsive"}
+    priority
+    className="next-image"
+/>
+
+#### CloudFront - ALB or EC2 as an origin
+- EC2 인스턴스와 연결하게 되면 보안 그룹에 Edge 로케이션의 IP를 허용해줘야 함.
+- ALB와 연결하게 되면 EC2 인스턴스는 사설이어도 되고, ALB는 퍼블릭으로 노출하거나, SecurityGroup에 열여줘야 함.
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-3-26-cloudfront4.png'
+    alt="Photo"
+    width={300}
+    height={150}
+    layout={"responsive"}
+    priority
+    className="next-image"
+/>
+
+#### CloudFront Geo Restriction
+- 누가 distribution에 접근할 수 있는지 제한할 수 있음
+    - Whitelist : 승인한 나라의 컨트리에 속하는 유저들을 allow할 수 있음
+    - Blacklist : 블랙리스트에 오른 나라의 유저들을 막을 수 있음
+- 나라는 Geo-IP라는 서드파티 데이터베이스를 활용해 결정된다
+- 유즈케이스 : 나라별 컨텐츠 액세스 제한
+
+#### CloudFront vs S3 Cross Region Replication
+- CloudFront
+    - 글로벌 엣지 네트워크
+    - 파일들이 TTL동안 캐싱됨
+    - 어디서나 사용되어야 하는 static content에 좋다.
+- S3 Cross Region Replication
+    - 복제가 일어나야하는 리전을 셋업 해야 함
+    - 파일은 거의 실시간으로 업데이트 됨
+    - 읽기 전용
+    - 적은 수의 리전에서 낮은 지연시간을 사용하는 동적인 콘텐츠에 적합.
+
+#### CloudFront Signed URL / Signed Cookie
+- 만약에 모두에게 공개되는 컨텐츠가 아닌 프리미엄 유저에게만 제공되는 paid content를 분산하고 싶을수 있다.
+- CloudFront Signed URL / Cookie를 사용해 제작할 수 있음.
+    - URL 만료를 포함
+    - 엑세스 할 수 있는 IP 범위를 지정할 수 있음
+- 얼마나 오래 URL이 유효해야 하는가?
+    - 영화나 음악 같은 콘텐츠 : 몇분 정도
+    - 장기간 엑세스 가능한 콘텐츠 : 몇년도 설정 가능
+- Signed URL = 개별 파일에 대한 엑세스
+- Cookie = 다수의 파일에 대한 엑세스, 재사용 가능
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-3-26-signed-url.png'
+    alt="Photo"
+    width={300}
+    height={150}
+    layout={"responsive"}
+    priority
+    className="next-image"
+/>
+
+#### CloudFront Signed URL vs S3 Pre-Signed URL
+- CloudFront Signed URL
+    - origin에 상관없이 path에 대한 엑세스 권한
+    - IP, path, date, expire에 대해 필터될 수 있음
+    - 캐싱에 영향을 받음
+- S3 Pre-Signed URL
+    - IAM 자체의 권한을 확인함
+    - 수명이 제한적
+
+#### CloudFront - Pricing
+- CloudFront의 엣지 로케이션이 전세계에 퍼져 있음
+- Edge location별로 데이터에 대한 가격이 부과 됨
+
+#### CloudFront - Price Classes
+- 비용 감소를 위해 엣지 로케이션 수를 줄일 수 있음
+- 3가지 가격 클래스
+    - Price Class All : 모든 리전
+    - Price Class 200 : 대부분의 리전, 비싼 리전 제외
+    - Price Class 100 : 몇몇 리전만 가능(크고, 싼 리전)
+
+#### CloudFront - Multiple Origin
+- 콘텐츠 타입에 따라 다른 종류의 Origin으로 라우팅 하고 싶은 경우
+- Path에 따른 분기
+    - /images/*
+    - /api/*
+    - /*
+
+#### CloudFront - Origin Group
+- 높은 가용성, failover를 위해
+- Origin Group : 하나의 primary와 secondary
+- primary가 실패할 경우 secondary가 사용됨
+
+#### CloudFront - Field Level Encryption
+- 어플리케이션 스택을 통해 유저의 민감 정보를 보호하는 기술
+- HTTPS를 포함해 보안에 대한 새로운 레이어를 더해줌
+- 민감 정보를 전달할때 edge location이 해당 정보를 암호화
+- 비대칭 암호화 사용
+- 사용
+    - POST요청에 필드를 정의하고, 암호화를 원하는 필드 지정(10까지)
+    - 암호화 하기 위해 필요한 키를 정의
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-3-26-cloudfront-encryption.png'
+    alt="Photo"
+    width={300}
+    height={50}
+    layout={"responsive"}
+    priority
+    className="next-image"
+/>

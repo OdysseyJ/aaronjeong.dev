@@ -1,0 +1,59 @@
+---
+title: '[AWS] Global Accelerator'
+description: ''
+date: '2022-03-26T17:13:35+09:00'
+tags: []
+---
+
+### 어플리케이션의 글로벌 유저들
+- 글로벌 어플리케이션을 배포한 경우
+- 많은 latency 이슈를 겪을 수 있음
+- 지연 시간을 최소화하기 위해 AWS 네트워크를 빨리 타는게 좋다.
+
+#### Unicast IP vs Anycast IP
+- Unicast IP : 하나의 서버가 하나의 IP를 가지고 있다.
+- Anycast IP : 모든 서버가 하나의 IP를 가지고 있고, client는 가장 가까운 서버로 라우팅됨.
+
+### Global Accelerator
+- 어플리케이션을 로드하기 위해 AWS 내부 글로벌 network를 활용
+- 어플리케이션을 위해 2개의 Anycast IP가 생성됨
+- Anycast IP는 트래픽을 가장 가까운 엣지 로케이션으로 보낸다.
+- Edge locations는 traffic을 어플리케이션으로 보낸다.
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-3-26-global-accelerator.png'
+    alt="Photo"
+    width={300}
+    height={300}
+    priority
+    className="next-image"
+/>
+
+- Elastic IP, EC2 instance, ALB, NLB, public or private와 전부 호환됨
+- 안정적인 퍼포먼스
+    - 지능형 라우팅으로 가장 짧은 엣지 로케이션으로 연결
+    - 뭔가 잘못된 경우에 빠른 failover
+    - client cache이슈가 없음 (왜냐면 IP가 바뀌지 않기 때문에)
+    - 내부 AWS 네트워크 사용으로 매우 빠름
+- 헬스 체크
+    - global accelerator는 어플리케이션 헬스 체크를 수행함
+    - 어플리케이션 글로벌화에 매우 큰 도움이 된다.
+    - 장애 복구에 굉장히 좋음
+- 보안
+    - 오직 2가지의 external IP만 whitelist되면 됨
+    - 자동 DDos Protection by AWS Shield
+
+### Global Accelerator vs CloudFront
+- 둘다 AWS 글로벌 네트워크고 전세계의 edge location을 사용한다
+- 두 서비스 모두 AWS Shield를 사용해 ddos공격으로부터 보호를 받는다
+- CloudFront
+    - 캐싱 가능한 컨텐츠의 퍼포먼스를 향상시킴
+    - Dynamic content (동적 사이트 전달 혹은 API 가속화)
+    - 엣지 로케이션으로부터 컨텐츠가 서빙된다.
+- Global Accelerator
+    - 글로벌 어플리케이션의 성능 향상을 돕는다
+    - 캐싱은 없음
+    - 패킷을 프록시하는데, 결국 모든 패킷들이 전부 어플리케이션에 전달됨
+    - non-HTTP 혹은 gaming(UDP), IOT(MQTT)등을 할때 유용함
+    - 글로벌하게 하나의 IP엔드포인트를 사용하는 HTTP
+    - 결정적이고 신속한 리전 장애 조치가 필요할 때

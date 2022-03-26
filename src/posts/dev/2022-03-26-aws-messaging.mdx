@@ -1,0 +1,114 @@
+---
+title: '[AWS] SQS'
+description: ''
+date: '2022-03-26T18:23:59+09:00'
+tags: []
+---
+
+### SQS
+- Producer : SQS 대기열에 메세지를 생성해주는 녀석 (Send)
+- Consumer : SQS 대기열에 있는 메세지를 Polling해서 소모해주는 녀석 (Poll)
+- Queue : Producer가 생성한 메세지가 대기하는 장소.
+
+#### SQS - Standard Queue
+- 10년부터 운영중
+- 완전 관리형 서비스, 어플리케이션을 decoupling할때 사용한다.
+- 특성
+    - throughput에 제한이 없음.
+    - 큐 안에 있는 메세지 개수 제한 없음
+    - 각 메세지는 수명이 짧다 (기본 4일간 남아있음, 최대 14일까지 늘릴 수 있다.)
+    - 지연 시간이 짧음 (10ms 이내)
+    - 256KB 제한
+- 중복된 메세지 있을 수 있음 (적어도 한번 전송)
+- 고장난 메세지가 있을 수 있음
+
+#### SQS - Producing Messages
+- SDK(SendMessage API)를 통해 Produce된 SQS 메세지
+- 읽고 삭제할때까지 SQS에 유지됨
+- 기본 4일, 최대 14일까지
+- 예 : 주문 요청
+    - order_id
+    - customer_id
+- SQS standard : 용량 제한 없음
+
+#### SQS - Consuming Messages
+- Consumer는 EC2, AWS Lambda 등등이 될 수 있다.
+- Comsumer는 SQS 메세지를 Poll한다.
+- 메세지를 프로세싱함 (예: message를 rds database에 저장하라)
+- DeleteMessage API를 사용해 해당 메세지를 지운다
+
+#### SQS - Multiple EC2 instance comsumers
+- 여러개의 consumer를 통해 동시에 메세지를 소비할 수 있다.
+- 소비하고나서 메세지를 삭제하지 않으면 다른 consumer가 다시 처리할 수 있음
+- consumer들을 수평 확장해 속도를 개선할 수 있다.
+
+#### SQS with Auto Scaling Group
+- SQS 큐에서 나온 메세지들을 Auto Scaling Group안의 EC2 인스턴스가 처리
+- Cloud Watch의 Queue Length를 통해 Alarm을 설정함
+- 해당 알람을 통해 Auto Scaling Group의 EC2 인스턴스를 자동으로 스케일링
+
+#### SQS를 통해 어플리케이션 티어들간의 결합도 낮추기
+- 비디오 업로드 : Frontend -> SQS -> Backend Processing -> Bucket
+
+#### SQS - Security
+- 암호화
+    - HTTPS를 통한 in-flight 암호화
+    - KMS를 통한 암호화
+    - Client side 암호화
+- 접근 권한 : IAM 정책
+- SQS 엑세스 정책
+    - SQS큐에 여러 어카운트가 접속하는 경우 유용함
+    - SQS 큐에 메세지를 쓸 수 있도록 다른 서비스를 허용하는 경우에 유용함
+
+#### SQS Queue Access Policy
+- 계정간 접근도 가능 "AWS" : ["111122223333"]
+- S3 이벤트 notification -> sqs queue에 발행
+
+#### SQS - Message Visibility Timeout
+- 컨슈머가 메세지를 polling하고 나서는, 다른 컨슈머들에게는 해당 메세지가 안보이게 됨
+- 디폴트 30초
+- 다른 컨슈머가 리턴을 요청하면 반환 안됨
+- 가시성 시간 초과가 경과되고, 메세지가 삭제되지 않으면 다시 대기열에 넣어짐
+- 다른 컨슈머가 해당 메세지를 다시 소비할 수 있음
+- 메세지가 visiblity timeout동안 프로세싱 되지 않으면 2번 프로세싱 될 수 있음
+- 컨슈머가 changeMessageVisibility API를 불러 더 시간을 얻을 수 있음
+- 만약 타임아웃을 길게 하면 fail될 경우 리프로세싱이 오래걸림
+- 만약 짧게 하면 메세지 핸들링이 중복될 수 있다.
+
+#### SQS - Dead Letter Queue
+- 소비자가 제한시간동안 메세지를 소비하지 못하는 경우 큐로 돌아감
+- 그런 일이 자주 발생하면 문제가 됨
+- 최대 수신 임계값을 정해 SQS가 메세지가 이상이 있음을 감지하고 Dead Letter Queue에 보냄
+- 디버깅을 위해 존재
+- 메세지 보관 기간이 있음
+- Dead Letter Queue에 높은 기간을 설정하는게 좋음
+
+#### SQS - Delay Queue
+- 메세지를 최대 15분 지연
+- default는 0초
+- 큐 레벨에서 디폴트 설정 가능
+- DelaySecond 파라미터를 통해 오버라이딩 가능
+
+#### SQS - Long Polling
+- 소비자가 대기열에 메세지 요청
+- 대기열에 없으면 계속 기다림 (롱 폴링)
+- API콜을 줄이고, 속도를 향상시키는 기술
+- 1~20초 설정 가능
+- 큐 레벨에서 설정하거나, Consumer가 직접 WaitTimeSecond를 설정해 할 수 있음
+
+#### SQS - Request-Response 시스템
+- 많은 requester들과 많은 Responder들이 큐를 통해 프로세싱되는것
+- 리퀘스트를 보낼 때 응답 대기열을 지정해 그곳으로 응답을 받으며, ID로 본인의 response 식별함
+- 확장가능한 시스템
+- 과부하를 주지 않음
+- 이러한 패턴을 구현하기 위해서 : SQS Temporary Queue Client를 사용한다.
+
+#### SQS - FIFO Queue
+- FIFO : First In First Out
+- 제한된 throughput 300msg/s, 묶음으로 보내는 경우 3000msg/s
+- 정확히 한번만 보냄
+- 메세지가 순서대로 처리됨
+
+#### SQS with Auto Scaling Group (ASG)
+- 어플리케이션 티어별로 디커플링이 가능함
+- 요청을 받으면 큐에 들어갈 메세지를 생성하는 Auto Scaling 그룹, 해당 메세지를 처리하는 Auto Scaling 그룹의 분리 가능
