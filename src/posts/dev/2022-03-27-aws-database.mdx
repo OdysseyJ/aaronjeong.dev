@@ -1,0 +1,34 @@
+---
+title: '[AWS] DATABASE'
+description: ''
+date: '2022-03-27T19:53:46+09:00'
+tags: []
+---
+
+### 데이터베이스 고르기
+- 매니징되는 데이터베이스 종류가 많다.
+- 내 아키텍쳐에 맞는 데이터베이스 고르기
+    - 읽기 작업이 많은지, 쓰기 작업이 많은지, 혹은 균형이 잡혀있는지?
+    - 처리량이 많은지?
+    - 변경될 예정인지?
+    - 확장이 필요한지?
+    - 얼마나 데이터를 오래 보관 할지?
+    - 계속 증가되지는 않을지?
+    - 평균 객체 크기는 얼마일지?
+    - 데이터를 액세스하는 방법?
+    - 데이터 내구성?
+    - Source of truth
+    - 지연 시간 요구사항
+    - 동시 접속 유저 수
+    - 모델?
+    - 쿼리 어떻게 하는지? join? structed?
+    - 긴 스키마를 가지는지? 유연한지? 리포팅? 검색? RDBMS/NoSQL?
+    - 라이센스 비용?
+
+#### Database Types
+- RDBMS(=SQL/OLTP): `RDS`, `Aurora` = join과 정규화된 데이터
+- NoSQL database: `DynamoDB`(~JSON), `ElasticCache`(key/value), `Neptune`(graphs) - no join, no SQL
+- Object Store `S3`(for big) / `Glacier`(for backups/archives)
+- Data Warehouse(=SQL Analytics/BI): `Redshift`(OLAP), `Athena`
+- Search: `ElasticSearch`(JSON) - free text, unstructured searches
+- Graphs: `Neptune` - display relationships between data
