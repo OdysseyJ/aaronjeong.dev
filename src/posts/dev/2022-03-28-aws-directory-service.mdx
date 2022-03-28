@@ -1,0 +1,62 @@
+---
+title: '[AWS] Directory Service, Organizations'
+description: ''
+date: '2022-03-28T18:36:39+09:00'
+tags: []
+---
+
+### Microsoft Active Directory Service(AD)
+- 윈도우 서버 에서 볼수 있음
+- 오브젝트형의 데이터베이스
+- 중앙 집중화된 보안
+- 오브젝트들은 트리 형태로 조직화된다
+- 트리의 그룹은 forest라고 부른다
+- 트리의 상단에 권한이 있으면(도메인 컨트롤러), 하위 레벨의 서버에도 같은 유저가 같은 권한 가짐
+
+### AWS Directory Services
+- AWS Managed Microsoft AD
+    - AD를 AWS에서 구현, 유저를 로컬로 관리, MFA 서포트
+    - 온프로미스에서 운영되는 AD에 "trust"접속이 가능하게 해준다.
+- AD Connector
+    - 그냥 존재하는 AD에 프록시만 하는 게이트웨이 역할
+    - 유저들은 on-promise AD에서 매니징됨
+- Simple AD
+    - AD가 호환되는 매니징되는 aws directory
+    - on-premise AD랑 합쳐질 수 없다. (단독 구성)
+
+### AWS Organizations
+- 글로벌 서비스
+- 여러개의 AWS 계정을 매니징하게 해준다
+- 메인 어카운트는 마스터로, 바꿀수 없음
+- 다른 어카운트는 멤버 어카운트
+- 멤버 어카운트는 조직의 일부분만 접근가능
+- 모든 계정간 billing을 하나로 묶는다
+- EC2, S3 같은 리소스 사용에 단체 가입하여 싸게 이용 가능
+- AWS 계정 생성을 자동화 가능 (API 제공)
+- 부서별, 환경별, 규제 기반, 리소스 고립, 계정간 서비스 리밋, 분리된 로깅
+- 여러 계정 vs 하나의 계정이 multiple vpc 방식을 원하는대로 선택함
+- 결제 목적으로 태깅 가능
+- cloudwatch, cloudtrail 등등 활성화 가능
+
+#### 구성 살펴보기
+- root ou(organization unit) 존재
+- ou 안에 ou가 다시 존재할 수 있음.
+
+#### Service Control Policies(SCP)
+- IAM 활동에 관해 화이트 리스트 / 블랙리스트 설정
+- OU / Account 레벨에서 지정 가능
+- Master Account에는 지정 불가능
+- SCP는 모든 계정의 유저와 롤에 적용됨(루트 포함)
+- 서비스 연결 롤에는 사용되지 않음
+- 각각 Allow해줘야함. (뭐든 default Allow없음)
+- 상위에서 Deny하면 하위에서 Allow해도 효과 없음 (트리 구조라)
+
+#### Moving Accounts
+- 한 조직 구성원을 다른 조직으로 마이그레이션 하는 경우
+    - 오래된 조직 멤버 탈퇴
+    - 새로운 조직에서 해당 어카운트 초대 하기
+    - 새로운 조직에 멤버로 들어가기
+- 마스터 어카운트를 옮기고 싶으면,
+    - 조직내 모든 계정 옮기고
+    - 조직 지우기
+    - 그 계정을 새로운 조직으로 마이그레이션하기
