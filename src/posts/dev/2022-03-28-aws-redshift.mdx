@@ -1,0 +1,52 @@
+---
+title: '[AWS] RedShift'
+description: ''
+date: '2022-03-28T10:17:08+09:00'
+tags: []
+---
+
+### RedShift Overview
+- PostgreSQL 기반, OLTP를 위해 사용되지는 않음
+- OLAP - Online Analytic Processing(분석, 데이터 웨어하우싱)에 사용
+- 다른 데이터 웨어하우스보다 10배는 좋고, PB까지 늘어남
+- 행 대신 열에 데이터를 저장함 (열 형식 스토리지)
+- 대량 병렬 쿼리 엔진 (MPP=Massive Parallel Query Execution)
+- 사용한 인스턴스 종류에 따라 과금
+- SQL 인터페이스 존재
+- BI툴이 연결될 수 있다.
+
+#### RedShift Continued
+- S3, DynamoDB, DMS, 다른 DB들에서 데이터를 불러올 수 있음
+- 1~128개의 노드 띄울 수 있고, 노드별 128TB까지 가능
+- 리더 노드 : query planning, 결과 집계
+- 계산 노드 : 쿼리 실행, 결과를 리더로 전송
+- Redshift 스펙트럼 : 쿼리를 바로 S3에서 실행
+- 백업과 복구, 보안 - VPC, IAM, KMS
+
+#### Snapshots & DR
+- MultiAZ모드가 없음
+- 스냅샷은 클러스터 그자체의 백업으로, S3에 저장된다
+- 스냅샷은 변경사항만 저장해서 증가시킬 수 있음
+- 새로운 클러스터에 스냅샷을 복구 할 수 있음
+- 8시간마다 혹은 5GB마다 할 수 있음
+- 매뉴얼 : 지울때까지 남음
+- Amazon Redshift에 자동으로 다른 리전으로 스냅샷을 카피하게끔 설정할 수 있음.
+
+#### Redshift로 데이터 불러오기
+- Amazon Kinesis Data Firehose
+- S3 using COPY command
+- EC2 instance JDBC driver (많은 데이터를 한번에 배치로 쓰기에 좋음)
+
+#### Redshift Spectrum
+- S3에 있는 데이터를 로드하지 않고 데이터를 쿼리
+- 쿼리를 시작하기 위해서 Redshift cluster가 사용가능해야함
+- 쿼리가 시작되면 몇천개의 노드 위에서 쿼리가 시작됨
+
+#### Solution Architect
+- Operation : RDS와 같음
+- Security : IAM, VPC, KMS, SSL
+- Reliability : 자동 복구, 크로스 리전간 스냅샷
+- Performance : 10배 빠른 퍼포먼스
+- Cost : 프로비저닝된 노드 당 계산, 다른 웨어하우스에 비해 적은 비용
+- vs Athena : 더 빠르고, 조인과 aggregation이 쉽다 (index 가능)
+- RedShift = Analytics / BI / Data Warehouse
