@@ -1,5 +1,5 @@
 ---
-title: '[AWS] Glue'
+title: '[AWS] Glue, Neptune'
 description: ''
 date: '2022-03-28T10:48:51+09:00'
 tags: []
@@ -13,3 +13,20 @@ tags: []
 #### Glue Data Catalog
 - Data Crawler를 가지고 각 데이터베이스에서 카탈로그를 만듬
 - Amazon Athena, Redshift Spectrum, EMR 등에 Glue Data Catalog가 활용됨
+
+### Neptune
+- 완전 관리형 그래프 데이터베이스
+- 그래프를 어디다 씀?
+    - 고관계형 데이터
+    - 소셜 네트워크
+    - 위키피디아 등등
+- 3AZ, 15 read replica
+- 백업과 복구가 가능, S3로 지속적 복제
+- KMS, HTTPS
+
+#### Neptune for Solutions Architect
+- Operations : RDS와 유사
+- Security : IAM, VPC, KMS, SSL(RDS와 유사) + IAM
+- Reliablility : Multi-AZ, clustering
+- Performance : 그래프형 데이터에 가장 잘 맞음, custering을 통한 성능 향상
+- Cost : 프로비저닝된 노드 당 지불
