@@ -5,3 +5,10 @@ date: '2022-03-28T19:02:17+09:00'
 tags: []
 ---
 
+### IAM Conditions
+- aws:SourceIP : 해당 IP로부터 만들어지는 ClientIP를 전부 (Allow/Deny)
+- aws:RequestedRegion : 해당 리전으로부터 만들어지는 요청만 (Allow/Deny)
+- aws:PrincipalTag/{Department} : 해당 태그가 있는 리소스만 허용
+- ec2:ResourceTag/{project} : 해당 태그가 있는 리소스만 허용(리소스레벨)
+- aws:MultiFactorAuthPresent : 멀티팩터 인증을 한 경우 체크
+-

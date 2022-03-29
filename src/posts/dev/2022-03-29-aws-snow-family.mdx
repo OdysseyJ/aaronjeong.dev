@@ -1,0 +1,55 @@
+---
+title: '[AWS] SnowFamily'
+description: ''
+date: '2022-03-29T10:55:47+09:00'
+tags: []
+---
+
+### AWS Snow Family
+- 높은 안전성을 가지는 이동성 장비
+- 엣지에서 데이터를 수집하고 처리 할 때
+- AWS 안팎으로 데이터를 마이그레이션할 때
+- Data migration : Snowcone / Snowball Edge / Snowmobile
+- Edge computing : Snowcone / Snowball Edge
+
+#### DATA Migration을 할 때 snow faimily를 사용하는 이유
+- 100TB 전송시 12일이 걸림(1Gbps)
+- 제한된 접근
+- 제한된 bandwidth
+- 높은 네트워크 비용
+- 대역폭 공유 문제 (사무실내 대역폭 모두 사용해버리기)
+- 연결 안전성
+- Snow Family : 오프라인 기기를 제공해서, 데이터를 담은 뒤 다시 AWS로 전송해 마이그레이션
+
+#### 예시
+- 직접 S3에 업로드
+client -> bucket
+- snow family를 이용
+client (aws snowball) -> (aws snowball) (import/export) bucket
+
+#### Snowball Edge
+- 물리적 장치임
+- TB 혹은 PB단위의 데이터를 담을 수 있음
+- 네트워크로 데이터를 전송하는것 대신 사용
+- 각 data 전송 업무마다 과금
+- block storage랑 s3-호환 오브젝트 저장소 제공
+- Snowball Edge의 두가지 옵션
+    - Storage Optimized : 80TB HDD capacity
+    - Compute Optimized : 42TB HDD capacity
+- 큰 데이터 클라우드 마이그레이션, 재해 복구를 위함
+
+#### Snowcone
+- 어디서나 사용 가능, 견고, 안전
+- 사막이든 물속이든 사용 가능
+- 엣지 컴퓨팅, 스토리지, 데이터 전송에 사용
+- 8TB의 용량을 가짐
+- Snowball 사용이 불가능할 때 Snowcone 사용 가능
+- AWS 오프라인으로 전송 가능.
+- 네트워크 연결이 전혀 없는 환경에서 사용하고, 이를 다시 AWS에 연결해 전송
+
+#### Snowmobile
+- 트럭임
+- 1EB = 1000PB = 10000000TB 전송
+- 각각의 Snowmobile은 100PB의 용량을 가진다 (1EB 하려면 10대 주문해야함)
+- 보안성이 높고, 온도조절 가능, GPS, 24/7
+- 10PB가 넘는다면 Snowball보다 더 나은 방법
