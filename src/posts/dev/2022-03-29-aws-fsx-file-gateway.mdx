@@ -1,0 +1,52 @@
+---
+title: '[AWS] FSx File Gateway, Amazon FSx'
+description: ''
+date: '2022-03-29T12:38:59+09:00'
+tags: []
+---
+
+### FSx File Gateway
+- 윈도우 파일 서버 오퍼링을 위해 AWS FSx에서 네이티브 엑세스 제공
+- 자주 엑세스 되는 데이터에 대한 로컬 캐시 제공
+- 윈도우즈에 완전 호환 (SMB, NTFS, Active Directory)
+- 그룹 파일 공유와 홈 디렉토리에 유용하다.
+
+### Amazon FSx - Overview
+- AWS내부의 서드파티 고성능 파일 시스템
+- 완전 관리형
+- 타사 파일 시스템을 AWS 내부에서 실행시키는 방법
+- Lustre, Window File Server, NetApp ONTAP등의 파일 시스템이 있다.
+
+#### FSx for window (File Server)
+- EFS는 공유되는 POSIX 리눅스용 파일 시스템임
+- FSx for window는 완전 관리형 윈도우 파일시스템 공유 드라이브
+- SMB 프로토콜과 Windows NTFS를 지원함
+- 마이크로소프트 Active Directory 결합도 지원하고, ACL도 지원하고, 유저 할당량도 지원
+- SSD에서 빌드 되어, 빠르고, 수백 PB데이터로 확대 가능
+- 온프로미스 인프라로 부터 액세스 될 수 있음
+- Multi-AZ로 구성할 수 있음
+- 매일 S3로 데이터가 백업됨.
+
+#### FSx for Lustre
+- 대규모 컴퓨팅을 위한 병렬 분산 파일 시스템
+- 리눅스와 클러스터라는 곳에서 유래된 이름
+- Lustre는 Linux 인스턴스용, 대규모 컴퓨팅에서 쓰임
+- 고성능 컴퓨팅(HPC), 머신러닝 등에서 사용
+- 비디오 프로세싱, 재정 모델링, 전기 설계 등의 업무에 쓰임
+- 파일 시스템일 뿐이지만 초당 100GB, 수천만의 IOPS를 가짐
+- S3와 문제없이 통합
+    - "read S3" 가능
+    - 계산 결과를 S3에 쓰기 가능 (Fsx를 통해)
+- 필요하다면 온프레미스 서버에서 사용 가능
+
+#### FSX 파일 시스템 배포 옵션
+- Scratch File System
+    - 임시 저장소
+    - 데이터는 복제되지 않음
+    - 높은 처리량
+    - 사용 : 짧은 프로세싱, 비용 최적화
+- Persistent File System
+    - 긴 기간 저장
+    - 데이터는 AZ간 복제됨
+    - 실패한 파일에 대해 수분 내 복구
+    - 사용 : 장기 프로세싱, 민감한 데이터

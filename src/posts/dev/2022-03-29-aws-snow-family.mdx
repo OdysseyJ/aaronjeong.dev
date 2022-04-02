@@ -53,3 +53,44 @@ client (aws snowball) -> (aws snowball) (import/export) bucket
 - 각각의 Snowmobile은 100PB의 용량을 가진다 (1EB 하려면 10대 주문해야함)
 - 보안성이 높고, 온도조절 가능, GPS, 24/7
 - 10PB가 넘는다면 Snowball보다 더 나은 방법
+
+#### Snow Family - Usage Process
+- Snowball devices를 AWS에 요청하기
+- snowball client / AWS OpsHub 를 내 서버에 설치하기
+- snowball을 서버에 연결해 client를 사용해 데이터 복사하기
+- 끝났으면 디바이스를 다시 재발송한다.
+- 데이터를 S3에 불러들인다
+- Snowball을 깨끗히 다 지운다
+
+#### Edge Computing이 뭔데?
+- 데이터가 엣지 로케이션에서 생성될 때 실시간으로 처리하는 방식
+    - 도로 위의 트럭, 바다 위의 배 등등
+    - 클라우드에서 멀리있는 경우
+- 이러한 위치들은 아마
+    - 인터넷 엑세스가 안되거나
+    - 컴퓨팅 파워에 한정적이거나
+- Snowball Edge / Snowcone 디바이스를 엣지 컴퓨팅용으로 셋업함
+- 엣지 컴퓨팅 사용 사례
+    - 데이터 전처리
+    - 엣지 머신 러닝
+    - 미디어 스트림 전송
+- 결과적으로 우리는 AWS로 데이터를 전송하면 됨
+
+#### Snow Family - Edge Computing
+- Snowcone (작음)
+    - 2개의 CPU, 4GB의 메모리
+    - USB-C파워를 사용함
+- Snowball Edge - Compute Optimized
+    - 52 vCPUs, 208 GiB of RAM
+- Snowball Edge - Storage Optimized
+    - 40 vCPUs, 80 GiB of RAM
+- 모두가 EC2 인스턴스 돌릴수 있고, AWS 람다 함수 돌릴 수 있음 (AWS IOT Greengrass)
+- 긴 기간 대여 옵션 : 1년 혹은 3년 가격 할인
+
+#### AWS OpsHub
+- 역사적으로 Snow Family device를 사용하기 위해서 CLI가 필요하다
+- 오늘날에는 AWS OpsHub를 통해 GUI 사용 가능
+
+#### Snowball into Galcier
+- 스노우볼은 Glacier에 직접 연결될 수 없다
+- S3에 연결한 다음, S3의 라이프사이클 정책과 연결해야 한다

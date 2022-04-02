@@ -1,9 +1,5 @@
 import sys
 input = sys.stdin.readline
 
-while True:
-    try:
-        a, b = map(int, input().split())
-        print(a + b)
-    except:
-        break
+a, b = map(int, input().split())
+print(a*b)
