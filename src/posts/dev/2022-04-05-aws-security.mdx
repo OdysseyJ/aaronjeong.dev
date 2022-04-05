@@ -1,0 +1,24 @@
+---
+title: '[AWS] Security'
+description: ''
+date: '2022-04-05T19:52:37+09:00'
+tags: []
+---
+
+### Why encryption?
+
+#### Encryption in flight (SSL)
+- 데이터는 전송 전에 암호화되어 전송 후 복호화됨
+- SSL 인증을 통해 암호화를 돕는다 (HTTPS)
+- 암호화는 MITM(man in the middle attack)가 일어나지 않음을 보장.
+
+#### Server side encryption at rest
+- 데이터가 서버에 수신된 후 암호화됨
+- 서버는 데이터를 암호화된 형태로 저장하고 있음.
+- 키 덕분에 암호화된 형태로 저장된다
+- 암호화 / 복호화 키는 어딘가에 보관되어 관리되어야 하며, 서버가 접근할 수 있어야 한다.
+
+#### Client side encryption
+- 데이터는 클라이언트에서 암호화되고 서버에 의해 복호화 될 수 없음
+- 데이터는 받은 클라이언트에 의해 복호화
+- 서버는 복호화 할 수 없어야 함

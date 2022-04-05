@@ -1,0 +1,31 @@
+---
+title: '[AWS] SSM Parameter Store'
+description: ''
+date: '2022-04-05T20:48:43+09:00'
+tags: []
+---
+
+### SSM Parameter Store
+- 비밀 값이나 configuration을 위한 비밀 저장소
+- KMS를 통해 암호화하여 저장할 수 있음
+- 서버리스, scalable, easy SDK
+- 버전 관리 가능
+- path와 IAM을 사용한 configuration
+- CloudWatch Events를 통한 알림
+- CloudFormation과 통합 가능
+
+#### Parameter Store tiers
+- Standard
+    - 1만개
+    - 4KB
+    - 파라미터 정책 : No
+    - 저장소 가격 : Free
+- Advanced
+    - 10만개
+    - 8KB
+    - 파라미터 정책 : Yes
+    - 저장소 가격 : $0.05
+
+#### Parameter Policies (for advanced parameters)
+- TTL 설정 가능
+- 한번에 여러개의 정책을 배정할 수 있다.

@@ -1,0 +1,95 @@
+---
+title: '[AWS] KMS'
+description: ''
+date: '2022-04-05T20:00:44+09:00'
+tags: []
+---
+
+### AWS KMS (Key Management Service)
+- AWS 서비스에서 암호화라고 하면, 대부분 KMS를 사용한다.
+- 데이터에 접근하는 사람을 쉽게 컨트롤 가능
+- IAM과 완전히 연동되어 권한 인증 가능
+- 연동 되는 서비스
+    -EBS
+    -S3
+    -Redshift
+    -RDS
+    -SSM
+    -...
+
+#### KMS - Customer Master Key (CMK) Types
+- Symmetric (AES-256 keys)
+    - KMS의 첫 제품, 하나의 암호화 키가 암호화화 복호화에 모두 쓰임
+    - KMS와 연동되는 AWS 서비스는 Symmetric CMKs를 사용
+    - 봉투 암호화에도 사용
+    - KMS로 대칭키를 생성시 KMS API를 사용해야 하며 절대로 키를 볼 수 없음
+- Asymmetric (RSA & ECC key pairs)
+    - 퍼블릭 키 (암호화)와 프라이빗 키(복호화) 한 쌍
+    - 암호화/복호화 혹은 인증/검증에 사용
+    - 퍼블릭 키는 다운로드 가능하나, private Key는 접근할 수 없음
+    - KMS API를 부를 수 없는 AWS외부의 유저들에게 사용할때 사용
+
+#### KMS
+- 키와 정책을 완전 관리 가능
+    - Create
+    - Rotation Policies
+    - Disable
+    - Enable
+- 키 사용 감사 가능 (cloud trail)
+- 3가지 타입의 Customer Master Keys (CMK)
+    - AWS Managed Service Default CMK : free
+    - User Keys created in KMS : $1 /month
+    - User Keys imported : $1 /month
+- KMS를 통한 API 요청마다 과금 ($0.03/10000 call)
+
+#### 언제 써야할까?
+- 민감 정보 접근
+    - 데이터베이스 비밀번호
+    - 다른 서비스 비밀번호
+    - SSL 인증을 위한 개인 키
+- KMS의 진정한 가치는 데이터를 암호화하거나 복호화하는 키를 볼 수 없음
+- 보안을 위해 키를 교체 가능
+- 4KB까지 암호화가 가능 (호출당)
+- 4KB 이상 데이터가 암호화되어야 한다면, 봉투 암호화(envelope encryption)사용
+- KMS 엑세스를 다른 사람에게 주려면
+    - Key 정책을 유저에게 허용하거나
+    - API call을 허용하는 IAM 정책을 만든다.
+
+#### 리전간 스냅샷 복사하기
+- KMS를 사용하는 특정 리소스를 복제할 때
+- 새로운 KMS키를 통해 재 암호화를 한 후에 옮겨야 함
+
+#### KMS Key Policies
+- KMS키에 대한 접근을 제어한다. (s3의 버킷 정책과 유사)
+- 차이 : 키 정책을 지정하지 않으면 아무도 키에 엑세스 할 수 없음.
+- 기본 KMS 키 정책
+    - 특정한 KMS 키 정책을 제공하지 않으면 만들어짐
+    - 루트 유저에게 키 접근 권한 제공
+    - KMS key에 IAM 정책을 연결해 엑세스를 제공할 수 있다.
+- 사용지 KMS 키 정책
+    - KMS키에 접근할 수 있는 유저, 롤을 지정
+    - 누가 키를 매니징할지 정의
+    - 교차 계정 액세스시 유용
+
+#### 계정간 스냅샷 복사
+- 스냅샷을 만듬 (내 CMK로 인증된)
+- KMS key 정책을 생성해 계정간 엑세스 허용
+- encrypt된 스냅샷 공유
+- 스냅샷 카피 만들어서 내 계정 내의 KMS로 암호화
+- 스냅샷으로부터 볼륨 만들기
+
+#### KMS 자동 키 순환
+- Customer-managed CMK에서만 가능 (AWS Managed CMK에서 불가능)
+- 사용시 매년 한번 일어남
+- 과거 데이터를 복호화하기 위해 이전 키도 유효한 상태 유지
+- 새로운 키는 같은 CMK ID를 가짐 (Backing Key만 변경)
+
+#### 수동 키 순환
+- 90, 180일 등 원할때 키를 순환 시킬 수 있음
+- 새로운 키는 다른 CMK ID를 가짐
+- 이전 키는 이전 데이터를 복호화 하려면 들고있는게 낫다
+- alias를 사용하는게 좋다
+- 비대칭 CMK처럼 자동 순환이 불가능한 키에 좋은 해결책
+
+#### KMS Alias Updating
+- 키 변경을 어플리케이션에게 숨기고 싶을 때 Alias를 사용하면 됨
