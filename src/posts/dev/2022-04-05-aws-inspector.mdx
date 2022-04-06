@@ -1,0 +1,37 @@
+---
+title: '[AWS] Inspector, Macie'
+description: ''
+date: '2022-04-05T21:33:52+09:00'
+tags: []
+---
+
+### AWS Inspector
+- 자동화된 EC2 인스턴스를 위한 보안 평가
+- AMI, RDS에서 사용 불가
+- 실행중인 OS 분석, 알려진 취약점 분석
+- 의도하지 않은 네트워크 접속 분석
+- Inspector Agent가 EC2 인스턴스 OS위에 설치되어야 함
+- 평가가 실행되면 취약성 보고받음
+- SNS로 알림 가능
+
+#### Inspector evaluate?
+- 네트워크 접근가능성
+- 호스트 접근
+    - 일반적인 취약점 및 노출에 대한 검사
+    - 보안 모범 사례
+    - 인터넷 보안 벤치마크 센터
+
+### Macie
+- 완전 관리형의 데이터 보안 및 데이터 프라이버시 시스템
+- AWS의 민감한 데이터 경고함 (개인 식별 정보, PII 등)
+- 만약 S3에 민감 데이터 있으면 Event를 발생시키거나, SNS등을 전송함
+
+### Shared Responsibility Model
+- AWS 책임 - 클라우드의 보안
+    - AWS위에서 돌아가는 모든 인프라를 보호하는 것
+    - S3, DynamoDB, RDS등의 매니지드 서비스
+- 고객 책임 - 클라우드 내에서의 보안
+    - EC2 인스턴스, 방화벽, network configuration, IAM
+    - 어플리케이션 데이터의 암호화
+- shared controls
+    - 패치 관리, config 관리, 인지 및 교육 등등

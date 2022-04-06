@@ -1,0 +1,48 @@
+---
+title: '[AWS] CloudHSM, AWS Shield, AWS WAF, GuardDuty'
+description: ''
+date: '2022-04-05T21:16:08+09:00'
+tags: []
+---
+
+### CloudHSM
+- KMS => 소프트웨어 암호화
+- CloudHSM => 하드웨어 암호화
+- 하드웨어 보안 모듈임
+- 본인의 암호화 키를 완전히 관리 가능
+- AWS의 클라우드 내에 설치되지만, 누군가 HSM 장치에 수동으로 엑세스하려고하면 중지 및 차단
+- SSL/TLS키를 가질 수 있음
+- 프리티어 없고, CloudHSM 클라이언트 소프트웨어 사용해야함
+- SSE-C 유형의 암호화에 좋음
+
+### AWS Shield
+- AWS Shield Standard:
+    - 모든 AWS 고객에게 무료 서비스
+    - DDOS 보호
+- AWS Shield Advanced:
+    - 조직당 3000$를 내는 유료 서비스
+    - EC2, ELB, CloudFront, Route53등에 DDOS 보호
+    - 24/7 접근 가능한 DDOS 대응 팀
+    - DDOS로 인해 로드밸런서 비용이 많이 나오면 변제 가능
+
+### AWS WAF - Web Application Firewall
+- 웹 어플리케이션을 보호하는 방어벽, L7에 위치
+- Layer7은 HTTP 레이어
+- 3군데 배포 될 수 있음 (Application Load Balancer, API Gateway, CloudFront)
+- Web ACL을 정의함
+    - 포함 가능한 룰 : IP addresses, HTTP headers, HTTP body, URI strings
+    - 보통의 공격으로부터 보호 가능 - SQL 인젝션, Cross Site Scription(XSS)
+    - 사이즈 제한 가능, 지리적 액세스 방어 가능
+    - 속도 기반 규칙 사용으로 DDoS 보호 가능
+
+### Firewall Manager
+- AWS 조직에 관한 모든 룰을 정의
+- 중앙 집중식으로 관리 가능
+
+### AWS GuardDuty
+- 지능형 위협 탐지 서비스
+- 많은 로그를 분석, 머신러닝을 통해 공격을 감지해냄
+- CloudTrail log, API 로그, DNS 로그 등등
+- CloudWatch Event rule 설정 가능
+- 이벤트는 Lambda나 SNS의 타겟이 될 수 있음.
+- 암호화폐 공격으로부터 보호할 수 있음
