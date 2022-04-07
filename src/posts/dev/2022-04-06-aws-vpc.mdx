@@ -38,4 +38,43 @@ tags: []
 #### Internet Gateway (IGW)
 - VPC내부의 리소스가 인터넷에 접근하는것을 허용해준다
 - 수평 확장, 가용성과 중복성이 높음
--
+- VPC하나당 인터넷에 하나만 연결할 수 있음 (하나의 인터넷 게이트웨이)
+
+#### Bastion Hosts
+- 공용 서브넷의 EC2 인스턴스
+- 유저가 ssh를 통해 공용 서브넷의 인스턴스에 접속, Bation호스트에서 다른 Private Subnet내의 인스턴스에 ssh
+- 인터넷에서 사설 EC2 인스턴스로 SSH를 하는 방법.
+- Bastion Host의 22번 포트만을 허용해서 보안을 높이는게 좋다.
+
+#### NAT Instance (outdated)
+- NAT = Network Address Translation
+- Private subnet에 있는 EC2 인스턴스에게 internet connection을 할 수 있게 해준다
+- public subnet에 launch되어야 함
+- EC2 세팅에서 Source/destination 체크를 비활성화해야 함
+- 고정된 Elastic IP를 꼭 가져야 함
+- 라우트 테이블을 private subnet으로부터 nat instance로 전송 되도록 설정 해야 함
+- 네트워크 패킷을 재작성하는 일을 함 (src ip address의 변경)
+- 오늘날에는 NAT gateway를 사용함
+- 보안그룹과 규칙을 관리해야 함
+- 필요시 Bastion Host로 활용 가능
+
+#### NAT Gateway
+- AWS 매니지드 NAT, 높은 가용성, 사용성
+- 대역폭과 사용량에 따라 과금
+- NATGW는 특정 AZ에 만들어지며, ElasticIP를 사용
+- 같은 서브넷에 있는 EC2 인스턴스에게 사용될 수 없음
+- IGW가 필요함 (사설 서브넷 => NATGW => IGW)
+- 초당 5GB대역폭, 자동으로 45GB까지
+- 보안 그룹과 규칙 관리 필요 없음
+
+#### NAT Gateway with High Availability
+- NAT Gateway는 하나의 AZ에 귀속됨
+- 다중 NAT gateway를 다중 AZ에 둘 경우 가용성이 높아짐
+- Bastion Host로 사용 불가능
+
+#### DNS Resoultion in VPC
+- DNS Resolution (Dns Support 활성화)
+    - Route53 Resolver 서버의 DNS 확인이 VPC에서 지원될지 결정
+    - 기본 설정은 True
+    - VPC내의 EC2 인스턴스가 아마존 제공 DNS 서버를 쿼리 할 수 있다.
+    -
