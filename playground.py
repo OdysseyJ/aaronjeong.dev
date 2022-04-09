@@ -2,6 +2,13 @@ import sys
 input = sys.stdin.readline
 
 n = int(input())
-for i in range(n):
-    a, b = map(int, input().split())
-    print(f'Case {i+1}: {a+b}')
+for _ in range(n):
+    m = int(input())
+    _max = 0
+    result = ""
+    for i in range(m):
+        price, name = input().split()
+        if _max < int(price):
+            _max = max(_max, int(price))
+            result = name
+    print(result)
