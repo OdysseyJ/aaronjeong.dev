@@ -4,11 +4,10 @@ input = sys.stdin.readline
 n = int(input())
 for _ in range(n):
     m = int(input())
-    _max = 0
-    result = ""
+    _sum = 0
+    _sum_gpa = 0
     for i in range(m):
-        price, name = input().split()
-        if _max < int(price):
-            _max = max(_max, int(price))
-            result = name
-    print(result)
+        a, b = map(float, input().split())
+        _sum += a
+        _sum_gpa += a*b
+    print(int(_sum), round(_sum_gpa/int(_sum), 1))
