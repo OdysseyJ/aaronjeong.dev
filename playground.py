@@ -1,13 +1,16 @@
 import sys
 input = sys.stdin.readline
 
-n = int(input())
-for _ in range(n):
-    m = int(input())
-    _sum = 0
-    _sum_gpa = 0
-    for i in range(m):
-        a, b = map(float, input().split())
-        _sum += a
-        _sum_gpa += a*b
-    print(int(_sum), round(_sum_gpa/int(_sum), 1))
+odds = []
+while True:
+    try:
+        num = int(input())
+        if num%2 != 0:
+            odds.append(num)
+    except:
+        break
+if not odds:
+    print(-1)
+else:
+    print(sum(odds))
+    print(sorted(odds)[0])
