@@ -3,8 +3,11 @@ input = sys.stdin.readline
 
 n = int(input())
 
-total = 0
-for i in range(n+1):
-    total += int((3*i*(i+1))/2)
+nums = [int(input()) for _ in range(n)]
+print(sum(nums)-(n-1))
 
-print(total)
+# n-1만큼 빼기
+# 3
+# 1
+# 1
+# 1
