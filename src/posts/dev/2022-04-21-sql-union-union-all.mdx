@@ -1,0 +1,58 @@
+---
+title: '[SQL] union vs union all'
+description: difference of union and union all
+date: '2022-04-21T14:17:51+09:00'
+tags: [SQL]
+---
+
+### union, union all은 언제 쓰는가?
+- 두개의 쿼리 결과를 합치고 싶을때 사용한다.
+
+### union
+- 쿼리 결과에서 중복을 제거하고 합치고 싶을 때 사용
+
+### union all
+- 쿼리 결과를 중복에 상관없이 합치고 싶을때 사용
+
+#### 실습 코드
+```sql
+Create Table Fruits(
+    Name   Varchar(50),
+    Val   Varchar(50)
+)
+Create Table Drinks(
+    Name   Varchar(50),
+    Val   Varchar(50)
+)
+
+Insert Into Fruits
+VALUES ('apple', '300'),
+       ('apple', '300'),
+       ('banana', '200')
+
+Insert Into Drinks
+VALUES ('beer', '300'),
+       ('beer', '400'),
+       ('coke', '200')
+
+select * from Drinks
+union
+select * from Fruits
+
+-- beer,400
+-- apple,300
+-- banana,200
+-- beer,300
+-- coke,200
+
+select * from Drinks
+union all
+select * from Fruits
+
+-- beer,400
+-- apple,300
+-- apple,300
+-- banana,200
+-- beer,300
+-- coke,200
+```
