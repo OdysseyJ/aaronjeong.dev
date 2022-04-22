@@ -3,11 +3,6 @@ input = sys.stdin.readline
 
 n = int(input())
 
-nums = [int(input()) for _ in range(n)]
-print(sum(nums)-(n-1))
-
-# n-1만큼 빼기
-# 3
-# 1
-# 1
-# 1
+for i in range(n):
+    a, b = map(int, input().split())
+    print(f"You get {a // b} piece(s) and your dad gets {a % b} piece(s).")
