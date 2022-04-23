@@ -1,0 +1,51 @@
+---
+title: '[Django] django orm group-by와 ordering'
+description: relation between annotate and model ordering
+date: '2022-04-24T00:08:12+09:00'
+tags: [Django, ORM]
+---
+
+### Django queryset group_by 사용하기
+
+Django에서는 values와 annotate를 함께 사용해 group-by를 표현한다.
+
+```python
+User.objects.values("username").annotate(name=Count('username'))
+```
+
+```sql
+SELECT "users_user"."username", COUNT("users_user"."username") AS "name"
+FROM "users_user"
+GROUP BY "users_user"."username"
+```
+
+이때, User모델에 ordering이 정의되어 있는 경우, order_by를 정의해주지 않을 경우 group by구문에 ordering이 함께 들어간다.
+```python
+class User(TimeStampedModel):
+    class Meta:
+        ordering = ('-created', '-modified')
+```
+
+```python
+User.objects.values("username").annotate(name=Count('username'))
+```
+
+```sql
+SELECT "users_user"."username", COUNT("users_user"."username") AS "name"
+FROM "users_user"
+GROUP BY "users_user"."username", "users_user"."created", "users_user"."modified"
+ORDER BY "users_user"."created" DESC, "users_user"."modified" DESC
+```
+
+따라서, 항상 order_by를 정의해 원하는 결과를 명시적으로 작성하는게 좋다.
+
+```python
+User.objects.values("username").annotate(name=Count('username')).order_by("name")
+```
+
+```sql
+SELECT "users_user"."username", COUNT("users_user"."username") AS "name"
+FROM "users_user"
+GROUP BY "users_user"."username",
+ORDER BY "name"
+```
