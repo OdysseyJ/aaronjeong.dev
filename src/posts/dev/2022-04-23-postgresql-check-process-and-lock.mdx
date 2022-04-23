@@ -1,0 +1,36 @@
+---
+title: '[Postgresql] long running query, lock check and kill'
+description: 'check and kill process, lock on postgreql'
+date: '2022-04-23T23:49:37+09:00'
+tags: [Postgresql]
+---
+
+### 실행중인 쿼리 확인
+- 먼저, 실행중인 쿼리의 PID를 가져오기 위해 해당 쿼리를 실행한다
+```sql
+SELECT * FROM pg_stat_activity WHERE state = 'active';
+```
+
+### 쿼리 종료 시키기
+- 종료
+```sql
+SELECT pg_cancel_backend(<PID>);
+```
+
+- 강제 종료
+```sql
+SELECT pg_terminate_backend(<PID>);
+```
+
+### 모든 쿼리 종료
+- 특수한 경우에만 사용해야 함
+```sql
+SELECT pg_cancel_backend(pid) FROM pg_stat_activity WHERE state = 'active' and pid <> pg_backend_pid();
+```
+
+### Lock 걸린 테이블 확인
+- RowExclusiveLock이 있다면 해제해야할 필요가 있을 수 있음 (다른 쿼리에도 영향을 미치므로)
+```sql
+SELECT t.relname, l.locktype, page, virtualtransaction, pid, mode, granted FROM pg_locks l, pg_stat_all_tables t WHERE l.relation = t.relid ORDER BY relation ASC;
+```
+
