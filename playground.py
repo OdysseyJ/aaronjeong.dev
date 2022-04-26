@@ -1,13 +1,11 @@
 import sys
 input = sys.stdin.readline
 
-n = int(input())
-
-for i in range(n):
-    car_price = int(input())
-    options_cnt = int(input())
-    total_price = car_price
-    for j in range(options_cnt):
-        cnt, price = map(int, input().split())
-        total_price += (cnt * price)
-    print(total_price)
+current = 0
+result = 0
+for i in range(10):
+    _out, _in = map(int, input().split())
+    current += _in
+    current -= _out
+    result = max(current, result)
+print(result)
