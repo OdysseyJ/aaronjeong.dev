@@ -1,0 +1,5 @@
+1. 장고 orm ordering 이슈 정리해서 남기기
+2. Authentication vs permission 정리해서 남기기
+3. Graphql with python Django 남기기
+4. 추상 클래스 정리해서 남기기
+5. python typing Generic 정리해서 남기기
