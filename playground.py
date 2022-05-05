@@ -13,6 +13,3 @@ for i in range(n):
         num = int(num / 2)
         idx += 1
     print()
-
-# 1
-# 13
