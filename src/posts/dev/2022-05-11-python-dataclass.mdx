@@ -1,0 +1,145 @@
+---
+title: '[Python] Dataclass'
+description: study python dataclass
+date: '2022-05-11T22:07:40+09:00'
+tags: [Python, Dev]
+---
+
+### Dataclass란?
+
+- python 3.7에서 추가되었다.
+- dataclass는 `__init__()`이나 `__repr__()`과 같은 특수 메서드를 사용자 정의 클래스에 자동으로 추가하는데 사용한다.
+```python
+from dataclasses import dataclass
+
+@dataclass
+class InventoryItem:
+    """Class for keeping track of an item in inventory."""
+    name: str
+    unit_price: float
+    quantity_on_hand: int = 0
+
+    def total_cost(self) -> float:
+        return self.unit_price * self.quantity_on_hand
+```
+
+```python
+def __init__(self, name: str, unit_price: float, quantity_on_hand: int = 0):
+        self.name = name
+        self.unit_price = unit_price
+        self.quantity_on_hand = quantity_on_hand
+```
+
+### 모듈 콘텐츠
+- 단순한 데코레이터로도 사용할 수 있지만, 데코레이터와 함께 다양한 옵션을 제공 한다.
+```python
+@dataclass
+class C:
+    ...
+
+@dataclass()
+class C:
+    ...
+
+@dataclass(init=True, repr=True, eq=True, order=False, unsafe_hash=False, frozen=False, match_args=True, kw_only=False, slots=False)
+class C:
+   ...
+```
+- init : 참이면 `__init__()` 메서드를 생성한다. 이미 정의했으면 매개변수가 무시된다.
+- repr : 참이면 `__repr__()` 메서드가 생성된다. 필드는 클래스에 정의된 순서대로 표시된다.
+    - `예 :InventoryItem(name='widget', unit_price=3.0, quantity_on_hand=10)`
+- eq : 참이면 `__eq__()` 메서드가 정의된다. 튜플처럼 순서대로 비교된다. 같은 형만 비교할 수 있다.
+- order(기본값 False) : 참이면 `__lt__()`, `__le__()`, `__gt__()`, `__ge__()` 메서드가 생성된다. 튜플처럼 순서대로 비교된다.
+- unsafe_hash(기본값 False) : False면 `eq`와 `frozen`의 설정에 따라 `__hash__()` 메서드가 생성된다.
+- frozen(기본값 False) : 참이면 필드에 대입시 예외 발생시킨다.
+- match_args(기본값 True) : 파이썬 3.10에 추가됨, True이면 `__match_args__` 튜플이 파라미터로부터 생성되어 `__init__()`에 사용된다.
+- kw_only(기본값 False) : 모든 필드들이 keyword-only로 마킹된다.
+- slots(기본값 False) : `__slot__` 어트리뷰트가 생성되어 새로운 클래스가 반환된다.
+
+### 다양한 용례
+
+- 필드 기본값 지정
+```python
+@dataclass
+class C:
+    a: int       # 'a' has no default value
+    b: int = 0   # assign a default value for 'b'
+```
+
+- 기본 필드 값을 field() 함수 호출로 변경할 수 있음
+```python
+@dataclass
+class C:
+    mylist: list[int] = field(default_factory=list)
+
+c = C()
+c.mylist += [1, 2, 3]
+```
+
+- 필드 호출로 지정시, 클래스 어트리뷰트는 지정한 default로 대체됨.
+```python
+@dataclass
+class C:
+    x: int
+    y: int = field(repr=False)
+    z: int = field(repr=False, default=10)
+    t: int = 20
+```
+(클래스 어트리뷰트 C.z 는 10 이 되고, 클래스 어트리뷰트 C.t 는 20 이 되고, 클래스 어트리뷰트 C.x 와 C.y 는 설정되지 않게 됩니다.)
+
+- nested 형태로 제작할 수 있다.
+```python
+@dataclass
+class Point:
+     x: int
+     y: int
+
+@dataclass
+class C:
+     mylist: list[Point]
+
+p = Point(10, 20)
+assert asdict(p) == {'x': 10, 'y': 20}
+
+c = C([Point(0, 0), Point(10, 4)])
+assert asdict(c) == {'mylist': [{'x': 0, 'y': 0}, {'x': 10, 'y': 4}]}
+```
+
+- 초기화 후 처리는 `__post_init__`에서 진행할 수 있다.
+```python
+@dataclass
+class C:
+    a: float
+    b: float
+    c: float = field(init=False)
+
+    def __post_init__(self):
+        self.c = self.a + self.b
+```
+
+- 가변 기본값을 사용시 데이터클래스는 변수를 공유한다.
+```python
+class C:
+    x = []
+    def add(self, element):
+        self.x.append(element)
+
+o1 = C()
+o2 = C()
+o1.add(1)
+o2.add(2)
+assert o1.x == [1, 2]
+assert o1.x is o2.x
+```
+
+-> 기본 팩토리 함수를 사용해 가변형 새 인스턴스 제작
+```python
+@dataclass
+class D:
+    x: list = field(default_factory=list)
+
+assert D().x is not D().x
+```
+
+#### 참고
+https://docs.python.org/ko/3/library/dataclasses.html
