@@ -1,0 +1,79 @@
+---
+title: '[Django] Transaction Atomic deep dive'
+description: ''
+date: '2022-05-12T20:33:17+09:00'
+tags: [Dev, Django]
+---
+
+### Transaction 명시적으로 제어하기
+- django에서는 특정 단위의 코드의 atomicity를 보장하기 위해 atomic이라는 함수를 제공한다.
+
+```python
+from django.db import transaction
+
+@transaction.atomic
+def viewfunc(request):
+    # This code executes inside a transaction.
+    do_stuff()
+```
+
+- atomic 블록은 nested 될 수 있고, inner block이 성공적으로 종료되더라도, outer atomic이 실패할 경우 롤백될 수 있다.
+
+```python
+from django.db import IntegrityError, transaction
+
+@transaction.atomic
+def viewfunc(request):
+    create_parent()
+
+    try:
+        with transaction.atomic():
+            generate_relationships()
+    except IntegrityError:
+        handle_exception()
+
+    add_children()
+```
+
+- atomic 구문 안에서 try/except block이 integrity error를 핸들링하게 하고 싶으면, 아래와 같이 작성한다.
+
+```python
+from django.db import IntegrityError, transaction
+
+@transaction.atomic
+def viewfunc(request):
+    create_parent()
+
+    try:
+        with transaction.atomic():
+            generate_relationships()
+    except IntegrityError:
+        handle_exception()
+
+    add_children()
+```
+위와 같은 케이스에서 generate_relationships()가 database error를 발생시킨다 해도, add_children()코드가 실행된다.
+
+이때, generate_relationships()에서 발생한 데이터베이스 변화는 handle_exception()을 실행하기 전에 롤백된다.
+
+- atomic 구문 안에서 try/catch를 피하는게 좋다. (롤백이 일어나기 전에 쿼리를 날리면 TransactionManagementError가 발생함.)
+
+- model의 상태는 transaction을 롤백해도 돌아오지 않기 때문에, manually 변경해 주어야 한다.
+
+```python
+from django.db import DatabaseError, transaction
+
+obj = MyModel(active=False)
+obj.active = True
+try:
+    with transaction.atomic():
+        obj.save()
+except DatabaseError:
+    obj.active = False
+
+if obj.active:
+    ...
+```
+
+### 참고
+https://docs.djangoproject.com/en/dev/topics/db/transactions/#controlling-transactions-explicitly
