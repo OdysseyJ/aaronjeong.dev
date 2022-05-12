@@ -56,7 +56,34 @@ def viewfunc(request):
 
 이때, generate_relationships()에서 발생한 데이터베이스 변화는 handle_exception()을 실행하기 전에 롤백된다.
 
-- atomic 구문 안에서 try/catch를 피하는게 좋다. (롤백이 일어나기 전에 쿼리를 날리면 TransactionManagementError가 발생함.)
+- atomic 구문 안에서 DatabaseError가 발생하면, 롤백 대기상태가 된다. 이때 아래쪽 코드는 실행이 되지만,
+롤백이 일어나기 전에 쿼리를 날리면 TransactionManagementError가 발생한다.
+
+```python
+# ERROR
+from django.db import IntegrityError, transaction
+@transaction.atomic
+def test_func():
+    User.objects.create(username="asdf", id=1)
+    print("2")
+    try:
+        print("1")
+        User.objects.create(username="asdf", id=1)
+    except IntegrityError:
+        pass
+    User.objects.get(id=1) # TransactionManagementError!
+```
+
+```python
+from django.db import IntegrityError, transaction
+@transaction.atomic
+def test_func():
+    try:
+        User.objects.get(username="asdf", id=9999999) # User.DoesNotExist
+    except Exception:
+        pass
+    User.objects.create(username="aaaa", login_id="BBBBBBB") # OK
+```
 
 - model의 상태는 transaction을 롤백해도 돌아오지 않기 때문에, manually 변경해 주어야 한다.
 
