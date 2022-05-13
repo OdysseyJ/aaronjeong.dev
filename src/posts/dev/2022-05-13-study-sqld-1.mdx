@@ -1,0 +1,103 @@
+---
+title: '[SQLD] 34회 기출문제 정리'
+description: study sqld and write til
+date: '2022-05-13T20:54:35+09:00'
+tags: [SQLD, Dev]
+---
+
+#### Delete vs Truncate vs Drop 명령어의 차이
+- Delete : 데이터를 지우지만, 데이터베이스 공간은 남겨둔 채로 지운다.
+- Truncate : 데이터를 지우면서, 데이터베이스 공간, 인덱스까지 모두 지운다. (테이블은 남아 있다.)
+- Drop : 테이블, 데이터를 모두 지운다.
+
+#### PROCEDURE, FUNCTION, TRIGGER
+- PROCEDURE : SQL을 함수 형태로 저장하고 사용 (RETURN이 없다.)
+
+```sql
+CREATE PROCEDURE 프로시저명(인자 인자형,...)
+BEGIN
+     SQL 문장들
+END
+
+CALL 프로시저명
+
+DROP PROCEDURE 프로시저명;
+```
+
+- FUNCTION : SQL을 함수 형태로 저장하고 사용 (RETURN이 있다.)
+
+```sql
+CREATE FUNCTION 함수명(인자 인자형,...) RETURNS 타입
+BEGIN
+     SQL문장들
+END
+
+함수명(인자)
+
+DROP FUNCTION 프로시져명
+```
+
+- TRIGGER : 특정 조건이 되면 자동으로 호출되는 저장 프리시져
+
+```sql
+CREATE TRIGGER 트리거명 BEFORE(또는 AFTER) CRUD선택 ON 테이블명
+     FOR EACH ROW
+BEGIN
+     변경 전 (OLD.칼럼명) 또는 변경후(NEW.칼럼명)을 이용한처리
+END
+```
+
+#### NULLIF, COALESCE, NVL
+- NULLIF(exp1, exp2) : exp1, exp2가 같을 경우 NULL
+- NVL(check, target) : check이 null이면 target, 아니라면 check 원래값을 반환
+- COALESCE(A, B, C, ...) : 차례대로 A가 null이 아닐경우 A, A가 null일경우 B...
+
+#### 계층형 쿼리 (START WITH... CONNECT BY)
+
+```sql
+SELECT [컬럼]...
+FROM [테이블]
+WHERE [조건]
+START WITH [최상위 조건]
+CONNECT BY [NOCYCLE][PRIOR 계층형 구조 조건];
+```
+
+#### GROUP BY (ROLLUP, CUBE, GROUPING SETS)
+
+- ROLLUP : 소그룹 간의 소계
+```sql
+SELECT ID, DEPT_NM, SUM(AMT)
+FROM SQLD_34_21
+GROUP BY ROLLUP(ID, DEPT_NM)
+```
+
+- CUBE : 모든 그룹케이스를 계산
+
+```sql
+SELECT ID, DEPT_NM, SUM(AMT)
+FROM SQLD_34_21
+GROUP BY CUBE(ID, DEPT_NM)
+```
+
+- GROUPING SETS : 특정 항목에 대한 소계
+
+```sql
+SELECT ID, DEPT_NM, SUM(AMT)
+FROM SQLD_34_21
+GROUP BY GROUPING SETS(ID, DEPT_NM)
+```
+
+#### Hash Join, Nested-Loop Join, Sort-Merge Join
+- Nested-Loop Join
+    - 좁은 범위에 유리한 성능
+    - 순차적 처리, Random Access 위주
+    - 데이터를 랜덤으로 액세스하기 때문에 결과 집합이 많으면 느려짐
+    - row수가 적은쪽을 driven으로 선택한다
+- Sort Merge Join
+    - 연결을 위해 랜덤 액세스를 하지 않고 스캔을 하면서 수행
+    - Nested Loop Join처럼 선행집합 개념이 없음
+    - 정렬을 위한 영역(Sort Area Size)에 따라 효율에 큰 차이 발생
+    - 조인 연산자가 '='이 아닌 경우 nested loop 조인보다 유리한 경우가 많음
+- Hash Join
+    - 정렬 작업이 없어 정렬이 부담되는 대량 배치작업에 유리
+    - 메모리 사용이 크다
