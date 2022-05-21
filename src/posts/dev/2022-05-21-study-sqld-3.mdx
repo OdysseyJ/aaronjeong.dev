@@ -1,0 +1,33 @@
+---
+title: '[SQLD] SQL 기본'
+description: study sqld
+date: '2022-05-21T18:05:42+09:00'
+tags: [Dev, SQLD]
+---
+
+#### DML, DDL, DCL, TCL
+- DML(Data Manipulation Language) : SELECT, INSERT, UPDATE, DELETE
+- DDL(Data Definition Language) : CREATE. ALTER, DROP, RENAME
+- DCL(Data Control Language) : GRANT, REVOKE
+- TCL(Transaction Control Language) : COMMIT, ROLLBACK
+
+#### 와일드카드
+- `*` : 모든
+- `%` : 모든
+- `-` : 한 글자
+- `||` : 문자와 문자 연결
+
+#### 트랜잭션
+- COMMIT : 올바르게 반영된 데이터를 DB에 반영
+- ROLLBACK : 트랜잭션 시작 이전의 상태로 되돌림. COMMIT되지 않은 모든 트랜잭션 롤백
+- SAVEPOINT : 저장 시점
+
+#### 트랜잭션의 특징
+- 원자성 : 트랜잭션에서 정의된 연산들은 모두 성공적으로 실행되던지 아니면 전혀 실행되지 않아야 함.
+- 일관성 : 트랜잭션 실행 전 DB 내용이 잘못되지 않으면 실행 후도 잘못되지 않아야 함.
+- 고립성 : 트랜잭션 실행 도중 다른 트랜잭션의 영향을 받아 잘못된 결과를 만들면 안됨
+- 지속성 : 트랜잭션이 성공적으로 수행되면 DB의 내용은 영구적으로 저장
+
+#### COMMIT
+- DDL : AUTO COMMIT
+- DML : COMMIT을 입력해야 함
