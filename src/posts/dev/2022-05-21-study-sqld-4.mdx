@@ -1,0 +1,30 @@
+---
+title: '[SQLD] SQL 연산 함수, Join'
+description: study sqld
+date: '2022-05-21T18:28:59+09:00'
+tags: [SQLD, Dev]
+---
+
+#### NULL 관련 함수
+- NVL(s1, s2) : s1이 NULL이면 s2 식 출력
+- NULLIF(s1, s2) : 식1과 식2가 같으면 NULL, 아니면 식1
+- COALESCE(s1, s2) : NULL이 아닌 최초의 표현식을 출력, 모두 NULL일시 NULL
+
+#### SELECT 문장 실행 순서
+- SELECT ALIAS -> FROM -> WHERE -> GROUP BY -> HAVING -> SELECT -> ORDER BY
+- 메모리에 모든 컬럼을 올리므로 ORDER BY에서 SELECT에 정의 되지 않을 컬럼을 써도 된다.
+
+#### WITH TIES
+```sql
+SELECT TOP(2) WITH TIES ENAME, SAL
+FROM EMP
+ORDER BY SAL DESC;
+```
+급여가 높은 2명을 내림차순으로 출력, 같은 급여를 받는 사원은 같이 출력
+
+#### 집합 연산자
+- UNION : 합집합(중복 행 1개로 합쳐서)
+- UNION ALL : 합집합(중복 행 표시)
+- INTERSECT : 교집합(중복 행 1개로)
+- MINUS : 차집합(중복 행 1개로)
+- CROSS JOIN : 곱집합(PRODUCT)
