@@ -95,7 +95,7 @@ GROUP BY GROUPING SETS(ID, DEPT_NM)
     - row수가 적은쪽을 driven으로 선택한다
 - Sort Merge Join
     - 연결을 위해 랜덤 액세스를 하지 않고 스캔을 하면서 수행
-    - Nested Loop Join처럼 선행집합 개념이 없음
+    - Nested Loop Join처럼 선행집합 개념이 없
     - 정렬을 위한 영역(Sort Area Size)에 따라 효율에 큰 차이 발생
     - 조인 연산자가 '='이 아닌 경우 nested loop 조인보다 유리한 경우가 많음
 - Hash Join

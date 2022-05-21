@@ -1,7 +1,43 @@
 ---
-title: '[SQLD] 기출문제 정리 '
+title: '[SQLD] 기출문제 정리'
 description: study sqld and write TIL
 date: '2022-05-14T16:30:50+09:00'
 tags: [Dev, SQLD]
 ---
 
+### 숫자 다루기
+- TRUNC : 숫자를 소수 m자리에서 잘라서 리턴
+- CEIL : 숫자보다 크거나 같은 최소 정수
+- ROUND : 숫자를 소수 m자리에서 반올림해서 리턴
+- FLOOR : 숫자보다 작거나 같은 최대 정수
+
+### JOIN
+- FULL OUTER JOIN = LEFT JOIN UNION RIGHT JOIN
+
+### RANGE BETWEEN
+RANGE BETWEEN start_point AND end_point
+- start_point는 end_point보다 작거나 같은 값
+- Default는 RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+- UNBOUNDED PRECEDING : start_point만 들어갈 수 있으며, 파티션의 first row
+- UNBOUNDED FOLLOWING : end_point만 들어갈 수 있으며, 파티션의 last row
+- CURRENT ROW : start, end_point 둘다 가능. 윈도우는 CUREENT ROW에서 start하거나 end 함
+
+### ORACLE vs SQL server
+```sql
+TAB1 COL1 CHAR(10) COL2 CHAR(10)
+INSERT INTO TAB1 VALUES ('1','');
+INSERT INTO TAB1 VALUES ('2','');
+INSERT INTO TAB1 VALUES ('3','');
+```
+
+- Oracle
+```sql
+# 30, 0
+SELECT SUM(LENGTH(COL1) ) , SUM(LENGTH(COL2) ) FROM TAB1
+```
+
+- SQL Server
+```sql
+# 3, 0
+SELECT SUM(LEN(COL1) ) , SUM(LEN(COL2) ) FROM TAB1
+```
