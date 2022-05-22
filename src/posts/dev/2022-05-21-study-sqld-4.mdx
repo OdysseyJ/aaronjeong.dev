@@ -28,3 +28,18 @@ ORDER BY SAL DESC;
 - INTERSECT : 교집합(중복 행 1개로)
 - MINUS : 차집합(중복 행 1개로)
 - CROSS JOIN : 곱집합(PRODUCT)
+
+#### grouping functions
+- ROLLUP : Subtotal을 생성하기 위해 사용. Grouping column이 N이라고 했을 때 N+1 level의 subtotal
+- GROUPING : 집계 표시면 1 아니면 0
+- CUBE : 결합 가능한 모든 값에 대해서 다차원 집계 생성. ROLLUP에 비해 시스템 부하 심함
+    - 2^N개 생성
+    - CUBE(A, B) = GROUPING SETS(A, B, (A, B), ())
+- GROUPING SETS : 인수들에 대한 개별 집계를 구할 수 있음.
+
+#### 순위 함수
+- RANK : 1224
+- DENSE_RANK : 1223
+- ROW_NUMBER : 동일한 값이라도 고유한 순위
+
+####
