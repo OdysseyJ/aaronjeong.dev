@@ -13,8 +13,3 @@ for i in range(n):
         num = int(num / 2)
         idx += 1
     print()
-
-
-def test_func():
-
-    problem_text = ''
