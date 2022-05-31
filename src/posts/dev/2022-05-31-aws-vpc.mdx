@@ -1,0 +1,40 @@
+---
+title: '[AWS] VPC'
+description: study aws vpc
+date: '2022-05-31T17:48:43+09:00'
+tags: [AWS, VPC]
+---
+
+### VPC Peering
+- 여러개의 VPC를 연결하여 하나의 네트워크처럼 사용하고 싶을 경우 설정
+- 중복되는 CIDR을 가져서는 안된다
+- Peering connection은 전이되지 않기 때문에, A-B-C의 경우 A-C또한 피어링을 맺어야 통신이 가능하다.
+- 각 VPC 서브넷의 route table을 업데이트하여 EC2 인스턴스가 서로 통신할 수 있도록 보장해야 한다.
+- 다른 계정간에도 연결이 가능하고, 리전간 연결이 가능하다.
+- peering된 VPC의 security group을 reference할 수 있다.
+
+### VPC Endpoints (AWS PrivateLink)
+- VPC내의 사설 엔드포인트로, AWS 서비스로의 사설 연결을 가능하게 해준다.
+- CloudWatch, S3등의 서비스에 대한 연결을 인터넷 연결 없이 진행하게 해준다.
+- 인터넷을 사용할 때보다 비용 절감, 속도 개선 효과가 있다.
+- 문제가 있을 경우 라우팅 테이블, DNS 세팅
+
+#### Endpoint의 타입
+- Interface Endpoints
+    - ENI(private IP address)를 엔트리 포인트로 제공(Security Group이 부착되어야 함)
+    - 대부분의 AWS 서비스에서 지원
+- Gateway Endpoints
+    - VPC 엔드포인트 게이트웨이를 엔트리 포인트로 제공하며, 라우팅 테이블에서 타겟으로 사용되어야 함.
+    - S3와 DynamoDB를 지원한다
+
+### VPC Flow Logs
+- 인터페이스로 향하는 IP 트래픽의 정보를 수집한다.
+    - VPC flow logs
+    - Subnet flow logs
+    - ENI flow logs
+- 연결 문제에 있어서 모니터링과 트러블슈팅을 도와준다.
+- Flow log는 s3 / cloudwatch에 쌓을 수 있다.
+- AWS managed interface에 대한 네트워크 정보도 얻을 수 있음
+    - ELB, RDS, ElasticCache, Redshift, NATGW, ...
+
+#### VPC Flow log를 통해서 troubleshooting하기

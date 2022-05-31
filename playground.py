@@ -10,19 +10,19 @@ def convex_hull(positions):
     for p3 in positions:
         while len(convex) >= 2:
             p1, p2 = convex[-2], convex[-1]
+            print(p1, p2, p3, ccw(p1, p2 ,p3))
             if ccw(p1, p2, p3) > 0:
                 break
             convex.pop()
         convex.append(p3)
     return len(convex)
 
-n = int(input())
+n, answer = int(input()), -2
 positions = list()
 for i in range(n):
     positions.append(list(map(int, input().split())))
 
 positions = sorted(positions, key=lambda pos:(pos[1], pos[0]))
-answer = -2
 answer += convex_hull(positions)
 
 positions.reverse()
