@@ -36,3 +36,12 @@ tags: [AWS, VPC]
 - Flow log는 s3 / cloudwatch에 쌓을 수 있다.
 - AWS managed interface에 대한 네트워크 정보도 얻을 수 있음
     - ELB, RDS, ElasticCache, Redshift, NATGW, ...
+
+### AWS Site-to-Site VPN
+- 기업의 사설 VPN과 AWS의 VPN을 연결할 수 있도록 해주는 서비스
+- Virtual Private Gateway (VGW)
+    - AWS 사이드의 VPN Connection을 위한 집선기
+    - 생성되면 VPC에 연결됨.
+- Customer Gateway (CGW)
+    - VPN 커넥션을 맺기 위한 고객 사이드의 Software 혹은 물리적 기기
+
