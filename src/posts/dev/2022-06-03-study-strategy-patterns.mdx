@@ -1,0 +1,231 @@
+---
+title: '[DesignPattern] StrategyPattern(전략 패턴) with python'
+description: strategy pattern with python codes
+date: '2022-06-03T16:54:56+09:00'
+tags: [DesignPattern, StrategyPattern]
+---
+
+### 상속이 모든 문제를 해결 해 줄 수 있을까?
+
+- Duck이라는 클래스의 인터페이스를 상속받은 YellowDuck, BlackDuck, RubberDuck이 있다고 가정하자.
+
+```python
+from abc import *
+
+
+class Duck(metaclass=ABCMeta):
+    def swim(self):
+        print("헤엄치기")
+
+    @abstractmethod
+    def display(self):
+        raise NotImplementedError()
+
+
+class YellowDuck(Duck):
+    def display(self):
+        print("노란오리")
+
+
+class BlackDuck(Duck):
+    def display(self):
+        print("검정오리")
+
+
+class RubberDuck(Duck):
+    def swim(self):
+        print("둥둥")
+
+    def display(self):
+        print("고무오리")
+```
+
+- 만약, 오리가 날아다닐 때 사용하는 `fly`함수, 오리가 꽥꽥 거릴때 사용하는 `quack`이라는 함수를 추가한다고 한다.
+- 상속은 이런 변경에 대홰 고무 오리는 날수 없음에도 fly함수를 상속해야 하므로 fly함수를 오버라이딩 해야만 한다.
+- 개발자는 Duck함수에 fly함수를 추가할 때, 아래 Duck함수의 구현체를 모두 확인해 fly함수가 적용될지 결정해 줘야 한다.
+```python
+class Duck(metaclass=ABCMeta):
+    ...
+    def fly(self):
+        print("헤엄치기")
+
+    def quack(self):
+        print("꽥꽥")
+
+# 만약 오리가 1000종류가 넘는다면?
+class RubberDuck(Duck):
+    def fly(self):
+        pass
+
+    def quack(self):
+        pass
+```
+
+### 새롭게 추가되는 행동에 대해서 인터페이스를 따로 정의하면 해결되지 않을까?
+
+- 두가지 추가되는 행위에 대해 새롭게 인터페이스 형태로 정의해 보자.
+- 인터페이스에는 구현된 코드가 없으므로, 코드의 재사용이 불가능하다. (구현체마다 fly, quack함수를 구현한다)
+```python
+class Flyable(metaclass=ABCMeta):
+    @abstractmethod
+    def fly(self):
+        raise NotImplementedError()
+
+class Quackable(metaclass=ABCMeta):
+    @abstractmethod
+    def quack(self):
+        raise NotImplementedError()
+
+class YellowDuck(Duck, Flyable, Quackable):
+    def display(self):
+        print("노란오리")
+
+    def fly(self):
+        print("펄럭")
+
+    def quack(self):
+        print("꽥꽥")
+
+
+class BlackDuck(Duck, Flyable, Quackable):
+    def display(self):
+        print("검정오리")
+
+    def fly(self):
+        print("펄럭")
+
+    def quack(self):
+        print("꽥꽥")
+```
+
+- 해당 케이스에서 만약 날아가는 동작을 조금 바꾸기 위해서는 날아다닐 수 있는 모든 코드를 고쳐야 한다.
+```python
+class YellowDuck(Duck, Flyable, Quackable):
+    def fly(self):
+        print("수정된펄럭")
+
+
+class BlackDuck(Duck, Flyable, Quackable):
+    def fly(self):
+        print("수정된펄럭")
+```
+
+### 오리의 행동을 인터페이스화해서 통합하기
+
+- 특정 행위를 인터페이스로 추상화하여, Duck클래스에서는 특정 행위 클래스를 이용해 quack과 fly를 진행한다.
+```python
+class FlyBehavior(metaclass=ABCMeta):
+    def fly(self):
+        pass
+
+
+class FlyWithWing(FlyBehavior):
+    def fly(self):
+        print("날개로 날기")
+
+
+class FlyWithRocket(FlyBehavior):
+    def fly(self):
+        print("로켓으로 날기")
+
+
+class QuackBehavior(metaclass=ABCMeta):
+    def quack(self):
+        pass
+
+
+class Quack(QuackBehavior):
+    def quack(self):
+        print("그냥꽥꽥")
+
+
+class SlowQuack(QuackBehavior):
+    def quack(self):
+        print("꽤액")
+
+
+class Duck(metaclass=ABCMeta):
+    fly_behavior: FlyBehavior
+    quack_behavior: QuackBehavior
+
+    def perform_quack(self):
+        return self.quack_behavior.quack()
+
+    def perform_fly(self):
+        return self.fly_behavior.fly()
+
+    def swim(self):
+        print("헤엄치기")
+
+    def quack(self):
+        print("꽥꽥")
+
+    @abstractmethod
+    def display(self):
+        raise NotImplementedError()
+
+
+class YellowDuck(Duck):
+    def __init__(self):
+        self.fly_behavior = FlyWithWing()
+        self.quack_behavior = Quack()
+
+    def fly(self):
+        print("수정된펄럭")
+```
+
+### 동적으로 오리의 행동 변화시키기
+
+- setter 함수를 구현해 동적으로 오리의 행동을 변화시킬 수 있다.
+```python
+class Duck(metaclass=ABCMeta):
+    fly_behavior: FlyBehavior
+    quack_behavior: QuackBehavior
+
+    def perform_quack(self):
+        return self.quack_behavior.quack()
+
+    def perform_fly(self):
+        return self.fly_behavior.fly()
+
+    def swim(self):
+        print("헤엄치기")
+
+    def quack(self):
+        print("꽥꽥")
+
+    def set_fly_behavior(self, fly_behavior: FlyBehavior):
+        self.fly_behavior = fly_behavior
+
+    def set_quack_behavior(self, quack_behavior: QuackBehavior):
+        self.quack_behavior = quack_behavior
+
+    @abstractmethod
+    def display(self):
+        raise NotImplementedError()
+
+
+class YellowDuck(Duck):
+    def __init__(self):
+        self.fly_behavior = FlyWithWing()
+        self.quack_behavior = Quack()
+
+    def display(self):
+        print("노란오리")
+
+
+class RubberDuck(Duck):
+    def quack(self):
+        print("삑삑")
+
+    def display(self):
+        print("고무오리")
+
+
+yellow_duck = YellowDuck()
+yellow_duck.perform_fly() # 날개로 날기
+yellow_duck.set_fly_behavior(fly_behavior=FlyWithRocket())
+yellow_duck.perform_fly() # 로켓으로 날기
+```
+
+- 새로운 타입의 오리, 새로운 형식의 `fly`와 `quack`에 대해 유연한 대응이 가능하다.
