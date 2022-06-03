@@ -1,81 +1,67 @@
 from abc import *
 
 
-class FlyBehavior(metaclass=ABCMeta):
-    def fly(self):
-        pass
 
+class Beverage(metaclass=ABCMeta):
+    description = "제목 없음"
 
-class FlyWithWing(FlyBehavior):
-    def fly(self):
-        print("날개로 날기")
-
-
-class FlyWithRocket(FlyBehavior):
-    def fly(self):
-        print("로켓으로 날기")
-
-
-class QuackBehavior(metaclass=ABCMeta):
-    def quack(self):
-        pass
-
-
-class Quack(QuackBehavior):
-    def quack(self):
-        print("그냥꽥꽥")
-
-
-class SlowQuack(QuackBehavior):
-    def quack(self):
-        print("꽤액")
-
-
-class Duck(metaclass=ABCMeta):
-    fly_behavior: FlyBehavior
-    quack_behavior: QuackBehavior
-
-    def perform_quack(self):
-        return self.quack_behavior.quack()
-
-    def perform_fly(self):
-        return self.fly_behavior.fly()
-
-    def swim(self):
-        print("헤엄치기")
-
-    def quack(self):
-        print("꽥꽥")
-
-    def set_fly_behavior(self, fly_behavior: FlyBehavior):
-        self.fly_behavior = fly_behavior
-
-    def set_quack_behavior(self, quack_behavior: QuackBehavior):
-        self.quack_behavior = quack_behavior
+    def get_description(self):
+        return self.description
 
     @abstractmethod
-    def display(self):
+    def cost(self):
         raise NotImplementedError()
 
 
-class YellowDuck(Duck):
+# Beverage 클래스가 들어갈 자리에 들어갈 수 있어야 하므로 Beverage를 상속
+class CondimentDecorator(Beverage):
+    beverage: Beverage
+
+    @abstractmethod
+    def get_description(self):
+        raise NotImplementedError()
+
+    @abstractmethod
+    def cost(self):
+        raise NotImplementedError()
+
+class Espresso(Beverage):
     def __init__(self):
-        self.fly_behavior = FlyWithWing()
-        self.quack_behavior = Quack()
+        self.description = "에스프레소"
 
-    def display(self):
-        print("노란오리")
+    def cost(self):
+        return 1.99
+
+class HouseBlend(Beverage):
+    def __init__(self):
+        self.description = "하우스 블렌드 커피"
+
+    def cost(self):
+        return 0.89
+
+class Mocha(CondimentDecorator):
+    def __init__(self, beverage: Beverage):
+        self.beverage = beverage
+
+    def get_description(self):
+        return self.beverage.get_description() + ", 모카"
+
+    def cost(self):
+        return self.beverage.cost() + 0.2
+
+class Whip(CondimentDecorator):
+    def __init__(self, beverage: Beverage):
+        self.beverage = beverage
+
+    def get_description(self):
+        return self.beverage.get_description() + ", 휘핑"
+
+    def cost(self):
+        return self.beverage.cost() + 0.1
 
 
-class RubberDuck(Duck):
-    def quack(self):
-        print("삑삑")
-
-    def display(self):
-        print("고무오리")
-
-
-yellow_duck = YellowDuck()
-yellow_duck.perform_fly()
-yellow_duck.set_fly_behavior(fly_behavior=FlyWithRocket())
-yellow_duck.perform_fly()
+beverage1: Beverage = Espresso()
+beverage1 = Mocha(beverage1)
+beverage1 = Mocha(beverage1)
+beverage1 = Whip(beverage1)
+print(beverage1.cost())
