@@ -1,0 +1,60 @@
+---
+title: '[DesignPattern] SingletonPattern(싱글톤패턴) with python'
+description: singleton pattern with python codes
+date: '2022-06-05T19:08:35+09:00'
+tags: [DesignPattern, SingletonPattern]
+---
+
+### 고전적인 싱글톤 패턴 구현하기
+```python
+class Singleton:
+    unique_instance : Singleton
+
+    def get_instance(self) -> Singleton:
+        return self.unique_instance if self.unique_instance else Singleton()
+```
+
+### 멀티 쓰레딩 환경에서의 싱글톤 패턴
+
+- synchronized
+```python
+import threading
+
+def synchronized(func):
+
+    func.__lock__ = threading.Lock()
+
+    def synced_func(*args, **kws):
+        with func.__lock__:
+            return func(*args, **kws)
+
+    return synced_func
+
+class Singleton:
+    unique_instance : Singleton
+
+    @synchronized
+    def get_instance(self) -> Singleton:
+        return self.unique_instance if self.unique_instance else Singleton()
+```
+
+- 처음부터 인스턴스 생성하기
+```python
+class Singleton:
+    unique_instance : Singleton = Singleton()
+
+    def get_instance(self) -> Singleton:
+        return self.unique_instance # 이미 만들어졌으므로 그냥 인스턴스를 반환한다.
+```
+
+### enum을 사용하면 아주 쉽게 싱글턴을 구현할 수 있다.
+```python
+from enum import Enum
+class Singleton(Enum):
+    UNIQUE_INSTANCE = 1
+
+singleton: Singleton = Singleton.UNIQUE_INSTANCE
+```
+
+#### 참고
+- 파이썬으로 여러가지 싱글톤 구현[https://wikidocs.net/3693]
