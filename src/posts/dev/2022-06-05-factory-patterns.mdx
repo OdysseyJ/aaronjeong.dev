@@ -1,0 +1,212 @@
+---
+title: '[DesignPattern] FactoryPattern(팩토리패턴) with python'
+description: factory pattern with python codes
+date: '2022-06-05T17:44:57+09:00'
+tags: [DesignPattern, FactoryPattern]
+---
+
+### 간단한 팩토리(Simple Factory)
+- 객체를 직접 생성하는 팩토리. 유일하게 구상 클래스를 직접 참조하는 부분을 말한다.
+- 디자인 패턴은 아니나, 관용구에 가깝다.
+- 다양한 피자를 주문하는 함수를 구현해보자.
+```python
+class PizzaStore:
+    def order_pizza(self, type: str):
+        pizza = None
+        if type == "cheese":
+            pizza = CheesePizza()
+        elif type == "greek":
+            pizza = GreekPizza()
+        elif type == "peperioni":
+            pizza = PeperoniPizza()
+        pizza.prepare()
+        pizza.bake()
+        pizza.cut()
+        pizza.box()
+
+        return pizza
+```
+
+- 만약 피자 타입이 추가되거나, 없어질때 해당 함수도 함께 변경되어야 한다.
+```python
+class PizzaStore:
+    def order_pizza(self, type: str):
+        pizza = None
+        # if type == "cheese":
+        #     pizza = CheesePizza()
+        if type == "greek":
+            pizza = GreekPizza()
+        elif type == "peperioni":
+            pizza = PeperoniPizza()
+        elif type == "bulgogi": # 추가
+            pizza = BulgogiPizza() # 추가
+        pizza.prepare()
+        pizza.bake()
+        pizza.cut()
+        pizza.box()
+
+        return pizza
+```
+
+- 간단한 팩토리 정의하기
+
+```python
+class SimplePizzaFactory:
+    def create_pizza(self, type: str):
+        pizza = None
+        if type == "greek":
+            pizza = GreekPizza()
+        elif type == "peperioni":
+            pizza = PeperoniPizza()
+        elif type == "bulgogi": # 추가
+            pizza = BulgogiPizza() # 추가
+        return pizza
+```
+
+```python
+class PizzaStore:
+    factory: SimplePizzaFactory
+
+    def __init__(self, factory: SimplePizzaFactory):
+        self.factory = factory
+
+    def order_pizza(self, type: str):
+        pizza = self.factory.create_pizza(type)
+
+        pizza.prepare()
+        pizza.bake()
+        pizza.cut()
+        pizza.box()
+
+        return pizza
+```
+
+### 팩토리 메서드 패턴
+- SimpleFactory는 지점의 스타일을 살릴수는 없다.
+- 피자를 만드는 일 자체는 PizzaStore 클래스에서 진행하면서도 지점의 스타일을 살리는 방법
+
+```python
+class Pizza:
+    name: str
+    dough: str
+    sauce: str
+    def prepare(self):
+        pass
+    def bake(self):
+        pass
+    def cut(self):
+        pass
+    def box(self):
+        pass
+
+class NYStyleGreekPizza(Pizza):
+    pass
+
+...
+
+class PizzaStore:
+    def order_pizza(self, type: str):
+        pizza: Pizza = self.create_pizza(type)
+
+        pizza.prepare()
+        pizza.bake()
+        pizza.cut()
+        pizza.box()
+
+        return pizza
+
+    @abstractmethod
+    def create_pizza(self, type: str):
+        pass
+
+class NYStylePizzaStore(PizzaStore):
+    def crate_pizza(self, type:str):
+        pizza = None
+        if type == "greek":
+            pizza = NYStyleGreekPizza()
+        elif type == "peperioni":
+            pizza = NYStylePeperoniPizza()
+        elif type == "bulgogi": # 추가
+            pizza = NYStyleBulgogiPizza() # 추가
+        return pizza
+
+class ChicagoStylePizzaStore(PizzaStore):
+    def crate_pizza(self, type:str):
+        pizza = None
+        if type == "greek":
+            pizza = ChicagoStyleGreekPizza()
+        elif type == "peperioni":
+            pizza = ChicagoStylePeperoniPizza()
+        elif type == "bulgogi": # 추가
+            pizza = ChicagoStyleBulgogiPizza() # 추가
+        return pizza
+```
+
+### 추상 팩토리 패턴
+- 서로 다른 상황에서 맞는 제품을 생성하는 팩토리를 구현할 수 있다.
+- 제품군을 생성하는 인터페이스를 제공할 수 있다.
+- 코드와 제품을 생성하는 팩토리를 분리할 수 있다.
+
+```python
+class PizzaIngredientFactory(metaclass=ABCMeta):
+    @abstractmethod
+    def create_dough(self) -> Dough:
+        pass
+
+    @abstractmethod
+    def create_sauce(self) -> Sauce:
+        pass
+
+    @abstractmethod
+    def create_cheese(self) -> Cheese:
+        pass
+
+    @abstractmethod
+    def create_veggies(self) -> List[Veggies]:
+        pass
+
+    @abstractmethod
+    def create_pepperoni(self) -> Pepperoni:
+        pass
+
+    @abstractmethod
+    def create_clam(self) -> Clams:
+        pass
+
+class NYPizzaIngredientFactory(PizzaIngredientFactory):
+    def create_dough(self) -> Dough:
+        return ThinCrustDough()
+
+    def create_sauce(self) -> Sauce:
+        return MarinaraSauce()
+
+    def create_cheese(self) -> Cheese:
+        return ReggianoCheese()
+
+    def create_veggies(self) -> List[Veggies]:
+        return [Garlic(), Mushroom(), Onion()]
+
+    def create_pepperoni(self) -> Pepperoni:
+        return SlicedPepperoni()
+
+    def create_clam(self) -> Clams:
+        return FreshClams()
+
+class Pizza(metaclass=ABCMeta):
+    ...
+    @abstractmethod
+    def prepare(self):
+        pass
+    ...
+
+class CheesePizza(Pizza):
+    ingredient_factory : PizzaIngredientFactory
+
+    def __init__(self, ingredient_factory: PizzaIngredientFactory):
+        self.ingredient_factory = ingredient_factory
+
+    def prepare(self):
+        dough = self.ingredient_factory.create_dough()
+        sauce = self.ingredient_factory.create_sauce()
+        cheese = self.ingredient_factory.create_cheese()
+```
