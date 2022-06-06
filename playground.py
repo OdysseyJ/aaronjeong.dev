@@ -1,67 +1,30 @@
-from abc import *
+text = "hello world jane aaron"
 
+# 기본적으로 있을때는 똑같이 동작한다.
+f_result = text.find("jane")
+i_result = text.index("jane")
+range_find = text.find("h", 0, 1)
+print(range_find)
+print(f_result)
+print(i_result)
 
+# Find와 Index는 없을때 차이가 난다.
+# ff_result = text.find("z")
+# ii_result = text.index("z")
+# print(ff_result)
+# print(ii_result)
 
-class Beverage(metaclass=ABCMeta):
-    description = "제목 없음"
+# Count
+c_result = text.count(" ")
+print(c_result)
 
-    def get_description(self):
-        return self.description
+# Startswith
+s_result = text.startswith("h")
+ss_result = text.startswith("j")
+S_result = text.startswith("H")
+SS_result = text.upper().startswith("H")
+print(s_result)
+print(ss_result)
+print(S_result)
+print(SS_result)
 
-    @abstractmethod
-    def cost(self):
-        raise NotImplementedError()
-
-
-# Beverage 클래스가 들어갈 자리에 들어갈 수 있어야 하므로 Beverage를 상속
-class CondimentDecorator(Beverage):
-    beverage: Beverage
-
-    @abstractmethod
-    def get_description(self):
-        raise NotImplementedError()
-
-    @abstractmethod
-    def cost(self):
-        raise NotImplementedError()
-
-class Espresso(Beverage):
-    def __init__(self):
-        self.description = "에스프레소"
-
-    def cost(self):
-        return 1.99
-
-class HouseBlend(Beverage):
-    def __init__(self):
-        self.description = "하우스 블렌드 커피"
-
-    def cost(self):
-        return 0.89
-
-class Mocha(CondimentDecorator):
-    def __init__(self, beverage: Beverage):
-        self.beverage = beverage
-
-    def get_description(self):
-        return self.beverage.get_description() + ", 모카"
-
-    def cost(self):
-        return self.beverage.cost() + 0.2
-
-class Whip(CondimentDecorator):
-    def __init__(self, beverage: Beverage):
-        self.beverage = beverage
-
-    def get_description(self):
-        return self.beverage.get_description() + ", 휘핑"
-
-    def cost(self):
-        return self.beverage.cost() + 0.1
-
-
-beverage1: Beverage = Espresso()
-beverage1 = Mocha(beverage1)
-beverage1 = Mocha(beverage1)
-beverage1 = Whip(beverage1)
-print(beverage1.cost())
