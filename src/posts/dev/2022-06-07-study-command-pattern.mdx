@@ -1,0 +1,57 @@
+---
+title: '[DesignPattern] CommandPattern(커맨드 패턴) with python'
+description: command pattern with python codes
+date: '2022-06-07T09:52:00+09:00'
+tags: [DesignPattern, CommandPattern]
+---
+
+### 커맨드 패턴으로 해결할 수 있는 것
+- 요청 내역을 캡슐화해서 객체를 서로 다른 요청 내역에 따라 매개변수화 가능
+- Invoker와 Receiver를 분리해서 Command객체를 통해 소통하게끔 한다.
+```python
+from typing import List
+from abc import ABCMeta, abstractmethod
+
+class Command(metaclass=ABCMeta):
+    @abstractmethod
+    def execute(sel):
+        pass
+
+class RemoteControl:
+    on_commands: List[Command] = []
+    off_commands: List[Command] = []
+
+    def __init__(self):
+        pass
+
+    def set_command(self, slot: int, on_command: Command, off_command: Command):
+        pass
+
+    def on_button_pressed(self, slot: int):
+        self.on_commands[slot].execute()
+
+    def off_button_pressed(self, slot: int):
+        self.off_commands[slot].execute()
+
+    def to_string(self):
+        result = ""
+        result += "---------리모컨---------\n"
+        for idx, command in enumerate(self.on_commands):
+            result += (f"slot {idx}\n"
+                        f"on command : {self.on_commands[idx]}, off command : {self.off_commands[idx]}")
+        return result
+
+class LightOffCommand(Command):
+    light: Light
+
+    def __init__(self, light: Light):
+        self.light = light
+
+    def execute(self):
+        light.off()
+```
+
+- NoCommand일때의 객체를 미리 정의해 리모컨에 아무런 커맨드도 정의되지 않은 상태에 대해 방어 코드를 작성할 수 있다.
+```python
+
+```

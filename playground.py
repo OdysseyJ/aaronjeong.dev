@@ -28,3 +28,11 @@ print(ss_result)
 print(S_result)
 print(SS_result)
 
+test = "hello world"
+print("#####")
+print(test.capitalize())
+print(test.upper())
+print("#####")
+print(len("assdf"))
+
+print(sorted([10, 5, 20], reverse=True))
