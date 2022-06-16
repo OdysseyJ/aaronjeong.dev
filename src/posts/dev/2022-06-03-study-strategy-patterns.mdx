@@ -119,6 +119,11 @@ class FlyBehavior(metaclass=ABCMeta):
         pass
 
 
+class DefaultFly(FlyBehavior):
+    def fly(self):
+        print("날개로 날기")
+
+
 class FlyWithWing(FlyBehavior):
     def fly(self):
         print("날개로 날기")
@@ -134,6 +139,11 @@ class QuackBehavior(metaclass=ABCMeta):
         pass
 
 
+class DefaultQuack(QuackBehavior):
+    def quack(self):
+        print("그냥꽥꽥")
+
+
 class Quack(QuackBehavior):
     def quack(self):
         print("그냥꽥꽥")
@@ -145,8 +155,8 @@ class SlowQuack(QuackBehavior):
 
 
 class Duck(metaclass=ABCMeta):
-    fly_behavior: FlyBehavior
-    quack_behavior: QuackBehavior
+    fly_behavior: FlyBehavior = DefaultFly()
+    quack_behavior: QuackBehavior = DefaultQuack()
 
     def perform_quack(self):
         return self.quack_behavior.quack()
@@ -179,8 +189,8 @@ class YellowDuck(Duck):
 - setter 함수를 구현해 동적으로 오리의 행동을 변화시킬 수 있다.
 ```python
 class Duck(metaclass=ABCMeta):
-    fly_behavior: FlyBehavior
-    quack_behavior: QuackBehavior
+    fly_behavior: FlyBehavior = DefaultFly()
+    quack_behavior: QuackBehavior = DefaultQuack()
 
     def perform_quack(self):
         return self.quack_behavior.quack()
@@ -229,3 +239,8 @@ yellow_duck.perform_fly() # 로켓으로 날기
 ```
 
 - 새로운 타입의 오리, 새로운 형식의 `fly`와 `quack`에 대해 유연한 대응이 가능하다.
+
+### 결론
+- 전략 패턴은, 같은 부모 클래스에 대해서 같은 부분과, 다른 행위가 함께 존재할 경우
+  유지보수성을 위해 사용하면 좋다.
+
