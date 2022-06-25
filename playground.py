@@ -1,2 +1,1 @@
-from abc import *
-
+print("hello world")
