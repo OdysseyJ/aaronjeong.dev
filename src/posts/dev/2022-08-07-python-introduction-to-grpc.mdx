@@ -1,0 +1,89 @@
+---
+title: '[gRPC] introduction to gRPC'
+description: 'introduction to grpc, why use grpc'
+date: '2022-08-07T14:52:36+09:00'
+tags: [gRPC, python]
+---
+
+## gRPC Overview
+
+[gRPC](https://grpc.io/docs/what-is-grpc/introduction/)를 사용하면, client application에서 다른 기기에 존재하는 server application의 함수를 직접 부를수 있게 해 준다.
+
+많은 RPC 서비스처럼, gRPC는 서비스를 정의하고, 다른 곳에서 불릴 수 있는 메서드들을 파라미터, 리턴타입과 함께 정의해 사용한다.
+
+### 서버의 측면
+
+서버는 정의된 인터페이스에 맞추어 클라이언트의 응답을 처리할 gRPC 서버를 만들면 된다.
+
+### 클라이언트의 측면
+
+클라이언트는 해당 서버 함수를 호출할 수 있는 stub이라는 객체를 통해 request를 보내고 response를 전달받게 된다.
+
+
+<Image
+  src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/8_7_grpc_overview.png'
+  alt="Photo"
+  width={400}
+  height={250}
+  priority
+  className="next-image"
+/>
+
+
+### gRPC의 장점
+- 환경에 제약받지 않고 client와 server의 통신을 구현할 수 있다.
+- gRPC를 지원하는 어떤 언어로도 작성될 수 있다.
+    - go
+    - java
+    - javascript
+    - python
+    - ruby
+    - ...
+
+## Protocol Buffers
+
+
+기본적으로, gRPC는 [Protocol Buffer](https://developers.google.com/protocol-buffers/docs/overview)를 이용해 통신한다.
+
+Protocol Buffers는 구글이 만든 오픈소스 기반의 구조화된 데이터를 serializing하는 매커니즘이다.
+
+JSON과 같은 다른 데이터포맷을 사용할 수 있지만, serializing을 하는 과정에서 protocol buffer의 속도가 훨씬 빠르다.
+
+프로토콜 버퍼는 아래와 같은 형식으로 작성된다.
+
+```python
+message Point {
+  int32 latitude = 1;
+  int32 longitude = 2;
+}
+```
+
+해당 형태의 data structure를 정의하고 난 뒤,
+
+`protoc`라고 불리는 protocol buffer compiler를 사용해 원하는 언어로 작성된 data access class를 생성할 수 있다.
+
+예를들어, 위의 Point 메세지를 compiler를 통해 python으로 generation을 하면,
+
+> python -m grpc_tools.protoc {some options}
+
+```python
+_POINT = DESCRIPTOR.message_types_by_name['Point']
+Point = _reflection.GeneratedProtocolMessageType('Point', (_message.Message,), {
+  'DESCRIPTOR' : _POINT,
+  '__module__' : 'route_guide_pb2'
+  # @@protoc_insertion_point(class_scope:routeguide.Point)
+  })
+_sym_db.RegisterMessage(Point)
+...
+```
+와 같은 파이썬 클래스 형태로 코드를 자동으로 generate 해 준다.
+
+## Protocol Buffer versions
+
+프로토콜 버퍼는 [proto3](https://developers.google.com/protocol-buffers/docs/proto3) 과 `proto2`의 2가지 버전을 가지고 있다.
+
+### proto3
+- [References by languages](https://developers.google.com/protocol-buffers/docs/reference/overview)
+- 더 많은 언어 지원
+- 더 많은 새로운 features
+- proto3이 권장됨.
