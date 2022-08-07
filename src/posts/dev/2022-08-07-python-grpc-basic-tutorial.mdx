@@ -105,7 +105,68 @@ syntax = "proto3";
 
 ### Server 코드 작성
 
+`RouteGuide` service를 서버에서 다 구현하고 나면, 다음 스텝은 gRPC 서버를 켜서 클라이언트가 service를 사용할 수 있게 해주는 것이다.
+```python
+def serve():
+  server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+  route_guide_pb2_grpc.add_RouteGuideServicer_to_server(
+      RouteGuideServicer(), server)
+  server.add_insecure_port('[::]:50051')
+  server.start()
+  server.wait_for_termination()
+```
 
+### Client 코드 작성
+
+Client에서 서비스 메서드를 사용하기 위해서는, 먼저 stub을 만들어야 한다.
+먼저 `route_guide_pb2_grpc`에서 `RouteGuideStub`을 인스턴스화 한다.
+
+```python
+channel = grpc.insecure_channel('localhost:50051')
+stub = route_guide_pb2_grpc.RouteGuideStub(channel)
+```
+
+single response를 내보내는 RPC 함수들을 위해 gRPC Python은 synchronous(blocking), asynchronous(non-blocking) 제어 방식을 모두 제공한다.
+
+streaming RPC 함수들을 위해서는, response value의 iterator를 반환한다. iterator()의 next()를 호출해 다음 객체를 호출할 수 있다.
+
+#### Simple RPC
+
+기본 rpc 함수는 로컬 함수를 사용하는것 처럼 직접 불러 사용할 수 있다.
+
+```python
+feature = stub.GetFeature(point)
+```
+
+#### Asynchronous Simple RPC
+
+future함수를 통해 사용할 수 있다.
+
+```python
+feature_future = stub.GetFeature.future(point)
+feature = feature_future.result()
+```
+
+#### Response-streaming RPC
+
+request streaming rpc는 stub을 통해 iterator를 전달해 사용하면 된다.
+
+```python
+route_summary = stub.RecordRoute(point_iterator)
+```
+
+```python
+route_summary_future = stub.RecordRoute.future(point_iterator)
+route_summary = route_summary_future.result()
+```
+
+#### Bidirectional streaming RPC
+
+쌍방향 streaming에서는 iterator를 전달하고, iterator를 반환받는다.
+
+```python
+for received_route_note in stub.RouteChat(sent_route_note_iterator):
+```
 
 ## 참고
 - [gRPC 공식 문서](https://grpc.io/docs/languages/python/basics/)
