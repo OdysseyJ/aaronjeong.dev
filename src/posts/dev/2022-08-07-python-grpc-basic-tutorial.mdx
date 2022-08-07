@@ -1,0 +1,112 @@
+---
+title: '[gRPC] python basic tutorial'
+description: python basic grpc tutorial
+date: '2022-08-07T16:02:05+09:00'
+tags: [gRPC, Python]
+---
+
+[이전글](http://aaronjeong.dev/posts/dev/2022-08-07-python-introduction-to-grpc)에서 다룬 내용을 기본적으로 숙지하고 있다는 전제 하에 작성된 글입니다.
+
+## gRPC를 사용하는 이유
+
+gRPC를 사용해 서버와 클라이어트에서 통신할 서비스를 `.proto`파일에 정의하기만 하면,
+
+다른 언어에서 생기는 모든 복잡함과 환경적인 것들은 모두 `gRPC`에 의해 자동으로 핸들링되기 때문이다.
+
+또한 효율적인 `serialization`, 간단한 `IDL`(Interactive Data Language), `easy interface update`등의 장점도 함께 사용할 수 있다.
+
+## gRPC를 사용하는 과정
+
+gRPC는 아래와 같은 프로세스를 통해 생성된다.
+
+1. `.proto`파일을 정의해, 통신 규약을 먼저 정한다.
+2. `protoc`를 이용해 원하는 언어의 데이터 클래스 형태로 generation을 한다.
+3. 서버에서는 .proto에 정의된 형식에 맞추어 client 요청에 맞는 handler 코드를 구현한다. 이때 protoc를 이용해 generate된 코드를 이용해 구현하면 된다.
+4. client에서는 .proto에 정의된 형식에 맞추어 함수를 호출한다.
+
+## gRPC Python 실습
+
+### .proto 파일 정의하기
+
+```proto
+service RouteGuide {
+    // normal rpc
+    rpc GetFeature(Point) returns (Feature) {}
+
+    // stream
+    rpc ListFeatures(Rectangle) returns (stream Feature) {}
+
+    // bidirectional stream
+    rpc RouteChat(stream RouteNote) returns (stream RouteNote) {}
+}
+
+message Point {
+  int32 latitude = 1;
+  int32 longitude = 2;
+}
+
+message Feature {
+    ...
+}
+```
+
+`service`와, `rpc` method를 정의하는데, 이때 `Point`와 `Feature`와 같이
+
+request와 reponse 타입에 관해서도 함께 정의한다.
+
+이때, stream 형식의 데이터 타입에 대해서는 타입 앞에 `stream`이라는 인자를 함께 붙여주면 된다.
+
+### Client / Server Code 생성
+
+#### protoc 이용하기
+
+`.proto` 파일을 정의하고 나면, 서버와 클라이언트를 구현하기 위해 `protoc`를 활용해 데이터 클래스들을 generation한다.
+
+파이썬에서는, pip를 통해 grpcio-tools를 설치해 protoc를 간편하게 이용할 수 있다.
+
+> $ pip install grpcio-tools
+
+설치 후, protoc를 아래와 같이 호출한다.
+
+> $ python -m grpc_tools.protoc -I../../protos --python_out=. --grpc_python_out=. ../../protos/route_guide.proto
+
+#### protoc option
+
+각각의 옵션에 대해서 살펴보면,
+- `-I../../protos`: ???
+- `--python_out`: {.proto_name}_pb2.py가 생성될 경로
+- `--grpc_python_out`: {.proto_name}_pb2_grpc.py가 생성될 경로
+- `../../protos/route_guide.proto`: proto file의 경로
+
+결과적으로, 해당 protoc를 실행하면 2가지 파일이 생성된다.
+- {.proto}_pb2.py
+- {.proto}_pb2_grpc.py
+
+해당 파일들은 아래와 같은 정보를 가지고 있다.
+- .proto에서 정의한 message들의 클래스 구현체
+- .proto에서 정의된 service에 대한 구현체
+    - `RouteGuideStub` : RouteGuide RPC들을 호출하기 위해 client에서 사용되는 클래스
+    - `RouteGuideServicer` : RouteGuide service를 구현하기 위해 정의된 interface
+- grpc.Server에 RouteGuideServicer를 등록하기 위한 함수
+    - `add_RouteGuideServicer_to_server`
+
+#### proto versions
+
+protocol buffer는 `proto2`와 `proto3` 2가지 버전이 존재하고
+
+어떤 버전을 사용할지에 대해서는 `.proto`파일에 직접 명시하면 된다.
+
+***[route_guide.proto]***
+```
+syntax = "proto3";
+```
+
+(필자는 route_guide.proto파일에 `proto3`을 사용하겠다고 명시했는데, 왜 _pb3.py가 아닌 _pb2.py의 형식으로 파일이 생성되는지 궁금해서 찾아봤다.) -> [_pb2.py이름의 유래](https://github.com/grpc/grpc/issues/15444)
+
+### Server 코드 작성
+
+
+
+## 참고
+- [gRPC 공식 문서](https://grpc.io/docs/languages/python/basics/)
+- [전체 소스코드 링크](https://github.com/OdysseyJ/python-grpc)
