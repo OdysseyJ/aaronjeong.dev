@@ -1,0 +1,115 @@
+---
+title: '[python] decorator pattern usecases'
+description: review decorator pattern
+date: '2022-08-11T22:21:55+09:00'
+tags: [python, decorator]
+---
+
+### 결제 로직을 데코레이터 패턴으로 작성해보기
+
+```python
+class BasePromotionPercentage(Enum):
+    YEAR = 0.9
+    HALF_YEAR = 0.8
+    MONTH = 0.7
+
+class Product(metaclass=ABCMeta):
+    description = "제목 없음"
+    base_promotion_percentage: BasePromotionPercentage
+
+    def get_description(self):
+        return self.description
+
+    @abstractmethod
+    def price(self):
+        raise NotImplementedError()
+
+
+class PromotionDecorator(Product):
+    product: Product
+
+    @abstractmethod
+    def get_description(self):
+        return self.description
+
+    @abstractmethod
+    def price(self):
+        raise NotImplementedError()
+
+
+class Premium300(Product):
+    base_promotion_percentage = BasePromotionPercentage.YEAR
+
+    def __init__(self):
+        self.description = "프리미엄 300일권"
+
+    def price(self):
+        return 1000000
+
+class Premium150(Product):
+    base_promotion_percentage = BasePromotionPercentage.HALF_YEAR
+
+    def __init__(self):
+        self.description = "프리미엄 150일권"
+
+    def price(self):
+        return 500000
+
+class Premium30(Product):
+    base_promotion_percentage = BasePromotionPercentage.MONTH
+
+    def __init__(self):
+        self.description = "프리미엄 30일권"
+
+    def price(self):
+        return 100000
+
+class CommonPromotion(PromotionDecorator):
+    def __init__(self, product: Product):
+        self.product = product
+
+    def get_description(self):
+        return self.product.get_description() + ", 기본할인"
+
+    def price(self):
+        return int(self.product.price() * self.base_promotion_percentage)
+
+class TenPercentCoupon(PromotionDecorator):
+    def __init__(self, product: Product):
+        self.product = product
+
+    def get_description(self):
+        return self.product.get_description() + ", 10%쿠폰적용"
+
+    def price(self):
+        return int(self.product.price() * 0.9)
+
+class Coupon10000(PromotionDecorator):
+    def __init__(self, product: Product):
+        self.product = product
+
+    def get_description(self):
+        return self.product.get_description() + ", 10000원할인"
+
+    def price(self):
+        return self.product.price() - 10000
+
+
+class Coupon3000(PromotionDecorator):
+    def __init__(self, product: Product):
+        self.product = product
+
+    def get_description(self):
+        return self.product.get_description() + ", 3000원할인"
+
+    def price(self):
+        return self.product.price() - 3000
+
+product1: Product = Premium300()
+product1 = CommonPromotion(product1)
+product1 = Coupon10000(product1)
+product1 = Coupon3000(product1)
+product1 = TenPercentCoupon(product1)
+print(product1.price())
+```
+
