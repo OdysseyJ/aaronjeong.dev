@@ -25,6 +25,10 @@ class Product(metaclass=ABCMeta):
         raise NotImplementedError()
 
 
+class Coupon(PromotionDecorator):
+    discount_price: int
+
+
 class PromotionDecorator(Product):
     product: Product
 
@@ -84,32 +88,53 @@ class TenPercentCoupon(PromotionDecorator):
     def price(self):
         return int(self.product.price() * 0.9)
 
-class Coupon10000(PromotionDecorator):
+class Coupon10000(Coupon):
+    discount_value = 10000
+
     def __init__(self, product: Product):
         self.product = product
 
     def get_description(self):
-        return self.product.get_description() + ", 10000원할인"
+        return self.product.get_description() + f", {self.discount_value}원 할인"
 
     def price(self):
         return self.product.price() - 10000
 
 
-class Coupon3000(PromotionDecorator):
+class Coupon3000(Coupon, PromotionDecorator):
+    discount_value = 3000
+
     def __init__(self, product: Product):
         self.product = product
 
     def get_description(self):
-        return self.product.get_description() + ", 3000원할인"
+        return self.product.get_description() + f", {self.discount_value}원할인"
 
     def price(self):
         return self.product.price() - 3000
 
 product1: Product = Premium300()
-product1 = CommonPromotion(product1)
-product1 = Coupon10000(product1)
-product1 = Coupon3000(product1)
-product1 = TenPercentCoupon(product1)
+
+promotions: PromotionDecorator[] = []
+
+# apply common promotion
+promotions.append(CommonPromotion(product1, percentage=BasePromotionPercentage.YEAR))
+
+# point apply
+# client = 서버에서 전달 받은 값
+# server = db에서 들고 온 값
+promotions.append(Coupon(product1, coupon=coupon))
+
+# percentage coupon
+promotions.append(PercentCoupon(product1, percentage=possible_percentage))
+
+# debugging
+promotions.append(Debugging(product1))
 print(product1.price())
+print(product1.description())
+
+# 중간에 쿠폰이나 프로모션이 수정되어야 하는 경우는 어떻게할까? -> 아이디어 없음
+# 미스틱 : 데코레이터패턴을 안쓴다.
+# 애런 : 프로모션 리스트에서 하나씩 돈다 O(n)
 ```
 
