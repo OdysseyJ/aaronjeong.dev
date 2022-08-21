@@ -1,0 +1,53 @@
+---
+title: '[DesignPattern] 최소 지식 원칙과 퍼사드 패턴'
+description: principle of least knowledge and facade pattern
+date: '2022-08-21T21:18:41+09:00'
+tags: [DesignPattern, FacadePattern]
+---
+
+### 최소 지식 원칙
+- 특정 객체와 상호작용하는 객체들의 개수와 상호작용 방식에 주의를 기울여 작성해야 한다는 원칙
+- 최소한의 객체로만 상호작용 하도록 만들어야 변경시 코드를 줄줄이 고치지 않아도 된다.
+
+#### 다른 객체에 의존성을 줄이면서 상호작용 하는 방법
+아래의 4가지 객체들만 요청하는것이 의존성을 줄일 수 있음.
+- 객체 자체
+- 메소드에 매개변수로 전달된 객체
+- 메소드를 생성하거나 인스턴스를 만든 객체
+- 객체에 속하는 구성 요소
+
+메소드를 호출한 결과로 리턴받은 객체에 들어있는 메소드를 다시 호출하면, 직접 알고있는 객체의 개수가 늘어난다
+```python
+
+# BAD
+def get_temperature():
+    thermometor: Thermometer = station.get_thermometer()
+    return thermometor.get_temperature()
+
+# GOOD - Thermometer 객체를 몰라도 된다
+def get_tempertaure()
+    return station.get_temperature()
+```
+
+```python
+class Car:
+    engine: Engine
+
+    def __init__(self, engine: Engine):
+        self.engine = engine
+
+    def start(self, key: Key):
+        doors: Doors = Doors()
+        authorized: bool = key.turns() # 매개변수로 전달된 객체의 메서드 - 2번 규칙
+        if authorized:
+            self.engine.start() # 객체에 속하는 구성 요소의 메서드 - 4번 규칙
+            update_dashboard_display() # 객체에 속하는 구성 요소 - 4번 규칙
+            doors.lock() # 새롭게 생성한 객체의 메소드 생성 - 3번 규칙
+
+    def update_dashboad_display(self):
+        ...
+```
+
+### 최소 지식 원칙과 퍼사드 패턴
+- 퍼사드 패턴을 통해 간편한 새로운 인터페이스를 만드는 경우 최소 지식 원칙을 지켜서 만드는 편이 좋다.
+- 퍼사드 패턴이 쌓이게 되면 최소지식 원칙을 지키지 않은 앱은 관리가 어려워진다.
