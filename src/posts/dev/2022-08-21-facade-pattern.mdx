@@ -1,0 +1,54 @@
+---
+title: '[DesignPattern] FacadePattern(퍼사드패턴) with python'
+description: facade pattern written with python
+date: '2022-08-21T20:33:07+09:00'
+tags: [DesignPattern, FacadePattern]
+---
+
+퍼사드(Facade) = 겉모양, 외관
+
+### 퍼사드 패턴은 어떤 상황에서 쓰는게 좋을까?
+- 여러 클래스들의 복잡한 인터페이스를 간단하게 변경하기 위해서 사용
+
+#### 퍼사드 패턴 예시
+```python
+class HomeTheaterFacade:
+    amp: Amplifier
+    tuner: Tuner
+    player: StreamingPlayer
+    projector: Projector
+    lights: TheaterLights
+    screen: Screen
+    popper: PopcornPopper
+
+    def __init__(self, amp: Amplifier, tuner: Tuner, player: StreamingPlayer, projector: Projector, lights: TheaterLights, screen: Screen, popper: PopcornPopper):
+        self.amp = amp
+        self.tuner = tuner
+        self.player = player
+        self.projector = projector
+        self.lights = lights
+        self.screen = screen
+        self.popper = popper
+
+    def prepare_watching_movie(self, movie: str):
+        print("영화 볼 준비 시작")
+        self.popper.on()
+        self.popper.pop()
+        self.lights.dim(10)
+        self.screen.down()
+        self.projector.on()
+        self.projector.wide_scrren_mode()
+        self.amp.on()
+        self.amp.set_streaming_player(player)
+        ...
+        self.player.play(movie)
+
+    def end_movie(self):
+        print("영화 보기 종료")
+        self.popper.off()
+        self.projector.off()
+        self.amp.off()
+        ...
+        self.player.off()
+```
+
