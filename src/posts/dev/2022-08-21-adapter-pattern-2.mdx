@@ -1,0 +1,46 @@
+---
+title: '[DesignPattern] AdapterPattern Example'
+description: adapter pattern
+date: '2022-08-21T20:20:47+09:00'
+tags: [DesignPattern, AdapterPattern]
+---
+
+### 어댑터 패턴 실전 적용 예제
+
+```python
+from typing import TypeVar
+
+T = TypeVar('T')
+
+class Iterator:
+    def has_next(self):
+        raise NotImplementedError()
+
+    def next(self):
+        raise NotImplementedError()
+
+    def remove(self):
+        raise NotImplementedError()
+
+class Enumeration:
+    def has_more_elements(self):
+        raise NotImplementedError()
+
+    def next_element(self):
+        raise NotImplementedError()
+
+class EnumerationIterator:
+    enumeration: Enumeration[T]
+
+    def __init__(self, enumeration: Enumeration[T]):
+        self.enumeration = enumeration
+
+    def has_next(self):
+        return self.enumeration.has_more_elements()
+
+    def next(self):
+        return self.enumeration.next_element()
+
+    def remove(self):
+        raise NotImplementedError()
+```
