@@ -23,5 +23,6 @@ nums = [int(n) for n in input().split(" ")]
 
 while True:
     for idx, (before, after) in enumerate(zip(nums, nums[1:])):
+        iu
         if before > after and is_valid(before*after):
             nums[idx], nums[idx+1] = after, before

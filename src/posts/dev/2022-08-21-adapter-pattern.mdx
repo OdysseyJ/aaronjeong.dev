@@ -1,0 +1,102 @@
+---
+title: '[DesignPattern] AdapterPattern(어댑터패턴) with python'
+description: adapter pattern written with python
+date: '2022-08-21T19:55:29+09:00'
+tags: [DesignPattern, AdapterPattern]
+---
+
+### 어댑터 패턴은 어떨때 쓰는게 좋은가?
+- 기존 인터페이스가 새로운 클래스의 인터페이스와 달라 호환이 되지 않을때
+- 특정 클래스의 코드는 그대로 둔 채 인터페이스를 다른 인터페이스로 변환해서 사용하고 싶을 때
+
+### 객체 어댑터
+
+#### 어댑터 패턴 예시
+
+기존에 존재하던 Duck이라는 클래스의 인터페이스와, 새롭게 등장한 Turkey라는 클래스의 인터페이스가 달라지는 경우
+Duck 클래스에 대한 Turkey클래스의 어댑터를 구현해 사용할 수 있다.
+```python
+class Duck:
+    def quack(self):
+        raise NotImplementedError()
+
+    def fly(self):
+        raise NotImplementedError()
+
+class MallardDuck(Duck):
+    def quack(self):
+        print("꽥")
+
+    def fly(self):
+        print("날다")
+
+class Turkey:
+    def gobble(self):
+        raise NotImplementedError()
+
+    def fly(self):
+        raise NotImplementedError()
+
+class WildTurkey(Turkey):
+    def gobble(self):
+        print("꾸액")
+
+    def fly(self):
+        print("짧게 날기")
+
+
+class TurkeyAdapter(Duck):
+    turkey: Turkey
+
+    def quack(self):
+        self.turkey.gobble()
+
+    def fly(self):
+        self.turkey.fly()
+```
+
+#### 어댑터 패턴의 특징
+- 어댑터 패턴은 어댑티(turkey)를 감쌀 때 구성(composition) 원칙을 사용해 어댑티의 모든 서브 클래스에 어댑터를 쓸 수 있게 한다.
+- 타겟의 인터페이스만 제대로 유지 한다면 다른 구현을 추가하는 것도 용이하다.
+
+
+### 클래스 어댑터
+- 클래스 어댑터는 타깃과 어댑티를 둘다 상속받는 서브클래스로 만들어 사용한다.
+- 다중 상속이 가능한 언어에서만 사용이 가능하다.
+
+#### 클래스 어댑터 예시
+```python
+class Duck:
+    def quack(self):
+        raise NotImplementedError()
+
+    def fly(self):
+        raise NotImplementedError()
+
+class Turkey:
+    def gobble(self):
+        raise NotImplementedError()
+
+    def fly(self):
+        raise NotImplementedError()
+
+class TurkeyAdapter(Duck, Turkey):
+    def quack(self):
+        self.gobble()
+
+    def fly(self):
+        self.fly()
+```
+
+### 객체 어댑터 vs 클래스 어댑터
+
+#### 객체 어댑터
+- 구성 사용
+- 어댑티 클래스와 그 서브클래스에 대해서도 사용 가능
+
+#### 클래스 어댑터
+- 상속 사용
+- 어댑티 전체를 다시 구현하지 않아도 됨
+- 어댑티의 행동 오버라이딩 가능
+
+
