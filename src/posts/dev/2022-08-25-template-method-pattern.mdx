@@ -1,0 +1,80 @@
+---
+title: '[DesignPattern] 템플릿 메서드 패턴'
+description: template method pattern python
+date: '2022-08-25T20:31:03+09:00'
+tags: [DesignPattern, TemplateMethodPattern]
+---
+
+### 템플릿 메서드 패턴
+- 두가지 서로 다른 객체가 유사한 방식으로 동작하지만, 세부 내용만 조금 다른 경우 사용
+- 알고리즘의 골격을 정의하고, 알고리즘의 일부 단계를 서브클래스에서 구현
+
+### 코드 예시
+```python
+class CaffeineBeverage(metaclass=ABCMeta):
+    def prepare_recipe(self):
+        self.boil_water()
+        self.brew()
+        self.pour_in_cup()
+        self.add_condiments()
+
+    @abstractmethod
+    def brew(self):
+        pass
+
+    @abstractmethod
+    def add_condiments(self):
+        pass
+
+    def boil_water(self):
+        print("물 끓이기")
+
+    def pour_in_cup(self):
+        print("컵에 담기")
+```
+
+### 후크(hook)
+- 추상 클래스에서 선언되지만 기본적인 내용만 구현되어 있거나 아무 코드도 들어있지 않은 메소드
+- 서브클래스가 다양한 위치에서 알고리즘에 끼어들고 싶을 때
+```python
+class CaffeineBeverageWithHook(metaclass=ABCMeta):
+    def prepare_recipe(self):
+        self.boil_water()
+        self.brew()
+        self.pour_in_cup()
+        if (self.customer_want_condiments()):
+            self.add_condiments()
+
+    @abstractmethod
+    def brew(self):
+        pass
+
+    @abstractmethod
+    def add_condiments(self):
+        pass
+
+    def boil_water(self):
+        print("물 끓이기")
+
+    def pour_in_cup(self):
+        print("컵에 담기")
+
+    def customer_want_condiments(self):
+        return True
+
+class Coffee(CaffeineBeverageWithHook):
+    def brew(self):
+        print("우리기")
+
+    def add_condiments(self):
+        print("재료 추가")
+
+    def customer_want_condiments(self):
+        return True
+```
+
+### 할리우드 원칙
+- 의존성 부패를 방지하기 위해서 사용된다.
+- 고수준 구성 요소가 저수준 구성 요소에 의존하고, 다시 고수준 요소에 의존하고 이런식으로 의존성이 꼬여있으면 좋지 않다.
+- 고수준 구성 요소가 저수준 구성 요소의 호출을 결정
+- 템플릿 메서드 패턴에서 하위 클래스는 상위 템플릿의 세부사항만 구현할 뿐 상위 템플릿의 함수를 호출하지는 않는다.
