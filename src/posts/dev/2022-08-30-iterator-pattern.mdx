@@ -1,0 +1,69 @@
+---
+title: '[DesignPattern] IteratorPattern(이터레이터패턴) with python'
+description: iterator pattern written with python
+date: '2022-08-30T00:15:39+09:00'
+tags: [DesignPattern, Iterator]
+---
+
+### Iterator 패턴은 언제 사용하는가?
+- 다양한 객체의 콜렉션을 하나의 인터페이스로 순회하고 싶을때 사용함.
+- 컬렉션의 구현 방법은 노출하지 않으면서, 집합체 내의 모든 항목에 접근하는 방법 제공 가능
+
+
+#### 코드 예시
+
+```python
+T = TypeVar()
+
+class Iterator(metaclass=ABCMeta):
+    @abstractmethod
+    def has_next(self) -> bool:
+        pass
+
+    @abstractmethod
+    def next(self) -> T:
+
+
+class DinnerMenuIterator(Iterator):
+    items: List[MenuItem]
+    position: int
+
+    def __init__(self, items: List[MenuItem]):
+        self.items = items
+
+
+    def next(self) -> MenuItem:
+        menu_item: MenuItem = self.items[self.position]
+        self.position += 1
+        return menu_item
+
+    def has_next(self) -> bool:
+        if self.position >= len(self.items) or self.items[self.position] is None:
+            return False
+        else:
+            return True
+
+
+class PancakeHouseMenu(Iterator):
+    items: Tuple[str, MenuItem]
+    position: int
+
+    def __init__(self, items: List[MenuItem]):
+        self.items = items
+
+    def next(self) -> MenuItem:
+        ...
+
+    def has_next(self) -> bool:
+        ...
+```
+
+
+### 단일 역할 원칙
+- 특정 클래스가 바뀌는 이유는 하나뿐이어야 한다.
+- 하나의 클래스는 하나의 역할을 맡아야 한다.
+
+### 응집도
+- 특정 클래스나 모듈이 목적이나 역할을 얼마나 일관되게 지원하는지에 대한 척도.
+- 응집도가 높으면 연관성이 높음
+- 응집도가 낮으면 연관성이 낮고, 서로 상관없는 기능이 묶여있다.
