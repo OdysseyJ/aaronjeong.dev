@@ -1,0 +1,62 @@
+---
+title: '[DesignPattern] CompositePattern with python'
+description: composite pattern written with python
+date: '2022-08-30T23:03:10+09:00'
+tags: [DesignPattern, CompositePattern]
+---
+
+### 컴포지트 패턴
+- 객체를 트리 구조로 구성해서 부분-전체의 계층 구조를 구현할때 사용.
+- 클라이언트에서 개별 객체와 복합 객체를 똑같은 방법으로 다룰 수 있음.
+
+### 예시 코드
+```python
+class MenuComponent(metaclass=ABCMeta):
+    @abstractmethod
+    def add(self, menu_component: MenuComponent):
+        pass
+
+    @abstractmethod
+    def remove(self, menu_component: MenuComponent):
+        pass
+
+    @abstractmethod
+    def print(self):
+        pass
+
+
+class MenuItem(MenuComponent):
+    def __init__(self, name: str, description: str, vegetarian: bool, price: float):
+        self.name = name
+        self.description = description
+        self.vegetarian = vegetarian
+        self.price = price
+
+    def add(self, menu_component: MenuComponent):
+        pass
+
+    def remove(self, menu_component: MenuComponent):
+        pass
+
+    def print(self):
+        print(...)
+
+
+class Menu(MenuComponent):
+    menu_components : List[MenuComponent]
+
+    def __init__(self, name: str, description: str):
+        self.menu_components = []
+        self.name = name
+        self.description = description
+
+    def add(self, menu_component: MenuComponent):
+        self.menu_components.append(menu_component)
+
+    def remove(self, menu_component: MenuComponent):
+        self.menu_components.remove(menu_component)
+
+    def print(self):
+        for menu_component in self.menu_components:
+            print(menu_component.print())
+```
