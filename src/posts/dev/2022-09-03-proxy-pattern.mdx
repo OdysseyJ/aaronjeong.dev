@@ -1,0 +1,29 @@
+---
+title: '[DesignPattern] ProxypPattern with python'
+description: proxy pattern written with python
+date: '2022-09-03T22:22:56+09:00'
+tags: [DesignPattern, ProxyPattern]
+---
+
+### 프록시패턴
+- 특정 객체로의 접근을 제어하는 대리인을 제공
+- 특정 객체를 대변하는 객체가 존재함
+
+### 예제
+```python
+class GumballMachine:
+    location: str
+
+    def __init__(self, location: str):
+        self.location = location
+
+class GumballMonitor:
+    machine: GumballMachine
+
+    def __init__(self, machine: GumballMachine):
+        self.machine = machine
+
+    def report(self):
+        print(self.machine.location)
+```
+
