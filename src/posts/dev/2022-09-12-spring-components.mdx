@@ -1,0 +1,27 @@
+---
+title: '[Spring] Spring 컴포넌트 스캔 및 빈 설정'
+description: spring component and bean
+date: '2022-09-12T09:46:08+09:00'
+tags: [Java, Spring]
+---
+
+### Spring의 빈
+- Spring 내부에서 관리되는 객체
+- 기본적으로 싱글톤으로 생성하여 재생성을 막는다.
+
+### Spring에서의 빈 등록 방식
+- 컴포넌트 스캔
+- SpringConfig를 통한 Bean 직접 등록
+
+#### 컴포넌트 스캔
+- `@Service`, `@Repository`, `@Controller` ...
+- `@SpringBootApplication`의 하위 패키지는 자동으로 컴포넌트 스캔을 해준다.
+- `@Autowired`를 통해서 자동으로 DI(Dependency Injection)을 수행
+- 정형화된 컨트롤러, 서비스, 레포지토리는 컴포넌트 스캔 이용
+
+
+#### SpringConfig를 통한 Bean 등록
+- `@Configuration` 어노테이션 이용
+- 정형화되지 않거나, 상황에 따라 구현 클래스를 변경해야 하는 경우 이용
+
+
