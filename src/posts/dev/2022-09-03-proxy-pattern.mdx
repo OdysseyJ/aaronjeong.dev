@@ -9,21 +9,40 @@ tags: [DesignPattern, ProxyPattern]
 - 특정 객체로의 접근을 제어하는 대리인을 제공
 - 특정 객체를 대변하는 객체가 존재함
 
-### 예제
-```python
-class GumballMachine:
-    location: str
+#### 예제
+```java
+public class MyRemoteClient {
+    public static void main(String[] args) {
+        new MyRemoteClient().go();
+    }
 
-    def __init__(self, location: str):
-        self.location = location
-
-class GumballMonitor:
-    machine: GumballMachine
-
-    def __init__(self, machine: GumballMachine):
-        self.machine = machine
-
-    def report(self):
-        print(self.machine.location)
+    public void go() {
+        try {
+            MyRemote service = (MyRemove) Naming.lookup("rmi://127.0.0.1/RemoteHello")
+            String s = service.sayHello();
+            System.out.println(s);
+        } catch(Exception ex){
+            ex.printStackTrace();
+        }
+    }
+}
 ```
+
+#### 원격 프록시와 가상 프록시 비교하기
+- 원격 프록시
+    - 다른 Remote 객체를 대리호출한다.
+    - ex) RMI, GRPC
+- 가상 프록시
+    - 생성하는데 많은 비용이 드는 객체를 대신한다.
+    - 진짜 객체가 필요한 상황이 올때까지 객체의 생성을 미룬다.
+    - ex) ImageIconProxy
+
+#### 프록시 패턴과 데코레이터 패턴의 차이
+- 프록시 패턴
+    - 객체로의 접근을 제어
+    - 객체를 대변하는 역할
+    - 여러번 감싸는 경우가 없음
+- 데코레이터 패턴
+    - 객체의 행동을 추가
+    - 객체의 행동을 여러번 변화시켜야하는 경우 사용하면 좋다
 
