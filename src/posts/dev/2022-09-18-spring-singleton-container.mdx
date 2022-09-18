@@ -1,0 +1,33 @@
+---
+title: '[Spring] Singleton Container'
+description: ''
+date: '2022-09-18T16:03:53+09:00'
+tags: [Spring]
+---
+
+### 싱글톤 컨테이너
+- 스프링 컨테이너는 싱글톤 패턴의 문제점을 해결하면서, 객체 인스턴스를 싱글톤으로 관리한다.
+- 스프링에서 빈 객체들은 전부 싱글톤으로 관리된다
+- 스프링 컨테이너는 싱글톤 객체를 생성하고 관리하는 싱글톤 레지스트리 기능을 한다.
+- 장점
+    - 싱글톤 패턴을 위한 지저분한 코드가 필요없음.
+    - DIP, OCP, 테스트, private 생성자로부터 자유롭게 싱글톤 사용
+
+
+```java
+    @Test
+    @DisplayName("스프링 컨테이너와 싱글톤")
+    void springContainer(){
+        ApplicationContext ac = new AnnotationConfigApplicationContext(AppConfig.class);
+
+        MemberService memberService1 = ac.getBean("memberService", memberService.class);
+        MemberService memberService2 = ac.getBean("memberService", memberService.class);
+
+        assertThat(memberService1).isSameAs(memberService2);
+    }
+```
+
+### 주의점
+- 스프링 빈은 항상 무상태로 설계 하자.
+- 상태를 가지면, 싱글톤 객체이기 때문에 상태가 공유되어서, 여러 쓰레드에서 동시에 접근시 값을 변경해버릴 수 있다.
+- 공유 필드는 조심 또 조심 해야한다.
