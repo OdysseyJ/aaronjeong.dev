@@ -1,0 +1,17 @@
+---
+title: '[Spring] BeanDefinition'
+description: spring bean definition
+date: '2022-09-18T15:47:49+09:00'
+tags: [Spring]
+---
+
+### 스프링 빈 설정 메타 정보 - BeanDefinition
+- 스프링이 다양한 설정 형식을 지원할 수 있는 이유 : `BeanDefinition`이라는 추상화
+- `BeanDefinition`을 빈 설정 메타정보라고 한다.
+    - `@Bean` or `<bean>` 당 하나의 메타정보 생성
+- 스프링 컨테이너는 메타 정보들을 기반으로 스프링 빈 생성
+
+#### BeanDefinition 생성
+- `AnnotationConfigApplicationContext` -> `AnnotatedBeanDefinitionReader` -> `BeanDefinition`
+- `GenericXmlApplicationContext` -> `XmlBeanDefinitionReader` -> `BeanDefinition`
+- 새로운 형식 추가시, `XXXDefinitionReader` -> `BeanDefinition`
