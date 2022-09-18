@@ -2,6 +2,23 @@
 title: '[Spring] BeanFactory와 ApplicationContext'
 description: Difference of beanfactory and application context
 date: '2022-09-15T21:35:11+09:00'
-tags: []
+tags: [Spring]
 ---
+
+### BeanFactory
+- 스프링 컨테이너의 최상위 인터페이스
+- 스프링 빈을 관리하고 조회하는 역할을 담당
+- `getBean()`을 제공
+
+### ApplicationContext
+- BeanFactory의 모든 기능 (상속)
+- 어플리케이션 개발시 필요한 수많은 부가기능을 함께 관리
+
+#### ApplicationContext의 부가 기능
+- 메세지 소스를 활용한 국제화 기능(ko, en ..)
+- 환경 변수 (dev, stage, prod)
+- 애플리케이션 이벤트 (event listeners)
+- 편리한 리소스 조회 (file, classpath...)
+
+
 
