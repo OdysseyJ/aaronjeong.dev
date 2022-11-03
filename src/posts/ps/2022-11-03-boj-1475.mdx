@@ -1,0 +1,31 @@
+---
+title: boj 1475 python
+description: ''
+date: '2022-11-03T21:35:38+09:00'
+tags: [Python]
+---
+
+```python
+import sys
+input = sys.stdin.readline
+
+number = input().strip()
+
+array = [0 for _ in range(10)]
+
+for n in number:
+    array[int(n)] += 1
+
+_sum = (array[6] + array[9])
+a = int(_sum / 2) + (_sum % 2)
+array[6] = a
+array[9] = a
+
+_max = 0
+for idx, num in enumerate(array):
+    if _max < num:
+        _max = num
+
+print(_max)
+```
+
