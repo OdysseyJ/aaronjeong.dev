@@ -1,4 +1,3 @@
-1. 추상 클래스
-2. Python Typing Generic
-3. Design Pattern
-4. GRPC
+로그에 대해서 더 자세한 내용은 slf4j, logback을 검색해보자. SLF4J - http://www.slf4j.org
+Logback - http://logback.qos.ch
+스프링 부트가 제공하는 로그 기능은 다음을 참고하자. https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot- features.html#boot-features-logging
