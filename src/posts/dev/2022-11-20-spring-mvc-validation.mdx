@@ -7,3 +7,49 @@ tags: [Spring, MVC]
 
 ### 스프링에서의 Validation
 
+- 아래와 같은 타입의 Dto가 있다고 하자.
+
+```java
+@Data
+public class ItemCreateDto {
+    @NotBlank
+    private String itemName;
+
+    @NotNull
+    @Range(min=1000, max=1000000)
+    private Integer price;
+
+    @NotNull
+    @Max(9999)
+    private Integer quantity;
+}
+```
+
+<br/>
+<br/>
+
+- BindingResult 객체와 `@Validated` 어노테이션의 조합으로 유저가 실제로 입력한 raw 데이터를 얻을 수 있다.
+
+```java
+@Slf4j
+@RestController
+@RequiredArgsConstructor
+public class ValidationItemController {
+
+    @PostMapping("/add")
+    public String addItem(@Validated ItemCreateDto itemDto, BindingResult bindingResult) {
+        // 특정 필드 아닌 복합 룰 검증
+        if (form.getPrice() != null && form.getQuantity() != null){
+            int resultPrice = form.getPrice() * form.getQuantity();
+            if (resultPrice < 10000){
+                throw new BindingError("결과값은 10000을 넘을 수 없습니다.");
+            }
+        }
+
+        if (bindingResult.hasErrors()){
+            return "error";
+        }
+        return "ok";
+    }
+
+```
