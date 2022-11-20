@@ -2,6 +2,59 @@
 title: '[Spring] error handling'
 description: spring mvc error handling
 date: '2022-11-20T17:08:26+09:00'
-tags: []
+tags: [Spring, MVC]
 ---
 
+### 스프링의 에러 처리
+
+- 스프링에서는 `@ExceptionHandler`라는 어노테이션을 통해 특정 Exception이 발생했을 경우에 대한 에러 처리 핸들링을 할 수 있다.
+
+
+```java
+@Slf4j
+@RestController
+public class ApiExceptionV2Controller {
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler
+    public ErrorResult runtimeExceptionHandler(RuntimeException e){
+        return new ErrorResult("BAD", e.getMessage());
+    }
+
+    @GetMapping("/api2/members/{id}")
+    public MemberDto getMember(@PathVariable("id") String id){
+        throw new RuntimeException("잘못된 사용자");
+    }
+}
+```
+
+- `@RestControllerAdvice`는 전체 RestController에 적용되는 핸들러를 구현하기 위한 빈이다.
+```java
+@Slf4j
+@RestControllerAdvice
+public class ExControllerAdvice {
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ErrorResult illegalExceptionHandler(IllegalArgumentException e){
+        log.error("Ex", e);
+        return new ErrorResult("BAD", e.getMessage());
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResult> userExHandler(UserException e){
+        log.error("[userexceptionhandler]", e);
+        ErrorResult errorResult = new ErrorResult("User-Ex", e.getMessage());
+        return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler
+    public ErrorResult exHandler(Exception e){
+        log.error("[exceptionHandler]", e);
+        return new ErrorResult("EX", "내부 호출");
+    }
+}
+```
+
+-
