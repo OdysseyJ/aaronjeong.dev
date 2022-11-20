@@ -5,23 +5,121 @@ date: '2022-09-12T09:46:08+09:00'
 tags: [Java, Spring]
 ---
 
-### Spring의 빈
+### 스프링에서의 빈
 - Spring 내부에서 관리되는 객체
 - 기본적으로 싱글톤으로 생성하여 재생성을 막는다.
 
+```java
+@Bean
+public MemberService memberService(){}
+    return new MemberServiceImpl(memberRepository());
+```
+
+<br/>
+<br/>
+
+### 스프링에서의 컨테이너
+- 스프링 빈들을 관리하는 중앙 객체
+- 빈들의 이름을 unique하게 관리해준다.
+- 의존 관계 주입, 주입을 위한 등록을 담당
+- 기본적으로 객체를 싱글톤으로 관리한다.
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/11-20-spring-singleton.png'
+    alt="Photo"
+    width={600}
+    height={300}
+    priority
+    className="next-image"
+/>
+
+<br/>
+<br/>
+
 ### Spring에서의 빈 등록 방식
-- 컴포넌트 스캔
-- SpringConfig를 통한 Bean 직접 등록
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/11-20-spring-bean.png'
+    alt="Photo"
+    width={500}
+    height={200}
+    priority
+    className="next-image"
+/>
 
 #### 컴포넌트 스캔
-- `@Service`, `@Repository`, `@Controller` ...
+- `@Component`, `@Service`, `@Repository`, `@Controller` ...
 - `@SpringBootApplication`의 하위 패키지는 자동으로 컴포넌트 스캔을 해준다.
 - `@Autowired`를 통해서 자동으로 DI(Dependency Injection)을 수행
-- 정형화된 컨트롤러, 서비스, 레포지토리는 컴포넌트 스캔 이용
 
+<br/>
+<br/>
+
+- 정형화된 컨트롤러, 서비스, 레포지토리는 컴포넌트 스캔을 이용한다
+
+```java
+@Component
+  public class OrderServiceImpl implements OrderService {
+      private final MemberRepository memberRepository;
+      private final DiscountPolicy discountPolicy;
+
+      @Autowired
+      public OrderServiceImpl(MemberRepository memberRepository, DiscountPolicy
+  discountPolicy) {
+          this.memberRepository = memberRepository;
+          this.discountPolicy = discountPolicy;
+      }
+}
+```
+
+<br/>
+<br/>
+
+- 생성자가 딱 하나만 있는 경우 `@Autowired`를 생략할 수 있다.
+
+```java
+@Component
+  public class OrderServiceImpl implements OrderService {
+      private final MemberRepository memberRepository;
+      private final DiscountPolicy discountPolicy;
+
+      public OrderServiceImpl(MemberRepository memberRepository, DiscountPolicy
+  discountPolicy) {
+          this.memberRepository = memberRepository;
+          this.discountPolicy = discountPolicy;
+      }
+}
+```
+
+<br/>
+<br/>
+
+- `lombok`이라는 라이브러리와 함께 사용시, final에 명시한 필드를 기반으로 자동으로 생성자를 만들어주는 어노테이션도 있다.
+
+```java
+@Component
+@RequiredArgsConstructor
+public class OrderServiceImpl implements OrderService {
+  private final MemberRepository memberRepository;
+  private final DiscountPolicy discountPolicy;
+}
+```
+
+<br/>
+<br/>
 
 #### SpringConfig를 통한 Bean 등록
 - `@Configuration` 어노테이션 이용
 - 정형화되지 않거나, 상황에 따라 구현 클래스를 변경해야 하는 경우 이용
+
+```java
+@Configuration
+  public class AppConfig {
+    @Bean
+    public MemberRepository memberRepository(){
+        return new MemoryMemberRepository();
+    }
+  }
+```
 
 

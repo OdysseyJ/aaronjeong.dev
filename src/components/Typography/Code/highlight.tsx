@@ -3,6 +3,8 @@ import { liveEditorStyle } from "@src/components/Typography/Code/index";
 import BaseHighlight, { defaultProps, Language } from "prism-react-renderer";
 import theme from "prism-react-renderer/themes/nightOwl";
 import React from "react";
+// @ts-ignore
+import Prism from './add-languages'
 
 const RE = /{([\d,-]+)}/;
 
@@ -46,6 +48,7 @@ function Highlight({
   return (
     <BaseHighlight
       {...defaultProps}
+      Prism={Prism}
       code={codeString}
       language={language}
       theme={theme}
