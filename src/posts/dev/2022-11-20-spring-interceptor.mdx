@@ -1,0 +1,112 @@
+---
+title: '[Spring] filter, interceptor'
+description: spring filter and interceptor
+date: '2022-11-20T21:49:27+09:00'
+tags: [Spring, MVC]
+---
+
+### 스프링의 동작 흐름
+
+> HTTP 요청 -> WAS -> 필터 -> 서블릿 -> 인터셉터1 -> 인터셉터2 -> 컨트롤러
+
+
+### 필터
+
+- 스프링에서는 `Filter` 인터페이스 구현을 통해 필터를 구현할 수 있다.
+- 필터는 체인이 가능하고, `doFilter`를 항상 불러줘야 한다.
+
+```java
+@Slf4j
+public class LogFilter implements Filter {
+
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+        log.info("log filter init");
+        Filter.super.init(filterConfig);
+    }
+
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        log.info("do filter");
+        chain.doFilter(request, response);
+    }
+
+    @Override
+    public void destroy() {
+        log.info("destroy");
+        Filter.super.destroy();
+    }
+}
+```
+
+<br/>
+<br/>
+
+- 필터를 등록하려면, `WebMvcConfigurer` 인터페이스를 구현하는 `Configuration`빈을 구현하면 된다.
+- urlPattern을 등록해 특정 패턴의 url만 매핑하는것이 가능하다.
+```java
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+    @Bean
+    public FilterRegistrationBean logFilter(){
+        FilterRegistrationBean<Filter> filterRegistrationBean = new FilterRegistrationBean<>();
+        filterRegistrationBean.setFilter(new LogFilter());
+        filterRegistrationBean.setOrder(1);
+        filterRegistrationBean.addUrlPatterns("/*");
+        return filterRegistrationBean;
+    }
+}
+```
+
+### 인터셉터
+
+- 인터셉터는 `HandlerInterceptor` 인터페이스를 구현해야 한다.
+- 필요한 부분만 구현하면 되고, 모든 인터페이스 함수를 오버라이딩 하지 않아도 동작한다.
+```java
+@Slf4j
+public class LogInterceptor implements HandlerInterceptor {
+
+    public static final String LOG_ID = "logId";
+
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler){
+        log.info("prehandle");
+        return true;
+    }
+
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView){
+        log.info("posthandle");
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex){
+        log.info("aftercompletion");
+    }
+}
+```
+
+<br/>
+<br/>
+
+- 인터셉터를 등록하려면, 마찬가지로 `WebMvcConfigurer`인터페이스를 구현하는 설정 빈을 등록하면 된다.
+- excludePathPattern을 굉장히 세밀하게 조정할 수 있다.
+- 보통 로그인 인증 권한 체크를 위해 많이 쓰인다.
+```java
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry){
+        registry.addInterceptor(new LogInterceptor())
+                .order(1)
+                .addPathPatterns("/**")
+                .excludePathPatterns("/css/**", "/*.ico", "/error");
+
+        registry.addInterceptor(new LoginCheckInterceptor())
+                .order(2)
+                .addPathPatterns("/**")
+                .excludePathPatterns("/", "/members/add", "/login", "/logout", "/css/**", "/*.ico", "/error");
+    }
+}
+```
