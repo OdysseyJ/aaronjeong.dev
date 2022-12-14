@@ -1,0 +1,45 @@
+---
+title: '[AWS] deep dive SQS'
+description: study aws sqs
+date: '2022-12-14T10:05:54+09:00'
+tags: [AWS, SQS]
+---
+
+### SQS란?
+- 아마존에서 제공하는 큐 서비스
+
+#### Type
+- `Standard`
+    - 적어도 한번의 전송을 보장한다.
+    - 메세지 순서가 보장되지 않는다.
+    - 높은 throughput을 필요로 하는경우 유용하다.
+- `FIFO`
+    - 먼저 넣은 것부터 먼저 나온다.
+    - 정확히 한번만 전송 된다.
+    - 순서가 매우 중요하고, 중복이 허용되지 않는 경우 유용하다.
+    - fifo큐는 항상 이름 뒤에 `.fifo`를 붙여야 한다.
+
+#### Configuration
+- `Visibility timeout`
+    - 특정 컨슈머가 큐로부터 메세지를 받은 후에, 해당 메세지를 다른 컨슈머가 더이상 보지 못하게 되는 시간을 의미한다.
+    - SQS가 메세지를 리턴한 이후부터 시간이 시작된다.
+    - 한 컨슈머가 프로세싱을 실패하고 `Visibility timeout`시간이 만료되기 전에 메세지를 삭제하면, 해당 메세지를 다른 컨슈머가 볼 수 있게 된다.
+    - 메세지를 1번만 받는것이 강제되어야 한다면, 컨슈머는 메세지를 해당 시간 이내에 지워야 한다.
+- `Message retention period`
+    - SQS가 지워지지 않은 메세지를 보관하고 있는 기간이다.
+    - 최소 4일에서 최대 14일까지 설정이 가능하다.
+    - 메세지의 만료는 초기 enqueue시의 `timestamp`를 기반으로 동작한다.
+- `Delivery Delay`
+    - 메세지를 큐에 넣기 전에 컨슈머들에게 보이지 않아야 하는 시간이 있다면 설정하는 값이다.
+    - 해당 딜레이 시간동안 컨슈머들에게 보이지 않는다.
+- `Maximum message size`
+    - 최대 메세지 용량.
+- `Receive message wait time`
+    - message를 받을수 있는 상태가 될때까지 기다리는 시간을 의미한다.
+    - SQS 비용을 줄이는데 도움이 된다.
+        - empty response의 수를 줄이는데 도움을 줄 수 있다.
+
+#### Dead-letter queue
+- 죽은 메세지들을 보관하는 extra layer로 사용된다.
+- Dead letter queue로 옮겨질 때 초기 enqueue시의 `timestamp`가 변경 되지는 않는다.
+- 상위 큐의 enqueue시간을 따르기 때문에 실제로 메세지가 리텐션 타임만큼 보관되지 않을 수 있다.
