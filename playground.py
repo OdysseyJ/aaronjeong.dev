@@ -13,13 +13,12 @@ input = sys.stdin.readline
 
 # input
 height, width = [int(i) for i in input().strip().split(" ")]
-board = []
+board = [[0 for _ in range(width)] for _ in range(height)]
 visited = [[False for _ in range(width)] for _ in range(height)]
 for h in range(height):
-    board.append([int(i) for i in input().strip().split(' ')])
-
-print(board)
-print(visited)
+    line = input().strip().split(" ")
+    for w, i in enumerate(line):
+        board[h][w] = int(i)
 
 # prepare
 dx = [-1, 1, 0, 0]
@@ -32,28 +31,30 @@ def bfs(x, y):
     count = 1
     while queue:
         first = queue.popleft()
+        _x, _y = first
+        board[_y][_x] = 0
         for i in range(4):
-            x = first[0]
-            y = first[1]
-            _dx = dx[i] + x
-            _dy = dy[i] + y
+            _dx = dx[i] + _x
+            _dy = dy[i] + _y
             if _dx < 0 or _dy < 0 or _dx >= width or _dy >= height:
                 continue
             if visited[_dy][_dx] or board[_dy][_dx] == 0:
                 continue
             visited[_dy][_dx] = True
-            board[y][x] = 0
             count += 1
             queue.append((_dx, _dy))
     return count
 
 
-for line in board:
-    for num in board:
-        if num == 1:
-            pass
-            # bfs(x, y)
-        else:
-            continue
+max_size = 0
+count = 0
+for h in range(height):
+    for w in range(width):
+        if board[h][w] == 1:
+            count += 1
+            max_size = max(max_size, bfs(w, h))
+
+print(count)
+print(max_size)
 
 
