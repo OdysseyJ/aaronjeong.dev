@@ -1,0 +1,248 @@
+---
+title: '[AWS] SNS와 SQS를 이용해 Event 기반 시스템 제작하기'
+description: event driven with aws sns and sqs
+date: '2022-12-18T14:35:47+09:00'
+tags: [AWS, SNS, SQS]
+---
+
+### Topic, Subscriber, Publisher
+AWS SNS를 이해하기 위해서는 `Topic`, `Subscriber`, `Publisher`라는 개념을 이해해야 합니다.
+
+해당 개념은 우리가 흔히 사용하는 `Youtube`와 매우 흡사하므로, Youtube에 빗대어 설명 하겠습니다.
+
+#### Topic = 유튜브 채널
+
+`Topic`은 유튜브의 `유튜브 채널`과 같습니다.
+
+유튜브 유저들이 어떤 채널에 대해 구독할지를 선택하듯, SNS 내부에서는 특정 Topic에 대해 구독한다고 생각하시면 됩니다.
+
+#### Subscriber = 구독자
+
+`Subscriber`는 `구독자`와 같습니다.
+
+- 특정 `Topic`에 관해 구독하고
+- 해당 구독을 통해 구독 알림을 받아볼 수 있으며
+- 해당 알림을 받고 동영상을 보거나, 저장하거나, 친구에게 공유하는 등 원하는 행동을 할 수 있습니다.
+
+#### Publisher = 유튜버
+
+`Publisher`는 `유튜버`와 같습니다.
+- 특정 채널을 통해 영상을 게시하고
+- 구독자들에게 알림 메세지를 발행하며
+- 구독자들이 특정 행동을 하게끔 유도합니다.
+
+### SNS(Simple Notification Service)
+그렇다면 이제 본격적으로 SNS에 대해 알아보겠습니다.
+
+SNS는 말 그대로 특정 `Topic`을 구독하는 `Subscriber`들에게 `Notification`을 보내기 위한 서비스입니다.
+
+해당 기능을 잘 사용하면 `Event기반의 아키텍쳐`를 구성할 수 있는데, 이벤트 기반 아키텍쳐를 잘 사용하면 여러가지 장점을 얻을 수 있습니다.
+
+#### Event기반 아키텍쳐의 장점
+예를 들어, 쇼핑몰 서비스를 만든다고 가정해 보겠습니다.
+
+쇼핑몰에서 물건을 구매하면 아래와 같은 일들이 일어나야 하며, 해당 내용들은 계속해서 추가 될 수 있습니다.
+1. 유저에게 알림 보내기
+2. 결제 금액 이메일 보내기
+3. 유저가 입력한 배송지에 배송 예약하기
+4. 첫 구매 쿠폰 증정
+5. ...
+
+이런 상황에서 일반적으로 결제 완료 이벤트가 일어나면, 아래와 같은 코드가 동작해야합니다.
+```python
+def order_finish(order_id: str, user_id: str):
+    notify_order_to_user(order_id, user_id)
+    send_email_to_user(order_id, user_id)
+    add_delivery_request(order_id, user_id)
+    check_and_give_user_first_buying_coupon(user_id)
+    # some other logic will be added
+    ...
+```
+
+이제 결제 상황에서 슬랙 알림을 통해 바로바로 대응할 수 있게 해달라는 요구사항이 들어왔습니다.
+
+그렇다면 보통, 기존 아키텍쳐에서는 이런식으로 코드를 작성하게 됩니다.
+
+```python
+def order_finish(order_id: str, user_id: str):
+    notify_order_to_user(order_id, user_id)
+    # 새로 추가된 요구사항 - 슬랙 메세지 보내기
+    send_slack_alarm(order_id, user_id)
+    send_email_to_user(order_id, user_id)
+    add_delivery_request(order_id, user_id)
+    check_and_give_user_first_buying_coupon(user_id)
+    # some other logic will be added
+    ...
+```
+
+하지만 안타깝게도, `send_slack_alarm`이라는 함수를 작성한 사람이 실수로 잘못된 코드를 넣었다면 어떻게 될까요?
+
+~~해고의 가능성도 있지만~~, 어디까지나 코드의 관점에서는 `send_slack_alarm` 아래쪽의 코드는 모두 실패하게 됩니다.
+
+각 함수가 하나의 프로세스에서 각각 실행되어야 하므로, 굉장히 강하게 결합된 코드가 완성됩니다.
+
+하지만 만약, 이벤트 기반 아키텍쳐를 적용해 각각의 함수를 하나의 이벤트를 구독하게 한다면 어떤 장점을 가질 수 있을까요?
+
+```python
+
+@app.on_sqs_event("payment")
+def notify_to_user(order_id, user_id):
+    # 유저에게 알림 주는 로직 실행
+
+@app.on_sqs_event("payment")
+def send_slack_alarm(order_id, user_id):
+    # 슬랙을 보내는 로직 실행
+
+@app.on_sqs_event("payment")
+def send_email(order_id, user_id):
+    # 이메일 보내는 로직 실행
+
+...
+```
+
+위의 코드와 같이 각각의 로직이 분리된 형태로 실행 될 수 있고, 하나의 로직의 실패는 **다른 로직에 영향을 주지 못합니다**.
+
+함수간의 결합도가 떨어졌다고 할 수 있습니다. 이렇게 되면 실제로 새로운 로직을 굉장히 간편하게 추가할 수 있습니다. (확장에 열려있게 됩니다.)
+그냥 단순히 해당 이벤트를 구독하는 함수를 하나 더 만들어주기만 하면 되기 때문이죠.
+
+또한, 이렇게 적으면 테스트코드를 적기도 굉장히 간편해집니다. 각각의 로직에서 이벤트를 수신하게 되면 하는 행위에 대한 단위 테스트만 작성하시면 됩니다.
+
+또 다른 장점으로는, SQS와 같은 저장소와 함께 사용시 **복구에 대한 탄력성**이 생깁니다.
+
+실제로 서비스를 운영 하다 보면, 네트워크 이슈, 일시적 장애 등등 굉장히 다양한 상황에 맞닥뜨리게 됩니다.
+
+위와 같은 이유로 로직이 실패했을 경우, 기존 코드에서는 같은 로직을 다시 수행하지 않지만, 만약 SNS 메세지를 SQS와 같은 저장소를 이용해 처리할 경우
+
+로직이 실패한다면 해당 저장소 (여기서는 큐)의 맨 끝에 다시 집어 넣어줌으로써 로직이 실패해도 다시 처리될 수 있도록 만들 수 있습니다.
+
+~~아 물론 일시적인 실패가 아니라 코드 자체에 오류가 있는 경우에는 센트리 지옥을 맛보게 되실수 있습니다~~
+
+#### SNS의 Subscriber 종류
+SNS에서는 아래와 같은 다양한 Subscriber를 선택해 사용할 수 있습니다.
+- SQS(Simple Queue Service)
+- Lambda
+- HTTP
+- SMS
+- email
+- mobile application endpoints
+
+이번 글에서는 해당 기능 중 특별히 `SQS`를 Subscriber로 사용해 아키텍쳐를 구성할 것입니다.
+
+#### SQS
+SQS(Simple Queue Service)는 SNS의 구독자 종류중 하나입니다.
+
+SQS는 아래와 같은 특징을 가집니다.
+- 특정 `Topic`이 publish되면, 해당 메세지를 `Queue`에 쌓아 보관합니다.
+- `Standard`, `Fifo`로 2가지 타입이 있습니다.
+
+> SQS에 대한 더 자세한 내용은 우측의 링크를 참조하시면 됩니다. >
+[SQS Deep dive](http://aaronjeong.dev/posts/dev/2022-12-14-aws-sqs)
+
+SQS는 SNS를 함께 사용할 경우 여러가지 장점을 가집니다.
+
+1. SQS와 함께 SNS를 사용하면, 특정 `Topic`의 메세지를 큐에 저장해 보관할 수 있습니다.
+2. SNS 메세지의 발생 시점에 항상 메세지를 처리해야하는 것이 아니라, 큐에 보관 후 해당 메세지를 자유롭게 처리할 수 있습니다.
+3. 일시적으로 메세지 처리에 실패할 경우, 메세지를 큐에 `다시 넣어 처리` 할 수 있습니다.
+
+
+#### SNS를 SQS와 연동해서 사용해보기
+본격적으로 SNS를 SQS랑 함께 사용하여 구독/발행 아키텍쳐를 직접 제작해 보겠습니다.
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/sns-sqs.png'
+    alt="Photo"
+    width={400}
+    height={300}
+    priority
+    className="next-image"
+/>
+
+위의 그림과 같이, 하나의 SNS topic `order`에 대해 2개의 SQS `order-slack.fifo`와 `order-email`이 구독하고 있는 형태를 제작해보겠습니다.
+
+먼저, 아마존 SNS로 이동해, order topic을 하나 새로 만들겠습니다.
+
+> create topic > Name : order
+
+<br/>
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-12-18-sns-full.png'
+    alt="Photo"
+    width={600}
+    height={100}
+    priority
+    layout={'responsive'}
+    className="next-image"
+/>
+
+SQS로 이동해, 이번에는 SQS를 2개 만들어보겠습니다.
+
+> create queue > Standard > order-email
+
+<br/>
+
+> create queue > Standard > order-slack
+
+<br/>
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-12-18-sqs-full.png'
+    alt="Photo"
+    width={600}
+    height={150}
+    priority
+    layout={'responsive'}
+    className="next-image"
+/>
+
+<br/>
+<br/>
+<br/>
+
+이번에는, SQS가 SNS를 구독할 수 있도록 설정 하겠습니다.
+
+> queues > order-email > Subscribe to Amazon SNS topic
+
+<br/>
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-12-18-sns-subscribe.png'
+    alt="Photo"
+    width={600}
+    height={300}
+    priority
+    layout={'responsive'}
+    className="next-image"
+/>
+
+이렇게 구독 후 SNS메세지로 이동하면, 아래의 사진과 같이 2개의 SQS가 구독된 사실을 확인할 수 있습니다.
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-12-18-sns-detail.png'
+    alt="Photo"
+    width={600}
+    height={300}
+    priority
+    layout={'responsive'}
+    className="next-image"
+/>
+
+<br/>
+<br/>
+<br/>
+
+해당 SNS topic에 새로운 메세지를 발행하면, SQS에 아래의 사진과 같이 모두 1개의 메세지가 등록된 사실을 볼 수 있습니다.
+
+> SNS > publish message
+
+<br/>
+
+<Image
+    src='https://seongwoon-blog.s3.ap-northeast-2.amazonaws.com/images/2022-12-18-sqs-messages.png'
+    alt="Photo"
+    width={600}
+    height={150}
+    priority
+    layout={'responsive'}
+    className="next-image"
+/>
