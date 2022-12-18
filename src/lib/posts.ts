@@ -82,26 +82,6 @@ export const getAllPosts :()=> Promise<PostReturnType> = async () => {
   };
 };
 
-export const getPostsByDate :()=> Promise<PostByDateReturnType> = async () => {
-  const allPostsByPath: any[] = await Promise.all(
-      paths.map(async (path)=> await Promise.all(getPathSlugs(path).map(async ({slug})=> await getPostBySlug(path, slug)))))
-
-  const allPosts: PostType[] = [].concat(...allPostsByPath)
-
-  const postsByDates = Array.from({length: 365}, () => []) as PostType[][]
-
-  allPosts.forEach((p)=>{
-    const date = dayjs(p.data.date).startOf("day")
-    const today = dayjs().startOf("day")
-    const diff = today.diff(date, "day")
-    postsByDates[diff].push(p.data.date)
-  })
-
-  return {
-    posts: postsByDates,
-    total: allPosts.length,
-  };
-};
 
 export const getTags = async () => {
   const { posts } = await getAllPosts();

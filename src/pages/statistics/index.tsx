@@ -6,8 +6,7 @@ import {
 import { NextSeo } from "next-seo";
 import WordCloud from "@src/components/Charts/WordCloud";
 import PieChart from "@src/components/Charts/Pie";
-import {getAllPosts, getPathPosts, getPathSlugs, getPostsByDate} from "@src/lib/posts";
-import HeatMap from "@src/components/Charts/HeatMap";
+import {getPathPosts, getPathSlugs} from "@src/lib/posts";
 
 type HomeStaticProps = {
    texts: {
