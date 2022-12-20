@@ -1,3 +1,19 @@
+---
+title: boj 4179 python
+description: boj 4179 python
+date: '2022-12-20T20:45:30+09:00'
+tags: [Algorithm]
+---
+
+### 접근
+- BFS
+
+### 어려웠던점
+- 불을 먼저 퍼트려놓고, 사람에 대한 BFS를 다시 돌린다.
+- `if board[_dy][_dx] <= board[_y][_x] + 1` 조건에서 +1을 떠올리기가 힘들었다.
+
+
+```python
 import sys
 from collections import deque
 
@@ -59,3 +75,5 @@ def hbfs():
 
 fbfs()
 hbfs()
+```
+
