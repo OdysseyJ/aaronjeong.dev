@@ -2,77 +2,48 @@ import sys
 from collections import deque
 input = sys.stdin.readline
 
-# 5
-# RRRBB
-# GGBBB
-# BBBRR
-# BBRRR
-# RRRRR
+# 5 17
+# 2
+# 17 5
+# 4
 
-n = int(input().strip())
+MAX = 500000
+n, k = [int(i) for i in input().strip().split()]
+if n == k:
+    print(0)
+else:
+    v_c = [-1 for _ in range(MAX+1)]
+    v_s = [-1 for _ in range(MAX+1)]
 
-board = []
-_dx = [-1, 1, 0, 0]
-_dy = [0, 0, -1, 1]
+    t_c = 0
+    p_c = k
+    while p_c <= MAX:
+        v_c[p_c] = t_c
+        t_c += 1
+        p_c += t_c
 
-for _ in range(n):
-    board.append([i for i in input().strip()])
+    def bfs():
+        t_s = 0
+        temp = [n]
+        while temp:
+            queue = deque(temp)
+            temp = []
+            while queue:
+                p_s = queue.popleft()
+                for i in [p_s*2, p_s+1, p_s-1]:
+                    if not (0 <= i <= MAX):
+                        continue
+                    n_t_s = t_s + 1
+                    if v_c[i] == n_t_s:
+                        print(n_t_s)
+                        return
+                    if n_t_s >= t_c:
+                        continue
+                    if v_s[i] == n_t_s:
+                        continue
+                    v_s[i] = n_t_s
+                    temp.append(i)
+            t_s += 1
+        print(-1)
 
-
-def bfs():
-    visited = [[False for _ in range(n)] for _ in range(n)]
-    count = 0
-
-    for w in range(n):
-        for h in range(n):
-            if not visited[w][h]:
-                count += 1
-                queue = deque([(w, h)])
-                visited[w][h] = True
-                while queue:
-                    x, y = queue.popleft()
-                    for i in range(4):
-                        dx = x + _dx[i]
-                        dy = y + _dy[i]
-                        if not (0 <= dx < n and 0 <= dy < n):
-                            continue
-                        if visited[dx][dy]:
-                            continue
-                        if board[dx][dy] != board[x][y]:
-                            continue
-                        visited[dx][dy] = True
-                        queue.append((dx, dy))
-    return count
-
-
-def rg_bfs():
-    visited = [[False for _ in range(n)] for _ in range(n)]
-    count = 0
-
-    for w in range(n):
-        for h in range(n):
-            if not visited[w][h]:
-                count += 1
-                queue = deque([(w, h)])
-                visited[w][h] = True
-                while queue:
-                    x, y = queue.popleft()
-                    for i in range(4):
-                        dx = x + _dx[i]
-                        dy = y + _dy[i]
-                        if not (0 <= dx < n and 0 <= dy < n):
-                            continue
-                        if visited[dx][dy]:
-                            continue
-                        if board[dx][dy] in ["R", "G"]:
-                            if board[x][y] == "B":
-                                continue
-                        if board[dx][dy] == "B":
-                            if board[x][y] in ["R", "G"]:
-                                continue
-                        visited[dx][dy] = True
-                        queue.append((dx, dy))
-    return count
-
-
-print(bfs(), rg_bfs())
+    bfs()
