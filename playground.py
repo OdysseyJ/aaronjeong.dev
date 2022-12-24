@@ -24,26 +24,31 @@ else:
 
     def bfs():
         t_s = 0
-        temp = [n]
-        while temp:
-            queue = deque(temp)
-            temp = []
+        arr = [n]
+        while arr:
+            if t_s > t_c:  # 수빈이가 동생 보다 더 오래 걸리는 경우
+                break
+
+            queue = deque(arr)
+            arr = []
             while queue:
                 p_s = queue.popleft()
                 for i in [p_s*2, p_s+1, p_s-1]:
-                    if not (0 <= i <= MAX):
+                    if not (0 <= i <= MAX):  # 범위 체크
                         continue
                     n_t_s = t_s + 1
-                    if v_c[i] == n_t_s:
+                    if n_t_s == v_c[i]:  # 정답
                         print(n_t_s)
                         return
-                    if n_t_s >= t_c:
-                        continue
-                    if v_s[i] == n_t_s:
+                    if n_t_s == v_s[i]:  # 같은 시간초 에서 중복 큐 삽입 막기
                         continue
                     v_s[i] = n_t_s
-                    temp.append(i)
+                    arr.append(i)
             t_s += 1
         print(-1)
+        # if v_s[k] != -1:  # 수빈이가 한번 이라도 그 장소에 간적 있으면
+        #     print(t_s)
+        # else:  # Not Found
+        #     print(-1)
 
     bfs()
