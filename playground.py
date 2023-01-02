@@ -1,24 +1,43 @@
 import sys
-from collections import deque
 input = sys.stdin.readline
 
-N, K = [int(i) for i in input().split()]
-visited = [-1 for _ in range(100001)]
+_dx = [-1, 0, 1, 0]
+_dy = [0, -1, 0, 1]
 
 
-cnt = 0
-queue = deque([(N, 0)])
-visited[N] = 0
-while queue:
-    p, t = queue.popleft()
-    if p == K:
-        cnt += 1
-    for i in [p+1, p-1, p*2]:
-        if not (0 <= i <= 100000):
-            continue
-        if visited[i] != -1 and visited[i] <= visited[p]:
-            continue
-        visited[i] = t+1
-        queue.append((i, t+1))
-print(visited[K])
-print(cnt)
+N = int(input().strip())
+arr = []
+for i in range(N):
+    arr.append([int(j) for j in input().strip().split()])
+
+
+def dfs(height):
+    cnt = 0
+    visited = [[False for _ in range(N)] for _ in range(N)]
+    for x in range(N):
+        for y in range(N):
+            if visited[x][y] or arr[x][y] < height:
+                continue
+            cnt += 1
+            stack = [(x, y)]
+            visited[x][y] = True
+            while stack:
+                _x, _y = stack.pop()
+                for idx in range(4):
+                    dx = _dx[idx] + _x
+                    dy = _dy[idx] + _y
+                    if not (0<=dx<N) or not (0<=dy<N):
+                        continue
+                    if visited[dx][dy] == True:
+                        continue
+                    if arr[dx][dy] < height:
+                        continue
+                    visited[dx][dy] = True
+                    stack.append((dx, dy))
+    return cnt
+
+
+count = 0
+for h in range(1, 101):
+    count = max(dfs(h), count)
+print(count)
