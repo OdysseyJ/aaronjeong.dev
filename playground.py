@@ -1,43 +1,39 @@
 import sys
-input = sys.stdin.readline
-
-_dx = [-1, 0, 1, 0]
-_dy = [0, -1, 0, 1]
+sys.setrecursionlimit(10000)
 
 
 N = int(input().strip())
-arr = []
+paper = [[0 for _ in range(N)] for _ in range(N)]
+counts = [0 for _ in range(3)]
+
 for i in range(N):
-    arr.append([int(j) for j in input().strip().split()])
+    line = [int(i) for i in input().strip().split()]
+    for j, c in enumerate(line):
+        paper[i][j] = c
 
 
-def dfs(height):
-    cnt = 0
-    visited = [[False for _ in range(N)] for _ in range(N)]
-    for x in range(N):
-        for y in range(N):
-            if visited[x][y] or arr[x][y] < height:
-                continue
-            cnt += 1
-            stack = [(x, y)]
-            visited[x][y] = True
-            while stack:
-                _x, _y = stack.pop()
-                for idx in range(4):
-                    dx = _dx[idx] + _x
-                    dy = _dy[idx] + _y
-                    if not (0<=dx<N) or not (0<=dy<N):
-                        continue
-                    if visited[dx][dy] == True:
-                        continue
-                    if arr[dx][dy] < height:
-                        continue
-                    visited[dx][dy] = True
-                    stack.append((dx, dy))
-    return cnt
+def solve(n, x, y):
+    if n == 1:
+        num = paper[x][y]
+        counts[num] += 1
+        return num
+
+    d = n//3
+    t0 = solve(d, x, y)
+    t1 = solve(d, x+d, y)
+    t2 = solve(d, x+d+d, y)
+    t3 = solve(d, x, y+d)
+    t4 = solve(d, x+d, y+d)
+    t5 = solve(d, x+d+d, y+d)
+    t6 = solve(d, x, y+d+d)
+    t7 = solve(d, x+d, y+d+d)
+    t8 = solve(d, x+d+d, y+d+d)
+
+    if t0 is not None and t0 == t1 == t2 == t3 == t4 == t5 == t6 == t7 == t8:
+        counts[t0] -= 8
+        return t0
 
 
-count = 0
-for h in range(1, 101):
-    count = max(dfs(h), count)
-print(count)
+solve(N, 0, 0)
+for i in [-1, 0, 1]:
+    print(counts[i])
