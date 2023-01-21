@@ -1,33 +1,24 @@
 import sys
 
+N, M = map(int, sys.stdin.readline().strip().split())
+check = [False for _ in range(N+1)]
+results = dict()
 
-res = set()
 
-
-def solve(orig, brackets, removes, cur):
-    if cur == len(brackets):
-        if removes:
-            reversed_removes = reversed(sorted(removes))
-            temp = orig
-
-            for r in reversed_removes:
-                temp = temp[0: r] + temp[r+1:]
-            res.add(temp)
+def bt(nums):
+    if len(nums) == M:
+        result = ""
+        for n in sorted(nums):
+            result += f"{n} "
+        results[result] = 1
         return
 
-    solve(orig, brackets, removes, cur + 1)
-    solve(orig, brackets, removes + brackets[cur], cur + 1)
+    for i in range(1, N+1):
+        if not check[i]:
+            check[i] = True
+            bt(nums + [i])
+            check[i] = False
 
-
-x = sys.stdin.readline().strip()
-stack = []
-brackets = []
-
-for i, char in enumerate(x):
-    if char == '(':
-        stack.append(i)
-    elif char == ')':
-        brackets.append([stack.pop(), i])
-
-solve(x, brackets, [], 0)
-print(*sorted(list(res)), sep='\n')
+bt([])
+for r in results.keys():
+    print(r)
