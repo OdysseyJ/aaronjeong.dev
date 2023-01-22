@@ -18,4 +18,3 @@ def bt(nums):
             check[i] = True
             bt(nums + [i])
             check[i] = False
-t
