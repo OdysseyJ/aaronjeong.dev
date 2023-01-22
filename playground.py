@@ -18,7 +18,4 @@ def bt(nums):
             check[i] = True
             bt(nums + [i])
             check[i] = False
-
-bt([])
-for r in results.keys():
-    print(r)
+t
