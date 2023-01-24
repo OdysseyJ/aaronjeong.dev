@@ -1,20 +1,28 @@
 import sys
 
-N, M = map(int, sys.stdin.readline().strip().split())
-check = [False for _ in range(N+1)]
-results = dict()
+# 길이가 짧은 것부터
+# 길이가 같으면 사전 순으로
+# 13
+# but
+# i
+# wont
+# hesitate
+# no
+# more
+# no
+# more
+# it
+# cannot
+# wait
+# im
+# yours
 
+N = int(input())
+words = set()
+for _ in range(N):
+    word = sys.stdin.readline().strip()
+    words.add(word)
 
-def bt(nums):
-    if len(nums) == M:
-        result = ""
-        for n in sorted(nums):
-            result += f"{n} "
-        results[result] = 1
-        return
-
-    for i in range(1, N+1):
-        if not check[i]:
-            check[i] = True
-            bt(nums + [i])
-            check[i] = False
+sorted_words = sorted(words, key=lambda x: (len(x), x))
+for word in sorted_words:
+    print(word)
