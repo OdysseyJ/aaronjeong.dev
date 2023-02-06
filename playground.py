@@ -1,66 +1,49 @@
-# # 1 : 절대값으로 정렬 후 이웃 원소 더하기
-#
-# N = int(input())
-# nums = [int(i) for i in input().strip().split()]
-# s_nums = sorted(nums, key=lambda x: (abs(x), x))
-#
-# _min = abs(s_nums[0] + s_nums[1])
-# results = (s_nums[0], s_nums[1])
-# for a, b in zip(s_nums, s_nums[1:]):
-#     _sum = abs(a+b)
-#     if _sum < _min:
-#         _min = _sum
-#         results = (a, b)
-# print(*sorted(results))
-#
-#
-# # 2 : 투포인터
-#
-# N = int(input())
-# nums = [int(i) for i in input().strip().split()]
-# s_nums = sorted(nums)
-#
-# l = 0
-# r = N-1
-# _min = abs(s_nums[l] + s_nums[r])
-# results = (s_nums[l], s_nums[r])
-#
-# while abs(r-l) != 1:
-#     l_sum = abs(s_nums[l+1] + s_nums[r])
-#     r_sum = abs(s_nums[l] + s_nums[r-1])
-#     if l_sum < r_sum:
-#         l += 1
-#         if _min > l_sum:
-#             _min = l_sum
-#             results = (s_nums[l], s_nums[r])
-#     else:
-#         r -= 1
-#         if _min > r_sum:
-#             _min = r_sum
-#             results = (s_nums[l], s_nums[r])
-#
-# print(*results)
+# 4056
+import sys
+input = sys.stdin.readline
+
+N = int(input().strip())
+
+def find_square():
+    pass
 
 
-# 11728
-n, m = [int(i) for i in input().strip().split(" ")]
-a = [int(i) for i in input().strip().split(" ")]
-b = [int(i) for i in input().strip().split(" ")]
-i_a, i_b = 0, 0
+def find_vertical():
+    pass
 
-result = []
-for i in range(n+m):
-    if i_a == len(a):
-        result.append(b[i_b])
-        i_b += 1
-    elif i_b == len(b):
-        result.append(a[i_a])
-        i_a += 1
-    elif a[i_a] < b[i_b]:
-        result.append(a[i_a])
-        i_a += 1
-    else:
-        result.append(b[i_b])
-        i_b += 1
 
-print(" ".join(map(str, result)))
+def find_horizontal():
+    pass
+
+
+def find(arr, remains):
+    if not remains:
+        for i in range(1, 10):
+            for j in range(1, 10):
+                print(arr[i][j])
+    for remain in remains:
+        x, y = remain
+
+        # 가능한 리스트 뽑기
+        possible = 5
+        find_square()
+        find_vertical()
+        find_horizontal()
+
+        arr[x][y] = possible
+        visited[x][y] = True
+        next_remains = remain.remove(remain)
+        find(arr, next_remains)
+        visited[x][y] = False
+
+
+for _ in range(N):
+    boards = [[0 for _ in range(10)] for _ in range(10)]
+    visited = [[False for _ in range(10)] for _ in range(10)]
+    zeros = []
+    for i in range(9):
+        for j, c in enumerate(input().strip()):
+            num = int(c)
+            if num == 0:
+                zeros.append((i, j))
+            boards[i+1][j+1] = num

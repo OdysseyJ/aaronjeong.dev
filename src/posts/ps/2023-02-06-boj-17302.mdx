@@ -1,0 +1,51 @@
+---
+title: '[python] boj 17302'
+description: boj 17302 solved by python
+date: '2023-02-06T13:31:46+09:00'
+tags: [Python, Algorithm]
+---
+
+```python
+# 17302
+import sys
+input = sys.stdin.readline
+
+N, M = [int(i) for i in input().strip().split(" ")]
+boards = []
+
+for _ in range(N):
+    boards.append([i for i in input().strip()])
+
+_dx = [-1, 0, 1, 0]
+_dy = [0, 1, 0, -1]
+
+
+def flip(x, y, arr):
+    if arr[y][x] == "W":
+        arr[y][x] = "B"
+    elif arr[y][x] == "B":
+        arr[y][x] = "W"
+
+
+for i in range(N):
+    for j in range(M):
+        for idx in range(4):
+            dx = _dx[idx] + j
+            dy = _dy[idx] + i
+            if not ((0 <= dx < M) and (0 <= dy < N)):
+                continue
+            flip(dx, dy, boards)
+
+for i in range(N):
+    for j in range(M):
+        if boards[i][j] == "B":
+            boards[i][j] = 3
+        else:
+            boards[i][j] = 2
+
+print(1)
+for i in range(N):
+    for j in range(M):
+        print(boards[i][j], end="")
+    print()
+```
