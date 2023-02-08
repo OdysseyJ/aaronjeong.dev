@@ -1,18 +1,20 @@
 # 4056
 import sys
+sys.setrecursionlimit(10000)
 input = sys.stdin.readline
 
 N = int(input().strip())
 
-def find_square():
+
+def is_square_valid(arr, x, y, i):
     pass
 
 
-def find_vertical():
+def is_vertical_valid(arr, x, y, i):
     pass
 
 
-def find_horizontal():
+def is_horizontal_valid(arr, x, y, i):
     pass
 
 
@@ -21,25 +23,27 @@ def find(arr, remains):
         for i in range(1, 10):
             for j in range(1, 10):
                 print(arr[i][j])
+
     for remain in remains:
         x, y = remain
 
         # 가능한 리스트 뽑기
-        possible = 5
-        find_square()
-        find_vertical()
-        find_horizontal()
-
-        arr[x][y] = possible
-        visited[x][y] = True
-        next_remains = remain.remove(remain)
-        find(arr, next_remains)
-        visited[x][y] = False
+        for i in range(1, 10):
+            if not is_vertical_valid(arr, x, y, i):
+                continue
+            if not is_horizontal_valid(arr, x, y, i):
+                continue
+            if not is_square_valid(arr, x, y, i):
+                continue
+            arr[x][y] = i
+            remains.remove(remain)
+            find(arr, remains)
+            arr[x][y] = 0
+            remains.add(remain)
 
 
 for _ in range(N):
     boards = [[0 for _ in range(10)] for _ in range(10)]
-    visited = [[False for _ in range(10)] for _ in range(10)]
     zeros = []
     for i in range(9):
         for j, c in enumerate(input().strip()):
@@ -47,3 +51,4 @@ for _ in range(N):
             if num == 0:
                 zeros.append((i, j))
             boards[i+1][j+1] = num
+    find(boards, zeros)
