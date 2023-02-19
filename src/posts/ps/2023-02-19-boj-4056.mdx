@@ -1,3 +1,14 @@
+---
+title: boj 4056 스스스도쿠
+description: boj 4056 solved by ptthon
+date: '2023-02-19T12:16:01+09:00'
+tags: [PS, python]
+---
+
+#### 접근
+- 이미 잘못 되어 있는 스도쿠가 주어질 경우에 대한 처리를 모르고있다가, 질문 게시판을 다 뒤져보고 난 뒤 깨달았다.
+
+```python
 # 4056
 import copy
 import sys
@@ -90,3 +101,4 @@ for _ in range(N):
     if not found:
         print("Could not complete this grid.")
     print()
+```
