@@ -1,25 +1,31 @@
 import sys
+input = sys.stdin.readline
 
-MAX = 1000000
+n = int(input().strip())
 
-DECIMAL = 1
-NON_DECIMAL = 0
-dp = [DECIMAL] * (MAX+1)
-dp[1] = NON_DECIMAL
-for i in range(2, MAX):
-    if dp[i] == DECIMAL:
-        for j in range(i*i, MAX+1, i):
-            dp[j] = NON_DECIMAL
+# dp[i][n] = n번째 칸까지 최대(0~2), 최소(3~5)
+dp = [[0 for _ in range(6)] for _ in range(n)]
 
+arr = []
+for i in range(n):
+    nums = [int(i) for i in input().strip().split(" ")]
+    a, b, c = nums
+    if i == 0:
+        dp[i][0] = nums[0]
+        dp[i][1] = nums[1]
+        dp[i][2] = nums[2]
+        dp[i][3] = nums[0]
+        dp[i][4] = nums[1]
+        dp[i][5] = nums[2]
+    else:
+        dp[i][0] = max(dp[i-1][0] + nums[0], dp[i-1][1] + nums[0])
+        dp[i][1] = max(dp[i-1][0] + nums[1], dp[i-1][1] + nums[1], dp[i-1][2] + nums[1])
+        dp[i][2] = max(dp[i-1][1] + nums[2], dp[i-1][2] + nums[2])
 
-while True:
-    n = int(sys.stdin.readline().strip())
-    if n == 0:
-        break
-    for i in range(3, int(n/2)+1):
-        if dp[i] == DECIMAL and dp[n-i] == DECIMAL:
-            print("{} = {} + {}".format(n, i, n-i))
-            break
-        if i == int(n/2):
-            print("Goldbach's conjecture is wrong")
-            break
+        dp[i][3] = min(dp[i-1][3] + nums[0], dp[i-1][4] + nums[0])
+        dp[i][4] = min(dp[i-1][3] + nums[1], dp[i-1][4] + nums[1], dp[i-1][5] + nums[1])
+        dp[i][5] = min(dp[i-1][4] + nums[2], dp[i-1][5] + nums[2])
+
+max_r = max(dp[n-1][:3])
+min_r = min(dp[n-1][3:])
+print(max_r, min_r)
