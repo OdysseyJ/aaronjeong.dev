@@ -1,15 +1,5 @@
-import sys
-input = sys.stdin.readline
-
-
-origin = "ABABABADABABACABABAD"
-
-s = "ABABACABABA"
-# ABABACABABA
-# 00123012343
-
-# i = 5
-# j = 3
+origin = input()
+s = input()
 
 
 def fail():
@@ -27,6 +17,7 @@ def fail():
 def kmp():
     _fail = fail()
     i, j = 0, 0
+    find = False
 
     while i != len(origin):
         if origin[i] == s[j]:
@@ -40,8 +31,13 @@ def kmp():
                 j = _fail[j-1]
 
         if j == len(s):
-            print("find")
+            find = True
             j = _fail[j-1]
+    return find
 
 
-kmp()
+result = kmp()
+if result:
+    print(1)
+else:
+    print(0)
