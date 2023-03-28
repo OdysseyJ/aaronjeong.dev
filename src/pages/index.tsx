@@ -108,6 +108,16 @@ const Home = ({ posts }: any) => (
                 #Vim
               </Badge>
             </Stack>
+            <Stack align={"center"} justify={"center"} direction={"column"} mt={5}>
+              <Text fontWeight={600} color={"gray.500"} >
+                아티클
+              </Text>
+              <Stack align={"center"} justify={"center"} direction={"column"} mt={2}>
+                <Link style={{color: "blue"}} href="https://medium.com/team-turing/%EC%9D%B4%EB%B2%88-%EC%83%9D%EC%97%90-pm%EC%9D%80-%EC%B2%98%EC%9D%8C%EC%9D%B4%EB%9D%BC-%EC%88%98%ED%95%99-%EC%BD%98%ED%85%90%EC%B8%A0%EC%9A%A9-cms-%EC%A0%9C%EC%9E%91%EA%B8%B0-3dff51d835b2" target="_blank">
+                  튜링 블로그 아티클
+                </Link>
+              </Stack>
+            </Stack>
           </Box>
         </Center>
       </GridItem>
