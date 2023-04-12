@@ -2,16 +2,33 @@ origin = input()
 s = input()
 
 
-def fail():
-    f = [0 for _ in range(len(s))]
+# def fail():
+#     f = [0 for _ in range(len(s))]
+#     j = 0
+#     for i in range(1, len(s)):
+#         while j > 0 and s[i] != s[j]:
+#             j = f[j-1]
+#         if s[i] == s[j]:
+#             j += 1
+#             f[i] = j
+#     return f
+
+
+# abacaaba
+# 00101123
+def fail(s):
+    l = len(s)
+    f = [0 for _ in range(l)]
     j = 0
-    for i in range(1, len(s)):
+    for i in range(1, l):
         while j > 0 and s[i] != s[j]:
-            j = f[j-1]
+            j = f[j - 1]
         if s[i] == s[j]:
             j += 1
             f[i] = j
     return f
+
+
 
 
 def kmp():
