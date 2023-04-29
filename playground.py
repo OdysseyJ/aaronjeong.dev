@@ -1,60 +1,24 @@
-origin = input()
-s = input()
+number_dic_ko = ("", "일", "이", "삼", "사", "오", "육", "칠", "팔", "구")
+place_value1_ko = ("", "십", "백", "천")
+place_value2_ko = ("", "만", "억", "조", "경")
 
 
-# def fail():
-#     f = [0 for _ in range(len(s))]
-#     j = 0
-#     for i in range(1, len(s)):
-#         while j > 0 and s[i] != s[j]:
-#             j = f[j-1]
-#         if s[i] == s[j]:
-#             j += 1
-#             f[i] = j
-#     return f
+def split_number(number, n):
+    """number를 n자리씩 끊어서 리스트로 반환한다."""
+    res = []
+    div = 10**n
+    while number > 0:
+        number, remainder = divmod(number, div)
+        res.append(remainder)
+    return res
 
 
-# abacaaba
-# 00101123
-def fail(s):
-    l = len(s)
-    f = [0 for _ in range(l)]
-    j = 0
-    for i in range(1, l):
-        while j > 0 and s[i] != s[j]:
-            j = f[j - 1]
-        if s[i] == s[j]:
-            j += 1
-            f[i] = j
-    return f
+def convert_lt_10000(number, delimiter):
+    """10000 미만의 수를 한글로 변환한다.
+       delimiter가 ''이면 1을 무조건 '일'로 바꾼다."""
+    res = ""
+    return res
 
 
-
-
-def kmp():
-    _fail = fail()
-    i, j = 0, 0
-    find = False
-
-    while i != len(origin):
-        if origin[i] == s[j]:
-            i += 1
-            j += 1
-        else:
-            if j-1 < 0:
-                i += 1
-                j = 0
-            else:
-                j = _fail[j-1]
-
-        if j == len(s):
-            find = True
-            j = _fail[j-1]
-    return find
-
-
-result = kmp()
-if result:
-    print(1)
-else:
-    print(0)
+print(split_number(9999, 1))
+print(convert_lt_10000(9999, 'A'))

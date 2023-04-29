@@ -1,0 +1,36 @@
+---
+title: DDD(Domain Driven Development) 정리
+description: study domain driven development
+date: '2023-04-29T20:20:57+09:00'
+tags: [DDD, Domain Driven]
+---
+
+## DDD(Domain Driven Development)란?
+
+- 비즈니스 Domain은 유사한 업무의 집합이다.
+
+- 어플리케이션은 비즈니스 도메인별로 나누어 설계 및 개발하는 방식
+
+- 목표 : 모듈간의 의존성 최소화, 응집성 최대화
+
+- Ubiquitos Language(유비쿼터스 언어)
+    - 개발자, 디자이너, PM 등 참여자들이 동일한 의미로 이해하는 언어
+    - 도메인내에 정확한 커뮤니케이션을 위해 공통언어를 정의하고 사용해야 한다.
+
+## Entity, VO, Aggregate, Factory, Repository
+- Entity : 객체가 id를 가져서 unique하게 구분되어야 할 경우
+- VO(Value Object): 구분될 필요 없는 정보를 담은 객체
+- Aggregate : Entity + VO, 논리적 객체
+- Factory : 인스턴스 제작 역할
+- Repository : Data Layer를 담당
+
+## Layered Architecture
+- Presentation : UI Layer
+- Service : Domain, Data Layer간의 class 제어 또는 연결
+- Domain : Domain Object별로의 비즈니스 로직 처리 담당
+- Data Layer : DB에서 정보 가져오기
+
+## 참고
+
+- DDD 핵심만 빠르게 이해하기[https://happycloud-lee.tistory.com/94]
+- DDD infrastructure layer 설계[https://jaehoney.tistory.com/221]
