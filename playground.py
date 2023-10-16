@@ -32,15 +32,30 @@ def number_to_word_ko(number, delimiter=" "):
        delimiter를 ''로 지정하면 1을 '일'로 바꾸고 공백을 넣지 않는다."""
     if number == 0:
         return "영"
-    word_list = []
-    for place, digits in enumerate(split_number(number, 4)):
-        if word := convert_lt_10000(digits, delimiter):
-            word += place_value2_ko[place]
-            word_list.append(word)
-    res = delimiter.join(word_list[::-1])
+    res = ""
+    for idx, numbers in enumerate(split_number(number, 4)):
+        if word := convert_lt_10000(numbers, delimiter):
+            prefix = word + place_value2_ko[idx] + " "
+            res = prefix + res
     if delimiter and 10000 <= number < 20000:
         res = res[1:]
     return res
+# def number_to_word_ko(number, delimiter=" "):
+#     """0 이상의 number를 한글로 바꾼다.
+#        delimiter를 ''로 지정하면 1을 '일'로 바꾸고 공백을 넣지 않는다."""
+#     if number == 0:
+#         return "영"
+#     word_list = []
+#     for place, digits in enumerate(split_number(number, 4)):
+#         if word := convert_lt_10000(digits, delimiter):
+#             word += place_value2_ko[place]
+#             word_list.append(word)
+#     res = delimiter.join(word_list[::-1])
+#     if delimiter and 10000 <= number < 20000:
+#         res = res[1:]
+#     return res
 
 
-print(number_to_word_ko(123456789))
+while True:
+    n = int(input())
+    print(number_to_word_ko(n, ""))
